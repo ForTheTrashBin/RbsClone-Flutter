@@ -1,0 +1,985 @@
+components:
+  schemas:
+    Country:
+      additionalProperties: false
+      properties:
+        flags:
+          description: Some binary encoded flags for this data (see external documentation)
+          format: int16
+          minimum: 0
+          type: integer
+        ibanlenth:
+          description: The exact length of the IBAN required in that country
+          format: int16
+          minimum: 0
+          type: integer
+        id:
+          description: This is the unique identifier a this data
+          format: uuid
+          type: string
+        name:
+          description: A longer more descriptive description of this data
+          maxLength: 30
+          minLength: 1
+          type: string
+        risktype:
+          description: This risk profile of this country
+          format: int16
+          minimum: 0
+          type: integer
+        shortcode:
+          description: A unique short name for this data
+          maxLength: 2
+          minLength: 2
+          type: string
+      required:
+        - id
+        - shortcode
+        - name
+        - flags
+        - risktype
+      type: object
+    CountryNoPK:
+      additionalProperties: false
+      properties:
+        flags:
+          description: Some binary encoded flags for this data (see external documentation)
+          format: int16
+          minimum: 0
+          type: integer
+        ibanlenth:
+          description: The exact length of the IBAN required in that country
+          format: int16
+          minimum: 0
+          type: integer
+        name:
+          description: A longer more descriptive description of this data
+          maxLength: 30
+          minLength: 1
+          type: string
+        risktype:
+          description: This risk profile of this country
+          format: int16
+          minimum: 0
+          type: integer
+        shortcode:
+          description: A unique short name for this data
+          maxLength: 2
+          minLength: 2
+          type: string
+      required:
+        - shortcode
+        - name
+        - flags
+        - risktype
+      type: object
+    Custodian:
+      additionalProperties: false
+      properties:
+        depotno:
+          description: This dopot numer assocciated with this custodian
+          maxLength: 10
+          type: string
+        flags:
+          description: Some binary encoded flags for this data (see external documentation)
+          format: int16
+          minimum: 0
+          type: integer
+        id:
+          description: This is the unique identifier a this data
+          format: uuid
+          type: string
+        idcountry:
+          description: A reference to a country, where the custodion is in
+          format: uuid
+          type: string
+        name:
+          description: A longer more descriptive description of this data
+          maxLength: 30
+          minLength: 1
+          type: string
+        shortcode:
+          description: A unique short name for this data
+          maxLength: 5
+          minLength: 1
+          type: string
+      required:
+        - id
+        - shortcode
+        - name
+        - flags
+        - idcountry
+      type: object
+    Custodian2Exchange:
+      additionalProperties: false
+      properties:
+        flags:
+          description: Some binary encoded flags for this data (see external documentation)
+          format: int16
+          minimum: 0
+          type: integer
+        idcustodian:
+          description: This is one of the two parts of the unique identifier of this data
+          format: uuid
+          type: string
+        idexchange:
+          description: This is one of the two parts of the unique identifier of this data
+          format: uuid
+          type: string
+        value01:
+          description: A value01 for this data
+          maxLength: 80
+          minLength: 1
+          type: string
+        value02:
+          description: A value01 for this data
+          format: int16
+          minimum: 0
+          type: integer
+      required:
+        - idexchange
+        - idcustodian
+        - flags
+        - value01
+        - value02
+      type: object
+    CustodianNoPK:
+      additionalProperties: false
+      properties:
+        depotno:
+          description: This dopot numer assocciated with this custodian
+          maxLength: 10
+          type: string
+        flags:
+          description: Some binary encoded flags for this data (see external documentation)
+          format: int16
+          minimum: 0
+          type: integer
+        idcountry:
+          description: A reference to a country, where the custodion is in
+          format: uuid
+          type: string
+        name:
+          description: A longer more descriptive description of this data
+          maxLength: 30
+          minLength: 1
+          type: string
+        shortcode:
+          description: A unique short name for this data
+          maxLength: 5
+          minLength: 1
+          type: string
+      required:
+        - shortcode
+        - name
+        - flags
+        - idcountry
+      type: object
+    ErrorDetail:
+      additionalProperties: false
+      properties:
+        location:
+          description: Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id'
+          type: string
+        message:
+          description: Error message text
+          type: string
+        value:
+          description: The value at the given location
+      type: object
+    ErrorModel:
+      additionalProperties: false
+      properties:
+        detail:
+          description: A human-readable explanation specific to this occurrence of the problem.
+          examples:
+            - Property foo is required but is missing.
+          type: string
+        errors:
+          description: Optional list of individual error details
+          items:
+            $ref: "#/components/schemas/ErrorDetail"
+          type:
+            - array
+            - "null"
+        instance:
+          description: A URI reference that identifies the specific occurrence of the problem.
+          examples:
+            - https://example.com/error-log/abc123
+          format: uri
+          type: string
+        status:
+          description: HTTP status code
+          examples:
+            - 400
+          format: int64
+          type: integer
+        title:
+          description: A short, human-readable summary of the problem type. This value should not change between occurrences of the error.
+          examples:
+            - Bad Request
+          type: string
+        type:
+          default: about:blank
+          description: A URI reference to human-readable documentation for the error.
+          examples:
+            - https://example.com/errors/example
+          format: uri
+          type: string
+      type: object
+    Exchange:
+      additionalProperties: false
+      properties:
+        flags:
+          description: Some binary encoded flags for this data (see external documentation)
+          format: int16
+          minimum: 0
+          type: integer
+        id:
+          description: This is the unique identifier a this data
+          format: uuid
+          type: string
+        name:
+          description: A longer more descriptive description of this data
+          maxLength: 80
+          minLength: 1
+          type: string
+        shortcode:
+          description: A unique short name for this data
+          maxLength: 8
+          minLength: 1
+          type: string
+      required:
+        - id
+        - shortcode
+        - name
+        - flags
+      type: object
+    ExchangeNoPK:
+      additionalProperties: false
+      properties:
+        flags:
+          description: Some binary encoded flags for this data (see external documentation)
+          format: int16
+          minimum: 0
+          type: integer
+        name:
+          description: A longer more descriptive description of this data
+          maxLength: 80
+          minLength: 1
+          type: string
+        shortcode:
+          description: A unique short name for this data
+          maxLength: 8
+          minLength: 1
+          type: string
+      required:
+        - shortcode
+        - name
+        - flags
+      type: object
+    MapCustodian2Exchange:
+      additionalProperties: false
+      properties:
+        flags:
+          description: Some binary encoded flags for this data (see external documentation)
+          format: int16
+          minimum: 0
+          type: integer
+        idcustodian:
+          description: This is one of the two parts of the unique identifier of this data
+          format: uuid
+          type: string
+        value01:
+          description: A value01 for this data
+          maxLength: 80
+          minLength: 1
+          type: string
+        value02:
+          description: A value01 for this data
+          format: int16
+          minimum: 0
+          type: integer
+      required:
+        - idcustodian
+        - flags
+        - value01
+        - value02
+      type: object
+    MapExchange2Custodian:
+      additionalProperties: false
+      properties:
+        flags:
+          description: Some binary encoded flags for this data (see external documentation)
+          format: int16
+          minimum: 0
+          type: integer
+        idexchange:
+          description: This is one of the two parts of the unique identifier of this data
+          format: uuid
+          type: string
+        value01:
+          description: A value01 for this data
+          maxLength: 80
+          minLength: 1
+          type: string
+        value02:
+          description: A value01 for this data
+          format: int16
+          minimum: 0
+          type: integer
+      required:
+        - idexchange
+        - flags
+        - value01
+        - value02
+      type: object
+info:
+  contact:
+    email: info@rbsclode.de
+    name: Your magnificent RbsClone support team
+    url: https://support.rbsclone.de
+  description: This is a detailed description of RbsClone. RbsClone is the best program in the world!
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: API for the magnificent Rbs-Clone
+  version: 0.1.0
+openapi: 3.1.0
+paths:
+  /countries:
+    get:
+      description: Get a list of all countries
+      operationId: getCountries
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Country"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a list of all countries
+      tags:
+        - Country
+  /country:
+    post:
+      description: Create a new country
+      operationId: createCountry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CountryNoPK"
+        required: true
+      responses:
+        "201":
+          description: Created
+          headers:
+            id:
+              schema:
+                description: Generated id for newly created data
+                format: uuid
+                type: string
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Create a new country
+      tags:
+        - Country
+  /country/id/{id}:
+    get:
+      description: Get a single country based on the id supplied
+      operationId: getCountryById
+      parameters:
+        - description: This is the unique identifier a this data
+          in: path
+          name: id
+          required: true
+          schema:
+            description: This is the unique identifier a this data
+            format: uuid
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Country"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a single country based on the id supplied
+      tags:
+        - Country
+  /country/shortcode/{shortcode}:
+    get:
+      description: Get a single country based on the shortcode supplied
+      operationId: getCountryByShortcode
+      parameters:
+        - description: This is the unique identifier a this data
+          in: path
+          name: shortcode
+          required: true
+          schema:
+            description: This is the unique identifier a this data
+            maxLength: 2
+            minLength: 2
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Country"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a single country based on the shortcode supplied
+      tags:
+        - Country
+  /country/{id}:
+    delete:
+      description: Delete a single country based on the id supplied
+      operationId: deleteCountry
+      parameters:
+        - description: This is the unique identifier a this data
+          in: path
+          name: id
+          required: true
+          schema:
+            description: This is the unique identifier a this data
+            format: uuid
+            type: string
+      responses:
+        "204":
+          description: No Content
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete a single country based on the id supplied
+      tags:
+        - Country
+    put:
+      description: Update an existing country based on the id supplied
+      operationId: updateCountry
+      parameters:
+        - description: This is the unique identifier a this data
+          in: path
+          name: id
+          required: true
+          schema:
+            description: This is the unique identifier a this data
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CountryNoPK"
+        required: true
+      responses:
+        "200":
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Update an existing country based on the id supplied
+      tags:
+        - Country
+  /custodian:
+    post:
+      description: Create a new custodian
+      operationId: createCustodian
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustodianNoPK"
+        required: true
+      responses:
+        "201":
+          description: Created
+          headers:
+            id:
+              schema:
+                description: Generated id for newly created data
+                format: uuid
+                type: string
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Create a new custodian
+      tags:
+        - Custodian
+  /custodian/id/{id}:
+    get:
+      description: Get a single custodian based on the id supplied
+      operationId: getCustodianById
+      parameters:
+        - description: This is the unique identifier a this data
+          in: path
+          name: id
+          required: true
+          schema:
+            description: This is the unique identifier a this data
+            format: uuid
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Custodian"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a single custodian based on the id supplied
+      tags:
+        - Custodian
+  /custodian/shortcode/{shortcode}:
+    get:
+      description: Get a single custodian based on the shortcode supplied
+      operationId: getCustodianByShortcode
+      parameters:
+        - description: This is the unique identifier a this data
+          in: path
+          name: shortcode
+          required: true
+          schema:
+            description: This is the unique identifier a this data
+            maxLength: 5
+            minLength: 1
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Custodian"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a single custodian based on the shortcode supplied
+      tags:
+        - Custodian
+  /custodian/{id}:
+    delete:
+      description: Delete a single custodian based on the id supplied
+      operationId: deleteCustodian
+      parameters:
+        - description: This is the unique identifier a this data
+          in: path
+          name: id
+          required: true
+          schema:
+            description: This is the unique identifier a this data
+            format: uuid
+            type: string
+      responses:
+        "204":
+          description: No Content
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete a single custodian based on the id supplied
+      tags:
+        - Custodian
+    put:
+      description: Update an existing custodian based on the id supplied
+      operationId: updateCustodian
+      parameters:
+        - description: This is the unique identifier a this data
+          in: path
+          name: id
+          required: true
+          schema:
+            description: This is the unique identifier a this data
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustodianNoPK"
+        required: true
+      responses:
+        "200":
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Update an existing custodian based on the id supplied
+      tags:
+        - Custodian
+  /custodian2exchange/idcustodian/{idcustodian}:
+    get:
+      description: Get a list of all mappings by idcustodian supplied
+      operationId: getCustodian2ExchangeByIdCustodian
+      parameters:
+        - description: This is one of the two parts of the unique identifier of this data
+          in: path
+          name: idcustodian
+          required: true
+          schema:
+            description: This is one of the two parts of the unique identifier of this data
+            format: uuid
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Custodian2Exchange"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a list of all mappings by idcustodian supplied
+      tags:
+        - Custodian2Exchange
+  /custodian2exchange/idexchange/{idexchange}:
+    get:
+      description: Get a list of mappings by idexchange supplied
+      operationId: getCustodian2ExchangeByIdExchange
+      parameters:
+        - description: This is one of the two parts of the unique identifier of this data
+          in: path
+          name: idexchange
+          required: true
+          schema:
+            description: This is one of the two parts of the unique identifier of this data
+            format: uuid
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Custodian2Exchange"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a list of mappings by idexchange supplied
+      tags:
+        - Custodian2Exchange
+  /custodian2exchange/{idexchange}:
+    post:
+      description: Modify the mapping of multiple custodians to a single exchange
+      operationId: mapCustodians2Exchange
+      parameters:
+        - description: This is one of the two parts of the unique identifier of this data
+          in: path
+          name: idexchange
+          required: true
+          schema:
+            description: This is one of the two parts of the unique identifier of this data
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: "#/components/schemas/MapCustodian2Exchange"
+              type:
+                - array
+                - "null"
+        required: true
+      responses:
+        "201":
+          description: Created
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Modify the mapping of multiple custodians to a single exchange
+      tags:
+        - Custodian2Exchange
+  /custodians:
+    get:
+      description: Get a list of all custodians
+      operationId: getCustodians
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Custodian"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a list of all custodians
+      tags:
+        - Custodian
+  /exchange:
+    post:
+      description: Create a new exchange
+      operationId: createExchange
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExchangeNoPK"
+        required: true
+      responses:
+        "201":
+          description: Created
+          headers:
+            id:
+              schema:
+                description: Generated id for newly created data
+                format: uuid
+                type: string
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Create a new exchange
+      tags:
+        - Exchange
+  /exchange/id/{id}:
+    get:
+      description: Get a single exchange based on the id supplied
+      operationId: getExchangeById
+      parameters:
+        - description: This is the unique identifier a this data
+          in: path
+          name: id
+          required: true
+          schema:
+            description: This is the unique identifier a this data
+            format: uuid
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exchange"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a single exchange based on the id supplied
+      tags:
+        - Exchange
+  /exchange/shortcode/{shortcode}:
+    get:
+      description: Get a single exchange based on the shortcode supplied
+      operationId: getExchangeByShortcode
+      parameters:
+        - description: This is the unique identifier a this data
+          in: path
+          name: shortcode
+          required: true
+          schema:
+            description: This is the unique identifier a this data
+            maxLength: 8
+            minLength: 1
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exchange"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a single exchange based on the shortcode supplied
+      tags:
+        - Exchange
+  /exchange/{id}:
+    delete:
+      description: Delete a single exchange based on the id supplied
+      operationId: deleteExchange
+      parameters:
+        - description: This is the unique identifier a this data
+          in: path
+          name: id
+          required: true
+          schema:
+            description: This is the unique identifier a this data
+            format: uuid
+            type: string
+      responses:
+        "204":
+          description: No Content
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete a single exchange based on the id supplied
+      tags:
+        - Exchange
+    put:
+      description: Update an existing exchange based on the id supplied
+      operationId: updateExchange
+      parameters:
+        - description: This is the unique identifier a this data
+          in: path
+          name: id
+          required: true
+          schema:
+            description: This is the unique identifier a this data
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExchangeNoPK"
+        required: true
+      responses:
+        "200":
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Update an existing exchange based on the id supplied
+      tags:
+        - Exchange
+  /exchange2custodian/{idcustodian}:
+    post:
+      description: Modify the mapping of multiple exchanges to a single custodian
+      operationId: mapExchanges2Custodian
+      parameters:
+        - description: This is one of the two parts of the unique identifier of this data
+          in: path
+          name: idcustodian
+          required: true
+          schema:
+            description: This is one of the two parts of the unique identifier of this data
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: "#/components/schemas/MapExchange2Custodian"
+              type:
+                - array
+                - "null"
+        required: true
+      responses:
+        "201":
+          description: Created
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Modify the mapping of multiple exchanges to a single custodian
+      tags:
+        - Custodian2Exchange
+  /exchanges:
+    get:
+      description: Get a list of all exchanges
+      operationId: getExchanges
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Exchange"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a list of all exchanges
+      tags:
+        - Exchange
+servers:
+  - description: The address of the magnificent RbsClone server
+    url: http://www.rbsclone.de:8080
