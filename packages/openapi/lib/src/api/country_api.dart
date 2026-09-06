@@ -4,13 +4,16 @@
 
 import 'dart:async';
 
+import 'package:built_value/json_object.dart';
 import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
 import 'package:built_collection/built_collection.dart';
 import 'package:openapi/src/api_util.dart';
 import 'package:openapi/src/model/country.dart';
+import 'package:openapi/src/model/country_list_item.dart';
 import 'package:openapi/src/model/country_no_pk.dart';
+import 'package:openapi/src/model/error_model.dart';
 
 class CountryApi {
   final Dio _dio;
@@ -146,9 +149,9 @@ class CountryApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [BuiltList<Country>] as data
+  /// Returns a [Future] containing a [Response] with a [BuiltList<CountryListItem>] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<BuiltList<Country>>> getCountries({
+  Future<Response<BuiltList<CountryListItem>>> getCountries({
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -156,7 +159,7 @@ class CountryApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/countries';
+    final _path = r'/country';
     final _options = Options(
       method: r'GET',
       headers: <String, dynamic>{
@@ -177,7 +180,7 @@ class CountryApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    BuiltList<Country>? _responseData;
+    BuiltList<CountryListItem>? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -185,8 +188,9 @@ class CountryApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType: const FullType(BuiltList, [FullType(Country)]),
-            ) as BuiltList<Country>;
+              specifiedType:
+                  const FullType(BuiltList, [FullType(CountryListItem)]),
+            ) as BuiltList<CountryListItem>;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -197,7 +201,7 @@ class CountryApi {
       );
     }
 
-    return Response<BuiltList<Country>>(
+    return Response<BuiltList<CountryListItem>>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

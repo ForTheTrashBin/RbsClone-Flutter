@@ -1,18 +1,12 @@
 import 'package:test/test.dart';
 import 'package:openapi/openapi.dart';
 
-// tests for Exchange
+// tests for CountryListItem
 void main() {
-  final instance = ExchangeBuilder();
+  final instance = CountryListItemBuilder();
   // TODO add properties to the builder and call build()
 
-  group(Exchange, () {
-    // Some binary encoded flags for this data (see external documentation)
-    // int flags
-    test('to test the property `flags`', () async {
-      // TODO
-    });
-
+  group(CountryListItem, () {
     // This is the unique identifier a this data
     // String id
     test('to test the property `id`', () async {

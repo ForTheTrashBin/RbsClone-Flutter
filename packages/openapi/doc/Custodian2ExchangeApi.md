@@ -5,14 +5,14 @@
 import 'package:openapi/api.dart';
 ```
 
-All URIs are relative to *http://www.rbsclone.de:8080*
+All URIs are relative to *https://www.rbsclone.de:8443*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**getCustodian2ExchangeByIdCustodian**](Custodian2ExchangeApi.md#getcustodian2exchangebyidcustodian) | **GET** /custodian2exchange/idcustodian/{idcustodian} | Get a list of all mappings by idcustodian supplied
-[**getCustodian2ExchangeByIdExchange**](Custodian2ExchangeApi.md#getcustodian2exchangebyidexchange) | **GET** /custodian2exchange/idexchange/{idexchange} | Get a list of mappings by idexchange supplied
-[**mapCustodians2Exchange**](Custodian2ExchangeApi.md#mapcustodians2exchange) | **POST** /custodian2exchange/{idexchange} | Modify the mapping of multiple custodians to a single exchange
-[**mapExchanges2Custodian**](Custodian2ExchangeApi.md#mapexchanges2custodian) | **POST** /exchange2custodian/{idcustodian} | Modify the mapping of multiple exchanges to a single custodian
+[**getCustodian2ExchangeByIdExchange**](Custodian2ExchangeApi.md#getcustodian2exchangebyidexchange) | **GET** /custodian2exchange/idexchange/{idexchange} | Get a list of all mappings by idexchange supplied
+[**mapCustodians2Exchange**](Custodian2ExchangeApi.md#mapcustodians2exchange) | **PUT** /custodian2exchange/idexchange/{idexchange} | Update the mapping of multiple custodians to a single exchange
+[**mapExchanges2Custodian**](Custodian2ExchangeApi.md#mapexchanges2custodian) | **PUT** /custodian2exchange/idcustodian/{idcustodian} | Update the mapping of multiple exchanges to a single custodian
 
 
 # **getCustodian2ExchangeByIdCustodian**
@@ -61,9 +61,9 @@ No authorization required
 # **getCustodian2ExchangeByIdExchange**
 > BuiltList<Custodian2Exchange> getCustodian2ExchangeByIdExchange(idexchange)
 
-Get a list of mappings by idexchange supplied
+Get a list of all mappings by idexchange supplied
 
-Get a list of mappings by idexchange supplied
+Get a list of all mappings by idexchange supplied
 
 ### Example
 ```dart
@@ -104,9 +104,9 @@ No authorization required
 # **mapCustodians2Exchange**
 > mapCustodians2Exchange(idexchange, mapCustodian2Exchange)
 
-Modify the mapping of multiple custodians to a single exchange
+Update the mapping of multiple custodians to a single exchange
 
-Modify the mapping of multiple custodians to a single exchange
+Update the mapping of multiple custodians to a single exchange
 
 ### Example
 ```dart
@@ -148,9 +148,9 @@ No authorization required
 # **mapExchanges2Custodian**
 > mapExchanges2Custodian(idcustodian, mapExchange2Custodian)
 
-Modify the mapping of multiple exchanges to a single custodian
+Update the mapping of multiple exchanges to a single custodian
 
-Modify the mapping of multiple exchanges to a single custodian
+Update the mapping of multiple exchanges to a single custodian
 
 ### Example
 ```dart

@@ -1,7 +1,6 @@
 import 'package:test/test.dart';
 import 'package:openapi/openapi.dart';
 
-
 /// tests for ExchangeApi
 void main() {
   final instance = Openapi().getExchangeApi();
@@ -47,7 +46,7 @@ void main() {
     //
     // Get a list of all exchanges
     //
-    //Future<BuiltList<Exchange>> getExchanges() async
+    //Future<BuiltList<ExchangeListItem>> getExchanges() async
     test('test getExchanges', () async {
       // TODO
     });
@@ -60,6 +59,5 @@ void main() {
     test('test updateExchange', () async {
       // TODO
     });
-
   });
 }

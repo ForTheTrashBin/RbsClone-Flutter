@@ -50,8 +50,7 @@ abstract class ErrorModel implements Built<ErrorModel, ErrorModelBuilder> {
   factory ErrorModel([void updates(ErrorModelBuilder b)]) = _$ErrorModel;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(ErrorModelBuilder b) => b
-      ..type = 'about:blank';
+  static void _defaults(ErrorModelBuilder b) => b..type = 'about:blank';
 
   @BuiltValueSerializer(custom: true)
   static Serializer<ErrorModel> get serializer => _$ErrorModelSerializer();
@@ -80,7 +79,8 @@ class _$ErrorModelSerializer implements PrimitiveSerializer<ErrorModel> {
       yield r'errors';
       yield serializers.serialize(
         object.errors,
-        specifiedType: const FullType.nullable(BuiltList, [FullType(ErrorDetail)]),
+        specifiedType:
+            const FullType.nullable(BuiltList, [FullType(ErrorDetail)]),
       );
     }
     if (object.instance != null) {
@@ -119,7 +119,9 @@ class _$ErrorModelSerializer implements PrimitiveSerializer<ErrorModel> {
     ErrorModel object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -145,7 +147,8 @@ class _$ErrorModelSerializer implements PrimitiveSerializer<ErrorModel> {
         case r'errors':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(BuiltList, [FullType(ErrorDetail)]),
+            specifiedType:
+                const FullType.nullable(BuiltList, [FullType(ErrorDetail)]),
           ) as BuiltList<ErrorDetail>?;
           if (valueDes == null) continue;
           result.errors.replace(valueDes);
@@ -210,5 +213,3 @@ class _$ErrorModelSerializer implements PrimitiveSerializer<ErrorModel> {
     return result.build();
   }
 }
-
-

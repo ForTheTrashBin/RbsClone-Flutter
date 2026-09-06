@@ -4,12 +4,15 @@
 
 import 'dart:async';
 
+import 'package:built_value/json_object.dart';
 import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
 import 'package:built_collection/built_collection.dart';
 import 'package:openapi/src/api_util.dart';
+import 'package:openapi/src/model/error_model.dart';
 import 'package:openapi/src/model/exchange.dart';
+import 'package:openapi/src/model/exchange_list_item.dart';
 import 'package:openapi/src/model/exchange_no_pk.dart';
 
 class ExchangeApi {
@@ -304,9 +307,9 @@ class ExchangeApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [BuiltList<Exchange>] as data
+  /// Returns a [Future] containing a [Response] with a [BuiltList<ExchangeListItem>] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<BuiltList<Exchange>>> getExchanges({
+  Future<Response<BuiltList<ExchangeListItem>>> getExchanges({
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -314,7 +317,7 @@ class ExchangeApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/exchanges';
+    final _path = r'/exchange';
     final _options = Options(
       method: r'GET',
       headers: <String, dynamic>{
@@ -335,7 +338,7 @@ class ExchangeApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    BuiltList<Exchange>? _responseData;
+    BuiltList<ExchangeListItem>? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -343,8 +346,9 @@ class ExchangeApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType: const FullType(BuiltList, [FullType(Exchange)]),
-            ) as BuiltList<Exchange>;
+              specifiedType:
+                  const FullType(BuiltList, [FullType(ExchangeListItem)]),
+            ) as BuiltList<ExchangeListItem>;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -355,7 +359,7 @@ class ExchangeApi {
       );
     }
 
-    return Response<BuiltList<Exchange>>(
+    return Response<BuiltList<ExchangeListItem>>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

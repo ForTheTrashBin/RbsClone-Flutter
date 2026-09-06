@@ -15,13 +15,16 @@ import 'package:openapi/src/date_serializer.dart';
 import 'package:openapi/src/model/date.dart';
 
 import 'package:openapi/src/model/country.dart';
+import 'package:openapi/src/model/country_list_item.dart';
 import 'package:openapi/src/model/country_no_pk.dart';
 import 'package:openapi/src/model/custodian.dart';
 import 'package:openapi/src/model/custodian2_exchange.dart';
+import 'package:openapi/src/model/custodian_list_item.dart';
 import 'package:openapi/src/model/custodian_no_pk.dart';
 import 'package:openapi/src/model/error_detail.dart';
 import 'package:openapi/src/model/error_model.dart';
 import 'package:openapi/src/model/exchange.dart';
+import 'package:openapi/src/model/exchange_list_item.dart';
 import 'package:openapi/src/model/exchange_no_pk.dart';
 import 'package:openapi/src/model/map_custodian2_exchange.dart';
 import 'package:openapi/src/model/map_exchange2_custodian.dart';
@@ -30,13 +33,16 @@ part 'serializers.g.dart';
 
 @SerializersFor([
   Country,
+  CountryListItem,
   CountryNoPK,
   Custodian,
   Custodian2Exchange,
+  CustodianListItem,
   CustodianNoPK,
   ErrorDetail,
   ErrorModel,
   Exchange,
+  ExchangeListItem,
   ExchangeNoPK,
   MapCustodian2Exchange,
   MapExchange2Custodian,
@@ -47,34 +53,34 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<MapCustodian2Exchange>(),
       )
       ..addBuilderFactory(
-        const FullType(BuiltList, [FullType(Country)]),
-        () => ListBuilder<Country>(),
+        const FullType(BuiltList, [FullType(CountryListItem)]),
+        () => ListBuilder<CountryListItem>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(ErrorDetail)]),
         () => ListBuilder<ErrorDetail>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(CustodianListItem)]),
+        () => ListBuilder<CustodianListItem>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(MapExchange2Custodian)]),
         () => ListBuilder<MapExchange2Custodian>(),
-      )
-      ..addBuilderFactory(
-        const FullType(BuiltList, [FullType(Exchange)]),
-        () => ListBuilder<Exchange>(),
-      )
-      ..addBuilderFactory(
-        const FullType(BuiltList, [FullType(Custodian)]),
-        () => ListBuilder<Custodian>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(Custodian2Exchange)]),
         () => ListBuilder<Custodian2Exchange>(),
       )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(ExchangeListItem)]),
+        () => ListBuilder<ExchangeListItem>(),
+      )
       ..add(const OneOfSerializer())
       ..add(const AnyOfSerializer())
       ..add(const DateSerializer())
-      ..add(Iso8601DateTimeSerializer())
-    ).build();
+      ..add(Iso8601DateTimeSerializer()))
+    .build();
 
 Serializers standardSerializers =
     (serializers.toBuilder()..addPlugin(StandardJsonPlugin())).build();

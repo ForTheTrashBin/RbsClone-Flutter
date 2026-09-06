@@ -5,13 +5,13 @@
 import 'package:openapi/api.dart';
 ```
 
-All URIs are relative to *http://www.rbsclone.de:8080*
+All URIs are relative to *https://www.rbsclone.de:8443*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**createCountry**](CountryApi.md#createcountry) | **POST** /country | Create a new country
 [**deleteCountry**](CountryApi.md#deletecountry) | **DELETE** /country/{id} | Delete a single country based on the id supplied
-[**getCountries**](CountryApi.md#getcountries) | **GET** /countries | Get a list of all countries
+[**getCountries**](CountryApi.md#getcountries) | **GET** /country | Get a list of all countries
 [**getCountryById**](CountryApi.md#getcountrybyid) | **GET** /country/id/{id} | Get a single country based on the id supplied
 [**getCountryByShortcode**](CountryApi.md#getcountrybyshortcode) | **GET** /country/shortcode/{shortcode} | Get a single country based on the shortcode supplied
 [**updateCountry**](CountryApi.md#updatecountry) | **PUT** /country/{id} | Update an existing country based on the id supplied
@@ -102,7 +102,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getCountries**
-> BuiltList<Country> getCountries()
+> BuiltList<CountryListItem> getCountries()
 
 Get a list of all countries
 
@@ -127,7 +127,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**BuiltList&lt;Country&gt;**](Country.md)
+[**BuiltList&lt;CountryListItem&gt;**](CountryListItem.md)
 
 ### Authorization
 

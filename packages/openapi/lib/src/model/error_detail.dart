@@ -81,7 +81,9 @@ class _$ErrorDetailSerializer implements PrimitiveSerializer<ErrorDetail> {
     ErrorDetail object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -148,5 +150,3 @@ class _$ErrorDetailSerializer implements PrimitiveSerializer<ErrorDetail> {
     return result.build();
   }
 }
-
-

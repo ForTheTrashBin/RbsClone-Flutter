@@ -5,7 +5,7 @@
 import 'package:openapi/api.dart';
 ```
 
-All URIs are relative to *http://www.rbsclone.de:8080*
+All URIs are relative to *https://www.rbsclone.de:8443*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -13,7 +13,7 @@ Method | HTTP request | Description
 [**deleteCustodian**](CustodianApi.md#deletecustodian) | **DELETE** /custodian/{id} | Delete a single custodian based on the id supplied
 [**getCustodianById**](CustodianApi.md#getcustodianbyid) | **GET** /custodian/id/{id} | Get a single custodian based on the id supplied
 [**getCustodianByShortcode**](CustodianApi.md#getcustodianbyshortcode) | **GET** /custodian/shortcode/{shortcode} | Get a single custodian based on the shortcode supplied
-[**getCustodians**](CustodianApi.md#getcustodians) | **GET** /custodians | Get a list of all custodians
+[**getCustodians**](CustodianApi.md#getcustodians) | **GET** /custodian | Get a list of all custodians
 [**updateCustodian**](CustodianApi.md#updatecustodian) | **PUT** /custodian/{id} | Update an existing custodian based on the id supplied
 
 
@@ -188,7 +188,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getCustodians**
-> BuiltList<Custodian> getCustodians()
+> BuiltList<CustodianListItem> getCustodians()
 
 Get a list of all custodians
 
@@ -213,7 +213,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**BuiltList&lt;Custodian&gt;**](Custodian.md)
+[**BuiltList&lt;CustodianListItem&gt;**](CustodianListItem.md)
 
 ### Authorization
 

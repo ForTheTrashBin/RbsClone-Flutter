@@ -39,6 +39,28 @@ components:
         - flags
         - risktype
       type: object
+    CountryListItem:
+      additionalProperties: false
+      properties:
+        id:
+          description: This is the unique identifier a this data
+          format: uuid
+          type: string
+        name:
+          description: A longer more descriptive description of this data
+          maxLength: 30
+          minLength: 1
+          type: string
+        shortcode:
+          description: A unique short name for this data
+          maxLength: 2
+          minLength: 2
+          type: string
+      required:
+        - id
+        - shortcode
+        - name
+      type: object
     CountryNoPK:
       additionalProperties: false
       properties:
@@ -142,6 +164,28 @@ components:
         - flags
         - value01
         - value02
+      type: object
+    CustodianListItem:
+      additionalProperties: false
+      properties:
+        id:
+          description: This is the unique identifier a this data
+          format: uuid
+          type: string
+        name:
+          description: A longer more descriptive description of this data
+          maxLength: 30
+          minLength: 1
+          type: string
+        shortcode:
+          description: A unique short name for this data
+          maxLength: 5
+          minLength: 1
+          type: string
+      required:
+        - id
+        - shortcode
+        - name
       type: object
     CustodianNoPK:
       additionalProperties: false
@@ -255,6 +299,28 @@ components:
         - name
         - flags
       type: object
+    ExchangeListItem:
+      additionalProperties: false
+      properties:
+        id:
+          description: This is the unique identifier a this data
+          format: uuid
+          type: string
+        name:
+          description: A longer more descriptive description of this data
+          maxLength: 80
+          minLength: 1
+          type: string
+        shortcode:
+          description: A unique short name for this data
+          maxLength: 8
+          minLength: 1
+          type: string
+      required:
+        - id
+        - shortcode
+        - name
+      type: object
     ExchangeNoPK:
       additionalProperties: false
       properties:
@@ -336,7 +402,7 @@ components:
       type: object
 info:
   contact:
-    email: info@rbsclode.de
+    email: info@rbsclone.de
     name: Your magnificent RbsClone support team
     url: https://support.rbsclone.de
   description: This is a detailed description of RbsClone. RbsClone is the best program in the world!
@@ -347,7 +413,7 @@ info:
   version: 0.1.0
 openapi: 3.1.0
 paths:
-  /countries:
+  /country:
     get:
       description: Get a list of all countries
       operationId: getCountries
@@ -357,7 +423,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: "#/components/schemas/Country"
+                  $ref: "#/components/schemas/CountryListItem"
                 type:
                   - array
                   - "null"
@@ -371,7 +437,6 @@ paths:
       summary: Get a list of all countries
       tags:
         - Country
-  /country:
     post:
       description: Create a new country
       operationId: createCountry
@@ -382,8 +447,8 @@ paths:
               $ref: "#/components/schemas/CountryNoPK"
         required: true
       responses:
-        "201":
-          description: Created
+        "204":
+          description: No Content
           headers:
             id:
               schema:
@@ -502,8 +567,8 @@ paths:
               $ref: "#/components/schemas/CountryNoPK"
         required: true
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
         default:
           content:
             application/problem+json:
@@ -514,6 +579,29 @@ paths:
       tags:
         - Country
   /custodian:
+    get:
+      description: Get a list of all custodians
+      operationId: getCustodians
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/CustodianListItem"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a list of all custodians
+      tags:
+        - Custodian
     post:
       description: Create a new custodian
       operationId: createCustodian
@@ -524,8 +612,8 @@ paths:
               $ref: "#/components/schemas/CustodianNoPK"
         required: true
       responses:
-        "201":
-          description: Created
+        "204":
+          description: No Content
           headers:
             id:
               schema:
@@ -644,8 +732,8 @@ paths:
               $ref: "#/components/schemas/CustodianNoPK"
         required: true
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
         default:
           content:
             application/problem+json:
@@ -688,9 +776,43 @@ paths:
       summary: Get a list of all mappings by idcustodian supplied
       tags:
         - Custodian2Exchange
+    put:
+      description: Update the mapping of multiple exchanges to a single custodian
+      operationId: mapExchanges2Custodian
+      parameters:
+        - description: This is one of the two parts of the unique identifier of this data
+          in: path
+          name: idcustodian
+          required: true
+          schema:
+            description: This is one of the two parts of the unique identifier of this data
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: "#/components/schemas/MapExchange2Custodian"
+              type:
+                - array
+                - "null"
+        required: true
+      responses:
+        "204":
+          description: No Content
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Update the mapping of multiple exchanges to a single custodian
+      tags:
+        - Custodian2Exchange
   /custodian2exchange/idexchange/{idexchange}:
     get:
-      description: Get a list of mappings by idexchange supplied
+      description: Get a list of all mappings by idexchange supplied
       operationId: getCustodian2ExchangeByIdExchange
       parameters:
         - description: This is one of the two parts of the unique identifier of this data
@@ -718,12 +840,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
-      summary: Get a list of mappings by idexchange supplied
+      summary: Get a list of all mappings by idexchange supplied
       tags:
         - Custodian2Exchange
-  /custodian2exchange/{idexchange}:
-    post:
-      description: Modify the mapping of multiple custodians to a single exchange
+    put:
+      description: Update the mapping of multiple custodians to a single exchange
       operationId: mapCustodians2Exchange
       parameters:
         - description: This is one of the two parts of the unique identifier of this data
@@ -744,28 +865,28 @@ paths:
                 - "null"
         required: true
       responses:
-        "201":
-          description: Created
+        "204":
+          description: No Content
         default:
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
-      summary: Modify the mapping of multiple custodians to a single exchange
+      summary: Update the mapping of multiple custodians to a single exchange
       tags:
         - Custodian2Exchange
-  /custodians:
+  /exchange:
     get:
-      description: Get a list of all custodians
-      operationId: getCustodians
+      description: Get a list of all exchanges
+      operationId: getExchanges
       responses:
         "200":
           content:
             application/json:
               schema:
                 items:
-                  $ref: "#/components/schemas/Custodian"
+                  $ref: "#/components/schemas/ExchangeListItem"
                 type:
                   - array
                   - "null"
@@ -776,10 +897,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
-      summary: Get a list of all custodians
+      summary: Get a list of all exchanges
       tags:
-        - Custodian
-  /exchange:
+        - Exchange
     post:
       description: Create a new exchange
       operationId: createExchange
@@ -790,8 +910,8 @@ paths:
               $ref: "#/components/schemas/ExchangeNoPK"
         required: true
       responses:
-        "201":
-          description: Created
+        "204":
+          description: No Content
           headers:
             id:
               schema:
@@ -910,8 +1030,8 @@ paths:
               $ref: "#/components/schemas/ExchangeNoPK"
         required: true
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
         default:
           content:
             application/problem+json:
@@ -921,55 +1041,12 @@ paths:
       summary: Update an existing exchange based on the id supplied
       tags:
         - Exchange
-  /exchange2custodian/{idcustodian}:
-    post:
-      description: Modify the mapping of multiple exchanges to a single custodian
-      operationId: mapExchanges2Custodian
-      parameters:
-        - description: This is one of the two parts of the unique identifier of this data
-          in: path
-          name: idcustodian
-          required: true
-          schema:
-            description: This is one of the two parts of the unique identifier of this data
-            format: uuid
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              items:
-                $ref: "#/components/schemas/MapExchange2Custodian"
-              type:
-                - array
-                - "null"
-        required: true
-      responses:
-        "201":
-          description: Created
-        default:
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-          description: Error
-      summary: Modify the mapping of multiple exchanges to a single custodian
-      tags:
-        - Custodian2Exchange
-  /exchanges:
+  /health:
     get:
-      description: Get a list of all exchanges
-      operationId: getExchanges
+      description: Check the state of services and components
+      operationId: get-health
       responses:
         "200":
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: "#/components/schemas/Exchange"
-                type:
-                  - array
-                  - "null"
           description: OK
         default:
           content:
@@ -977,9 +1054,25 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
-      summary: Get a list of all exchanges
+      summary: State of services and components (Health)
       tags:
-        - Exchange
+        - Utilities
+  /ping:
+    get:
+      description: Test of the connection to this server
+      operationId: get-ping
+      responses:
+        "200":
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Connection-Test
+      tags:
+        - Utilities
 servers:
   - description: The address of the magnificent RbsClone server
-    url: http://www.rbsclone.de:8080
+    url: https://www.rbsclone.de:8443

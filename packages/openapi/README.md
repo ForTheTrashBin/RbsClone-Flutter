@@ -61,13 +61,13 @@ try {
 
 ## Documentation for API Endpoints
 
-All URIs are relative to *http://www.rbsclone.de:8080*
+All URIs are relative to *https://www.rbsclone.de:8443*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 [*CountryApi*](doc/CountryApi.md) | [**createCountry**](doc/CountryApi.md#createcountry) | **POST** /country | Create a new country
 [*CountryApi*](doc/CountryApi.md) | [**deleteCountry**](doc/CountryApi.md#deletecountry) | **DELETE** /country/{id} | Delete a single country based on the id supplied
-[*CountryApi*](doc/CountryApi.md) | [**getCountries**](doc/CountryApi.md#getcountries) | **GET** /countries | Get a list of all countries
+[*CountryApi*](doc/CountryApi.md) | [**getCountries**](doc/CountryApi.md#getcountries) | **GET** /country | Get a list of all countries
 [*CountryApi*](doc/CountryApi.md) | [**getCountryById**](doc/CountryApi.md#getcountrybyid) | **GET** /country/id/{id} | Get a single country based on the id supplied
 [*CountryApi*](doc/CountryApi.md) | [**getCountryByShortcode**](doc/CountryApi.md#getcountrybyshortcode) | **GET** /country/shortcode/{shortcode} | Get a single country based on the shortcode supplied
 [*CountryApi*](doc/CountryApi.md) | [**updateCountry**](doc/CountryApi.md#updatecountry) | **PUT** /country/{id} | Update an existing country based on the id supplied
@@ -75,30 +75,35 @@ Class | Method | HTTP request | Description
 [*CustodianApi*](doc/CustodianApi.md) | [**deleteCustodian**](doc/CustodianApi.md#deletecustodian) | **DELETE** /custodian/{id} | Delete a single custodian based on the id supplied
 [*CustodianApi*](doc/CustodianApi.md) | [**getCustodianById**](doc/CustodianApi.md#getcustodianbyid) | **GET** /custodian/id/{id} | Get a single custodian based on the id supplied
 [*CustodianApi*](doc/CustodianApi.md) | [**getCustodianByShortcode**](doc/CustodianApi.md#getcustodianbyshortcode) | **GET** /custodian/shortcode/{shortcode} | Get a single custodian based on the shortcode supplied
-[*CustodianApi*](doc/CustodianApi.md) | [**getCustodians**](doc/CustodianApi.md#getcustodians) | **GET** /custodians | Get a list of all custodians
+[*CustodianApi*](doc/CustodianApi.md) | [**getCustodians**](doc/CustodianApi.md#getcustodians) | **GET** /custodian | Get a list of all custodians
 [*CustodianApi*](doc/CustodianApi.md) | [**updateCustodian**](doc/CustodianApi.md#updatecustodian) | **PUT** /custodian/{id} | Update an existing custodian based on the id supplied
 [*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**getCustodian2ExchangeByIdCustodian**](doc/Custodian2ExchangeApi.md#getcustodian2exchangebyidcustodian) | **GET** /custodian2exchange/idcustodian/{idcustodian} | Get a list of all mappings by idcustodian supplied
-[*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**getCustodian2ExchangeByIdExchange**](doc/Custodian2ExchangeApi.md#getcustodian2exchangebyidexchange) | **GET** /custodian2exchange/idexchange/{idexchange} | Get a list of mappings by idexchange supplied
-[*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**mapCustodians2Exchange**](doc/Custodian2ExchangeApi.md#mapcustodians2exchange) | **POST** /custodian2exchange/{idexchange} | Modify the mapping of multiple custodians to a single exchange
-[*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**mapExchanges2Custodian**](doc/Custodian2ExchangeApi.md#mapexchanges2custodian) | **POST** /exchange2custodian/{idcustodian} | Modify the mapping of multiple exchanges to a single custodian
+[*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**getCustodian2ExchangeByIdExchange**](doc/Custodian2ExchangeApi.md#getcustodian2exchangebyidexchange) | **GET** /custodian2exchange/idexchange/{idexchange} | Get a list of all mappings by idexchange supplied
+[*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**mapCustodians2Exchange**](doc/Custodian2ExchangeApi.md#mapcustodians2exchange) | **PUT** /custodian2exchange/idexchange/{idexchange} | Update the mapping of multiple custodians to a single exchange
+[*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**mapExchanges2Custodian**](doc/Custodian2ExchangeApi.md#mapexchanges2custodian) | **PUT** /custodian2exchange/idcustodian/{idcustodian} | Update the mapping of multiple exchanges to a single custodian
 [*ExchangeApi*](doc/ExchangeApi.md) | [**createExchange**](doc/ExchangeApi.md#createexchange) | **POST** /exchange | Create a new exchange
 [*ExchangeApi*](doc/ExchangeApi.md) | [**deleteExchange**](doc/ExchangeApi.md#deleteexchange) | **DELETE** /exchange/{id} | Delete a single exchange based on the id supplied
 [*ExchangeApi*](doc/ExchangeApi.md) | [**getExchangeById**](doc/ExchangeApi.md#getexchangebyid) | **GET** /exchange/id/{id} | Get a single exchange based on the id supplied
 [*ExchangeApi*](doc/ExchangeApi.md) | [**getExchangeByShortcode**](doc/ExchangeApi.md#getexchangebyshortcode) | **GET** /exchange/shortcode/{shortcode} | Get a single exchange based on the shortcode supplied
-[*ExchangeApi*](doc/ExchangeApi.md) | [**getExchanges**](doc/ExchangeApi.md#getexchanges) | **GET** /exchanges | Get a list of all exchanges
+[*ExchangeApi*](doc/ExchangeApi.md) | [**getExchanges**](doc/ExchangeApi.md#getexchanges) | **GET** /exchange | Get a list of all exchanges
 [*ExchangeApi*](doc/ExchangeApi.md) | [**updateExchange**](doc/ExchangeApi.md#updateexchange) | **PUT** /exchange/{id} | Update an existing exchange based on the id supplied
+[*UtilitiesApi*](doc/UtilitiesApi.md) | [**getHealth**](doc/UtilitiesApi.md#gethealth) | **GET** /health | State of services and components (Health)
+[*UtilitiesApi*](doc/UtilitiesApi.md) | [**getPing**](doc/UtilitiesApi.md#getping) | **GET** /ping | Connection-Test
 
 
 ## Documentation For Models
 
  - [Country](doc/Country.md)
+ - [CountryListItem](doc/CountryListItem.md)
  - [CountryNoPK](doc/CountryNoPK.md)
  - [Custodian](doc/Custodian.md)
  - [Custodian2Exchange](doc/Custodian2Exchange.md)
+ - [CustodianListItem](doc/CustodianListItem.md)
  - [CustodianNoPK](doc/CustodianNoPK.md)
  - [ErrorDetail](doc/ErrorDetail.md)
  - [ErrorModel](doc/ErrorModel.md)
  - [Exchange](doc/Exchange.md)
+ - [ExchangeListItem](doc/ExchangeListItem.md)
  - [ExchangeNoPK](doc/ExchangeNoPK.md)
  - [MapCustodian2Exchange](doc/MapCustodian2Exchange.md)
  - [MapExchange2Custodian](doc/MapExchange2Custodian.md)
@@ -111,5 +116,5 @@ Endpoints do not require authorization.
 
 ## Author
 
-info@rbsclode.de
+info@rbsclone.de
 

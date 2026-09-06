@@ -1,7 +1,6 @@
 import 'package:test/test.dart';
 import 'package:openapi/openapi.dart';
 
-
 /// tests for CountryApi
 void main() {
   final instance = Openapi().getCountryApi();
@@ -29,7 +28,7 @@ void main() {
     //
     // Get a list of all countries
     //
-    //Future<BuiltList<Country>> getCountries() async
+    //Future<BuiltList<CountryListItem>> getCountries() async
     test('test getCountries', () async {
       // TODO
     });
@@ -60,6 +59,5 @@ void main() {
     test('test updateCountry', () async {
       // TODO
     });
-
   });
 }

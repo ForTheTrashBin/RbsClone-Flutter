@@ -4,12 +4,14 @@
 
 import 'dart:async';
 
+import 'package:built_value/json_object.dart';
 import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
 import 'package:built_collection/built_collection.dart';
 import 'package:openapi/src/api_util.dart';
 import 'package:openapi/src/model/custodian2_exchange.dart';
+import 'package:openapi/src/model/error_model.dart';
 import 'package:openapi/src/model/map_custodian2_exchange.dart';
 import 'package:openapi/src/model/map_exchange2_custodian.dart';
 
@@ -101,8 +103,8 @@ class Custodian2ExchangeApi {
     );
   }
 
-  /// Get a list of mappings by idexchange supplied
-  /// Get a list of mappings by idexchange supplied
+  /// Get a list of all mappings by idexchange supplied
+  /// Get a list of all mappings by idexchange supplied
   ///
   /// Parameters:
   /// * [idexchange] - This is one of the two parts of the unique identifier of this data
@@ -182,8 +184,8 @@ class Custodian2ExchangeApi {
     );
   }
 
-  /// Modify the mapping of multiple custodians to a single exchange
-  /// Modify the mapping of multiple custodians to a single exchange
+  /// Update the mapping of multiple custodians to a single exchange
+  /// Update the mapping of multiple custodians to a single exchange
   ///
   /// Parameters:
   /// * [idexchange] - This is one of the two parts of the unique identifier of this data
@@ -207,12 +209,12 @@ class Custodian2ExchangeApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/custodian2exchange/{idexchange}'.replaceAll(
+    final _path = r'/custodian2exchange/idexchange/{idexchange}'.replaceAll(
         '{' r'idexchange' '}',
         encodeQueryParameter(_serializers, idexchange, const FullType(String))
             .toString());
     final _options = Options(
-      method: r'POST',
+      method: r'PUT',
       headers: <String, dynamic>{
         ...?headers,
       },
@@ -254,8 +256,8 @@ class Custodian2ExchangeApi {
     return _response;
   }
 
-  /// Modify the mapping of multiple exchanges to a single custodian
-  /// Modify the mapping of multiple exchanges to a single custodian
+  /// Update the mapping of multiple exchanges to a single custodian
+  /// Update the mapping of multiple exchanges to a single custodian
   ///
   /// Parameters:
   /// * [idcustodian] - This is one of the two parts of the unique identifier of this data
@@ -279,12 +281,12 @@ class Custodian2ExchangeApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/exchange2custodian/{idcustodian}'.replaceAll(
+    final _path = r'/custodian2exchange/idcustodian/{idcustodian}'.replaceAll(
         '{' r'idcustodian' '}',
         encodeQueryParameter(_serializers, idcustodian, const FullType(String))
             .toString());
     final _options = Options(
-      method: r'POST',
+      method: r'PUT',
       headers: <String, dynamic>{
         ...?headers,
       },

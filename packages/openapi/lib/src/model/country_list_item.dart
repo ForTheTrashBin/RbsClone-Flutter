@@ -6,21 +6,17 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'exchange.g.dart';
+part 'country_list_item.g.dart';
 
-/// Exchange
+/// CountryListItem
 ///
 /// Properties:
-/// * [flags] - Some binary encoded flags for this data (see external documentation)
 /// * [id] - This is the unique identifier a this data
 /// * [name] - A longer more descriptive description of this data
 /// * [shortcode] - A unique short name for this data
 @BuiltValue()
-abstract class Exchange implements Built<Exchange, ExchangeBuilder> {
-  /// Some binary encoded flags for this data (see external documentation)
-  @BuiltValueField(wireName: r'flags')
-  int get flags;
-
+abstract class CountryListItem
+    implements Built<CountryListItem, CountryListItemBuilder> {
   /// This is the unique identifier a this data
   @BuiltValueField(wireName: r'id')
   String get id;
@@ -33,34 +29,32 @@ abstract class Exchange implements Built<Exchange, ExchangeBuilder> {
   @BuiltValueField(wireName: r'shortcode')
   String get shortcode;
 
-  Exchange._();
+  CountryListItem._();
 
-  factory Exchange([void updates(ExchangeBuilder b)]) = _$Exchange;
+  factory CountryListItem([void updates(CountryListItemBuilder b)]) =
+      _$CountryListItem;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(ExchangeBuilder b) => b;
+  static void _defaults(CountryListItemBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<Exchange> get serializer => _$ExchangeSerializer();
+  static Serializer<CountryListItem> get serializer =>
+      _$CountryListItemSerializer();
 }
 
-class _$ExchangeSerializer implements PrimitiveSerializer<Exchange> {
+class _$CountryListItemSerializer
+    implements PrimitiveSerializer<CountryListItem> {
   @override
-  final Iterable<Type> types = const [Exchange, _$Exchange];
+  final Iterable<Type> types = const [CountryListItem, _$CountryListItem];
 
   @override
-  final String wireName = r'Exchange';
+  final String wireName = r'CountryListItem';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    Exchange object, {
+    CountryListItem object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'flags';
-    yield serializers.serialize(
-      object.flags,
-      specifiedType: const FullType(int),
-    );
     yield r'id';
     yield serializers.serialize(
       object.id,
@@ -81,7 +75,7 @@ class _$ExchangeSerializer implements PrimitiveSerializer<Exchange> {
   @override
   Object serialize(
     Serializers serializers,
-    Exchange object, {
+    CountryListItem object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -94,20 +88,13 @@ class _$ExchangeSerializer implements PrimitiveSerializer<Exchange> {
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required ExchangeBuilder result,
+    required CountryListItemBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'flags':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(int),
-          ) as int;
-          result.flags = valueDes;
-          break;
         case r'id':
           final valueDes = serializers.deserialize(
             value,
@@ -138,12 +125,12 @@ class _$ExchangeSerializer implements PrimitiveSerializer<Exchange> {
   }
 
   @override
-  Exchange deserialize(
+  CountryListItem deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = ExchangeBuilder();
+    final result = CountryListItemBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

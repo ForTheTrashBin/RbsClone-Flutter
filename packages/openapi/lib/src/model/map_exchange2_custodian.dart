@@ -16,7 +16,8 @@ part 'map_exchange2_custodian.g.dart';
 /// * [value01] - A value01 for this data
 /// * [value02] - A value01 for this data
 @BuiltValue()
-abstract class MapExchange2Custodian implements Built<MapExchange2Custodian, MapExchange2CustodianBuilder> {
+abstract class MapExchange2Custodian
+    implements Built<MapExchange2Custodian, MapExchange2CustodianBuilder> {
   /// Some binary encoded flags for this data (see external documentation)
   @BuiltValueField(wireName: r'flags')
   int get flags;
@@ -35,18 +36,24 @@ abstract class MapExchange2Custodian implements Built<MapExchange2Custodian, Map
 
   MapExchange2Custodian._();
 
-  factory MapExchange2Custodian([void updates(MapExchange2CustodianBuilder b)]) = _$MapExchange2Custodian;
+  factory MapExchange2Custodian(
+      [void updates(MapExchange2CustodianBuilder b)]) = _$MapExchange2Custodian;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(MapExchange2CustodianBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<MapExchange2Custodian> get serializer => _$MapExchange2CustodianSerializer();
+  static Serializer<MapExchange2Custodian> get serializer =>
+      _$MapExchange2CustodianSerializer();
 }
 
-class _$MapExchange2CustodianSerializer implements PrimitiveSerializer<MapExchange2Custodian> {
+class _$MapExchange2CustodianSerializer
+    implements PrimitiveSerializer<MapExchange2Custodian> {
   @override
-  final Iterable<Type> types = const [MapExchange2Custodian, _$MapExchange2Custodian];
+  final Iterable<Type> types = const [
+    MapExchange2Custodian,
+    _$MapExchange2Custodian
+  ];
 
   @override
   final String wireName = r'MapExchange2Custodian';
@@ -84,7 +91,9 @@ class _$MapExchange2CustodianSerializer implements PrimitiveSerializer<MapExchan
     MapExchange2Custodian object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -155,5 +164,3 @@ class _$MapExchange2CustodianSerializer implements PrimitiveSerializer<MapExchan
     return result.build();
   }
 }
-
-

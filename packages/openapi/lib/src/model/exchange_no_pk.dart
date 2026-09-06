@@ -15,7 +15,8 @@ part 'exchange_no_pk.g.dart';
 /// * [name] - A longer more descriptive description of this data
 /// * [shortcode] - A unique short name for this data
 @BuiltValue()
-abstract class ExchangeNoPK implements Built<ExchangeNoPK, ExchangeNoPKBuilder> {
+abstract class ExchangeNoPK
+    implements Built<ExchangeNoPK, ExchangeNoPKBuilder> {
   /// Some binary encoded flags for this data (see external documentation)
   @BuiltValueField(wireName: r'flags')
   int get flags;
@@ -74,7 +75,9 @@ class _$ExchangeNoPKSerializer implements PrimitiveSerializer<ExchangeNoPK> {
     ExchangeNoPK object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -138,5 +141,3 @@ class _$ExchangeNoPKSerializer implements PrimitiveSerializer<ExchangeNoPK> {
     return result.build();
   }
 }
-
-

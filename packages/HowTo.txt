@@ -1,0 +1,12 @@
+1. Change to the 'openapi' directory
+
+2. Delete the entire contents of the 'openapi' directory
+
+3. Copy the entire new interface definition to this directory
+
+4. Format the code using the command 'dart format .'
+
+5. Resolve the dependencies using the 'dart put get' command
+
+6. To create the package, entter the following command 'dart run build_runner build --delete-conflicting-outputs'
+

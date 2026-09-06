@@ -17,7 +17,8 @@ part 'custodian_no_pk.g.dart';
 /// * [name] - A longer more descriptive description of this data
 /// * [shortcode] - A unique short name for this data
 @BuiltValue()
-abstract class CustodianNoPK implements Built<CustodianNoPK, CustodianNoPKBuilder> {
+abstract class CustodianNoPK
+    implements Built<CustodianNoPK, CustodianNoPKBuilder> {
   /// This dopot numer assocciated with this custodian
   @BuiltValueField(wireName: r'depotno')
   String? get depotno;
@@ -40,13 +41,15 @@ abstract class CustodianNoPK implements Built<CustodianNoPK, CustodianNoPKBuilde
 
   CustodianNoPK._();
 
-  factory CustodianNoPK([void updates(CustodianNoPKBuilder b)]) = _$CustodianNoPK;
+  factory CustodianNoPK([void updates(CustodianNoPKBuilder b)]) =
+      _$CustodianNoPK;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(CustodianNoPKBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<CustodianNoPK> get serializer => _$CustodianNoPKSerializer();
+  static Serializer<CustodianNoPK> get serializer =>
+      _$CustodianNoPKSerializer();
 }
 
 class _$CustodianNoPKSerializer implements PrimitiveSerializer<CustodianNoPK> {
@@ -96,7 +99,9 @@ class _$CustodianNoPKSerializer implements PrimitiveSerializer<CustodianNoPK> {
     CustodianNoPK object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -175,5 +180,3 @@ class _$CustodianNoPKSerializer implements PrimitiveSerializer<CustodianNoPK> {
     return result.build();
   }
 }
-
-

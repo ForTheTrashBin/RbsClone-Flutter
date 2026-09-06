@@ -1,7 +1,6 @@
 import 'package:test/test.dart';
 import 'package:openapi/openapi.dart';
 
-
 /// tests for CustodianApi
 void main() {
   final instance = Openapi().getCustodianApi();
@@ -47,7 +46,7 @@ void main() {
     //
     // Get a list of all custodians
     //
-    //Future<BuiltList<Custodian>> getCustodians() async
+    //Future<BuiltList<CustodianListItem>> getCustodians() async
     test('test getCustodians', () async {
       // TODO
     });
@@ -60,6 +59,5 @@ void main() {
     test('test updateCustodian', () async {
       // TODO
     });
-
   });
 }

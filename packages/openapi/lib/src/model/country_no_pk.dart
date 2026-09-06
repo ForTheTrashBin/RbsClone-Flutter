@@ -96,7 +96,9 @@ class _$CountryNoPKSerializer implements PrimitiveSerializer<CountryNoPK> {
     CountryNoPK object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -175,5 +177,3 @@ class _$CountryNoPKSerializer implements PrimitiveSerializer<CountryNoPK> {
     return result.build();
   }
 }
-
-

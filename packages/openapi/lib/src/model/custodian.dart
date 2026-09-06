@@ -106,7 +106,9 @@ class _$CustodianSerializer implements PrimitiveSerializer<Custodian> {
     Custodian object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -192,5 +194,3 @@ class _$CustodianSerializer implements PrimitiveSerializer<Custodian> {
     return result.build();
   }
 }
-
-

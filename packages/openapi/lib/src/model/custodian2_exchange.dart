@@ -17,7 +17,8 @@ part 'custodian2_exchange.g.dart';
 /// * [value01] - A value01 for this data
 /// * [value02] - A value01 for this data
 @BuiltValue()
-abstract class Custodian2Exchange implements Built<Custodian2Exchange, Custodian2ExchangeBuilder> {
+abstract class Custodian2Exchange
+    implements Built<Custodian2Exchange, Custodian2ExchangeBuilder> {
   /// Some binary encoded flags for this data (see external documentation)
   @BuiltValueField(wireName: r'flags')
   int get flags;
@@ -40,16 +41,19 @@ abstract class Custodian2Exchange implements Built<Custodian2Exchange, Custodian
 
   Custodian2Exchange._();
 
-  factory Custodian2Exchange([void updates(Custodian2ExchangeBuilder b)]) = _$Custodian2Exchange;
+  factory Custodian2Exchange([void updates(Custodian2ExchangeBuilder b)]) =
+      _$Custodian2Exchange;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(Custodian2ExchangeBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<Custodian2Exchange> get serializer => _$Custodian2ExchangeSerializer();
+  static Serializer<Custodian2Exchange> get serializer =>
+      _$Custodian2ExchangeSerializer();
 }
 
-class _$Custodian2ExchangeSerializer implements PrimitiveSerializer<Custodian2Exchange> {
+class _$Custodian2ExchangeSerializer
+    implements PrimitiveSerializer<Custodian2Exchange> {
   @override
   final Iterable<Type> types = const [Custodian2Exchange, _$Custodian2Exchange];
 
@@ -94,7 +98,9 @@ class _$Custodian2ExchangeSerializer implements PrimitiveSerializer<Custodian2Ex
     Custodian2Exchange object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -172,5 +178,3 @@ class _$Custodian2ExchangeSerializer implements PrimitiveSerializer<Custodian2Ex
     return result.build();
   }
 }
-
-
