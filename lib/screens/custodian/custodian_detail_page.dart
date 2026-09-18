@@ -200,19 +200,16 @@ class _CustodianMasterListState extends State<CustodianMasterList> {
   Future<List<CustodianListItem>> fetchCustodians() async {
     final api = Openapi();
 
-    final results = await Future.wait([
-      api.getCustodianApi().getCustodians().timeout(
-        const Duration(seconds: 10),
-      ),
-      Future.delayed(Duration(milliseconds: 600)),
-    ]);
-
-    final response = results[0];
-    /*
-    final responses = await api.getCustodianApi().getCustodians().timeout(
+    final responseFuture = api.getCustodianApi().getCustodians().timeout(
       const Duration(seconds: 10),
     );
-*/
+
+    final minWaitFuture = Future.delayed(Duration(milliseconds: 600));
+
+    final waitGroup = await Future.wait([responseFuture, minWaitFuture]);
+
+    final response = waitGroup[0];
+
     return response.data?.toList() ?? const <CustodianListItem>[];
   }
 

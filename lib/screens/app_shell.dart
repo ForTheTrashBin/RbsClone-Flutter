@@ -23,14 +23,16 @@ class AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<AppShell> {
-  late final CountryRepository _countryRepository = CountryRepository();
-  late final CustodianRepository _custodianRepository = CustodianRepository();
-  late final ExchangeRepository _exchangeRepository = ExchangeRepository();
+  // late final CountryRepository _countryRepository = CountryRepository();
+  // late final CustodianRepository _custodianRepository = CustodianRepository();
+  // late final ExchangeRepository _exchangeRepository = ExchangeRepository();
 
   /// Welcher Menü-Item ist aktuell ausgewählt?
-  String _selectedMenuItemTitle = 'Länder';
-  int _mobileViewIndex = 0; // 0=Menü, 1=Liste, 2=Detail
 
+  String _selectedMenuItemTitle = 'WELCOME';
+
+  int _mobileViewIndex = 0; // 0=Menü, 1=Liste, 2=Detail
+  /*
   String? _selectedCountryId;
   String? _selectedCustodianId;
   String? _selectedExchangeId;
@@ -50,11 +52,12 @@ class _AppShellState extends State<AppShell> {
   @override
   void initState() {
     super.initState();
-    _loadCountries();
-    _loadCustodians();
-    _loadExchanges();
+    // _loadCountries();
+    // _loadCustodians();
+    // _loadExchanges();
   }
-
+  */
+  /*
   Future<void> _loadCountries() async {
     setState(() {
       _loadingCountries = true;
@@ -117,7 +120,7 @@ class _AppShellState extends State<AppShell> {
       });
     }
   }
-
+*/
   ///---------------------------------------------------------------------------
   /// Creates the hierarchical navigation menu structure with the
   /// main menu items and their children.
@@ -250,7 +253,16 @@ class _AppShellState extends State<AppShell> {
   /// Gibt den aktuellen Hauptinhalt basierend auf der Auswahl zurück
   Widget _buildMainContent() {
     switch (_selectedMenuItemTitle) {
+      case 'WELCOME':
+        return const PlaceholderPage(title: 'Willkommen!');
+
       case 'Länder':
+        return CountryMasterList(
+          onItemSelected: (_) {
+            print("Item selected");
+          },
+        );
+      /*
         return CountryMasterPanel(
           countries: _countries,
           loading: _loadingCountries,
@@ -275,7 +287,7 @@ class _AppShellState extends State<AppShell> {
           },
           onDeleteCountry: _deleteCountry,
         );
-
+*/
       case 'Lagerstellen':
         return CustodianMasterList(
           onItemSelected: (_) {
@@ -313,6 +325,12 @@ class _AppShellState extends State<AppShell> {
         );
         */
       case 'Börsen':
+        return ExchangeMasterList(
+          onItemSelected: (_) {
+            print("Item selected");
+          },
+        );
+      /*
         return ExchangeMasterPanel(
           exchanges: _exchanges,
           loading: _loadingExchanges,
@@ -337,12 +355,13 @@ class _AppShellState extends State<AppShell> {
           },
           onDeleteExchange: _deleteExchange,
         );
-
+*/
       default:
         return const PlaceholderPage(title: 'In Arbeit');
     }
   }
 
+  /*
   CountryListItem? get _selectedCountry {
     if (_selectedMenuItemTitle != 'Länder' || _countries.isEmpty) return null;
     final selectedId = _selectedCountryId ?? _countries.first.id;
@@ -371,7 +390,8 @@ class _AppShellState extends State<AppShell> {
       orElse: () => _exchanges.first,
     );
   }
-
+*/
+  /*
   Future<void> _deleteCountry(String id) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -468,7 +488,7 @@ class _AppShellState extends State<AppShell> {
           .showSnackBar(SnackBar(content: Text('Fehler: $e')));
     }
   }
-
+*/
   @override
   Widget build(BuildContext context) {
     final screenSize = ResponsiveBreakpoints.getScreenSize(context);

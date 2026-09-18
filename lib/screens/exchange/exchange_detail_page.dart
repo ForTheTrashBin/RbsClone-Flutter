@@ -152,6 +152,249 @@ class ExchangeDetailPanel extends StatelessWidget {
   }
 }
 
+class ExchangeMasterList extends StatefulWidget {
+  final ValueChanged<ExchangeListItem> onItemSelected;
+
+  const ExchangeMasterList({super.key, required this.onItemSelected});
+
+  @override
+  State<ExchangeMasterList> createState() => _ExchangeMasterListState();
+}
+
+class _ExchangeMasterListState extends State<ExchangeMasterList> {
+  late Future<List<ExchangeListItem>> _dbFuture;
+
+  List<ExchangeListItem> _allEntries = [];
+  List<ExchangeListItem> _filteredEntries = [];
+
+  final TextEditingController _searchController = TextEditingController();
+
+  int _selectedIndex = -1;
+
+  Future<List<ExchangeListItem>> fetchExchanges() async {
+    final api = Openapi();
+
+    final responseFuture = api.getExchangeApi().getExchanges().timeout(
+      const Duration(seconds: 10),
+    );
+
+    final minWaitFuture = Future.delayed(Duration(milliseconds: 600));
+
+    final waitGroup = await Future.wait([responseFuture, minWaitFuture]);
+
+    final response = waitGroup[0];
+
+    return response.data?.toList() ?? const <ExchangeListItem>[];
+  }
+
+  void _onRefresh() {
+    setState(() {
+      _allEntries = [];
+      _filteredEntries = [];
+
+      _dbFuture = fetchExchanges();
+    });
+  }
+
+  void onNew() {}
+
+  void _filterListe(String searchText) {
+    setState(() {
+      if (searchText.isEmpty) {
+        _filteredEntries = _allEntries;
+      } else {
+        _filteredEntries = _allEntries.where((entry) {
+          String searchTextLower = searchText.toLowerCase();
+
+          return entry.shortcode.toLowerCase().contains(searchTextLower) ||
+              entry.name.toLowerCase().contains(searchTextLower);
+        }).toList();
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _dbFuture = fetchExchanges();
+  }
+
+  // TODO: Premium-UX, Paket: shimmer, um das Flackern beim Update zu vermeiden
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: onNew,
+        label: const Text("Neu"),
+        icon: const Icon(Icons.add),
+      ),
+      body: FutureBuilder<List<ExchangeListItem>>(
+        future: _dbFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Fehler: ${snapshot.error}'));
+          } else if (snapshot.hasData) {
+            if (_allEntries.isEmpty) {
+              _allEntries = snapshot.data!;
+              _filteredEntries = _allEntries;
+            }
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0.0),
+              child: Column(
+                children: [
+                  //------------------------------------------------------------
+                  // Title & refresh
+                  //------------------------------------------------------------
+                  Container(
+                    height: 56.0,
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Börsen",
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.refresh),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimaryContainer,
+                          onPressed: _onRefresh,
+                        ),
+                      ],
+                    ),
+                  ),
+                  //------------------------------------------------------------
+                  // Count & search
+                  //------------------------------------------------------------
+                  Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    padding: const EdgeInsets.only(
+                      left: 16.0,
+                      right: 12.0,
+                      bottom: 12.0,
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primaryContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            "${_filteredEntries.length}",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              // color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: _filterListe,
+                            decoration: InputDecoration(
+                              hintText: "Suchen...",
+                              prefixIcon: const Icon(Icons.search),
+                              suffixIcon: _searchController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: Icon(Icons.clear, size: 20),
+                                      onPressed: () {
+                                        _searchController.clear();
+                                        _filterListe("");
+                                      },
+                                    )
+                                  : null,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 8,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  //------------------------------------------------------------
+                  // List of item or message, if list is empty
+                  //------------------------------------------------------------
+                  Expanded(
+                    child: ClipRect(
+                      child: _filteredEntries.isEmpty
+                          ? const Center(child: Text("Keine Börsen vorhanden."))
+                          : ListView.separated(
+                              itemCount: _filteredEntries.length,
+                              separatorBuilder: (_, __) =>
+                                  const Divider(height: 1),
+                              itemBuilder: (context, index) {
+                                final exchangeListItem =
+                                    _filteredEntries[index];
+                                final isSelected = _selectedIndex == index;
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    child: Text(
+                                      exchangeListItem.shortcode
+                                          .substring(0, 1)
+                                          .toUpperCase(),
+                                    ),
+                                  ),
+                                  title: Text(exchangeListItem.shortcode),
+                                  subtitle: Text(exchangeListItem.name),
+                                  selected: isSelected,
+                                  selectedTileColor: Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer
+                                      .withValues(alpha: 0.55),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedIndex = index;
+                                    });
+
+                                    widget.onItemSelected(exchangeListItem);
+                                  },
+                                );
+                              },
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          return const SizedBox.shrink();
+        },
+      ),
+    );
+  }
+}
+
 class ExchangeMasterPanel extends StatelessWidget {
   const ExchangeMasterPanel({
     required this.exchanges,
