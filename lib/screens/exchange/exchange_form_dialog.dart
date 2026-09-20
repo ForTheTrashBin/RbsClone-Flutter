@@ -94,7 +94,7 @@ class _ExchangeFormDialogState extends State<ExchangeFormDialog> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _shortcodeController,
-                  decoration: const InputDecoration(labelText: 'Shortcode'),
+                  decoration: const InputDecoration(labelText: 'Kürzel'),
                   validator: (value) => (value == null || value.trim().isEmpty)
                       ? 'Pflichtfeld'
                       : null,

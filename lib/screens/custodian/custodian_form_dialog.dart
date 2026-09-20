@@ -136,7 +136,7 @@ class _CustodianFormDialogState extends State<CustodianFormDialog> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _shortcodeController,
-                  decoration: const InputDecoration(labelText: 'Shortcode'),
+                  decoration: const InputDecoration(labelText: 'Kürzel'),
                   validator: (value) => (value == null || value.trim().isEmpty)
                       ? 'Pflichtfeld'
                       : null,

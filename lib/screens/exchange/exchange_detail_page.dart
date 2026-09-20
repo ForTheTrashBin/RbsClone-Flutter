@@ -1,180 +1,125 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:openapi/openapi.dart';
 
 import 'exchange_form_dialog.dart';
 
-class ExchangeDetailPage extends StatelessWidget {
-  const ExchangeDetailPage({
-    required this.exchange,
-    required this.onRefresh,
-    required this.onDelete,
-    super.key,
-  });
-
-  final Exchange exchange;
-  final Future<void> Function() onRefresh;
-  final Future<void> Function(String id) onDelete;
+class ExchangeDataModule extends StatefulWidget {
+  const ExchangeDataModule({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(exchange.name),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              final result = await showDialog<bool>(
-                context: context,
-                builder: (_) => ExchangeFormDialog(exchange: exchange),
-              );
-              if (result == true) {
-                await onRefresh();
-                if (context.mounted) Navigator.of(context).pop();
-              }
-            },
-            icon: const Icon(Icons.edit),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: ExchangeDetailPanel(
-          exchange: exchange,
-          onRefresh: onRefresh,
-          onEdit: () async {
-            final result = await showDialog<bool>(
-              context: context,
-              builder: (_) => ExchangeFormDialog(exchange: exchange),
-            );
-            if (result == true) {
-              await onRefresh();
-              if (context.mounted) Navigator.of(context).pop();
-            }
-          },
-          onDelete: () => onDelete(exchange.id),
-        ),
-      ),
-    );
-  }
+  State<ExchangeDataModule> createState() => _DataModuleState();
 }
 
-class ExchangeDetailPanel extends StatelessWidget {
-  const ExchangeDetailPanel({
-    required this.exchange,
-    required this.onRefresh,
-    required this.onEdit,
-    required this.onDelete,
-    super.key,
-  });
+class _DataModuleState extends State<ExchangeDataModule> {
+  Exchange? _selectedItem;
 
-  final Exchange exchange;
-  final Future<void> Function() onRefresh;
-  final Future<void> Function() onEdit;
-  final Future<void> Function() onDelete;
+  void onItemSelected(ExchangeListItem? item) async {
+    if (item != null) {
+      if ((_selectedItem == null) || (_selectedItem!.id != item.id)) {
+        print("An item was selected: ${item.id}");
+
+        final api = Openapi();
+
+        Exchange? newItem;
+
+        try {
+          final response = await api
+              .getExchangeApi()
+              .getExchangeById(id: item.id)
+              .timeout(const Duration(seconds: 10));
+
+          newItem = response.data;
+        } finally {
+          setState(() {
+            _selectedItem = newItem;
+          });
+        }
+      }
+    } else {
+      if (_selectedItem != null) {
+        print("An item was deselected");
+
+        setState(() {
+          _selectedItem = null;
+        });
+      }
+    }
+  }
+
+  //----------------------------------------------------------------------------
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final rows = [
-      _DetailRow(label: 'ID', value: exchange.id),
-      _DetailRow(label: 'Shortcode', value: exchange.shortcode),
-      _DetailRow(label: 'Name', value: exchange.name),
-      _DetailRow(label: 'Flags', value: exchange.flags.toString()),
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const Icon(Icons.currency_exchange, size: 28),
-            const SizedBox(width: 12),
-            Text(
-              exchange.name,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: ListView.separated(
-              itemCount: rows.length,
-              separatorBuilder: (_, _) => const Divider(height: 1),
-              itemBuilder: (context, index) => rows[index],
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            FilledButton.icon(
-              onPressed: onEdit,
-              icon: const Icon(Icons.edit),
-              label: const Text('Bearbeiten'),
-            ),
-            const SizedBox(width: 12),
-            OutlinedButton.icon(
-              onPressed: () async {
-                final confirmed = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Börse löschen?'),
-                    content: const Text('Die Daten werden dauerhaft entfernt.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Abbrechen'),
-                      ),
-                      FilledButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Löschen'),
-                      ),
-                    ],
+    return LayoutBuilder(
+      builder: ((context, constraints) {
+        if (constraints.maxWidth >= 768) {
+          return Scaffold(
+            body: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: _MasterList(
+                    // selectItem: provider.selectedItem,
+                    onItemSelected: onItemSelected,
                   ),
-                );
-                if (confirmed == true) {
-                  await onDelete();
-                  await onRefresh();
-                }
-              },
-              icon: const Icon(Icons.delete_outline),
-              label: const Text('Löschen'),
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(
+                  flex: 3,
+                  child: _selectedItem == null
+                      ? const Center(child: Text("Wähle einen Eintrag aus!"))
+                      : ExchangeEditorPanel(
+                          exchange: _selectedItem!,
+                          onSaved: () async {},
+                          onDelete: () async {},
+                        ),
+                  /*
+                      DetailView(
+                      item: selectedItem,
+                      isDirty: isDirty
+                      onchanged: (dirty) => ????
+                      )
+                      */
+                ),
+              ],
             ),
-          ],
-        ),
-      ],
+          );
+        } else {
+          return Center(child: Text("SmallScreen"));
+        }
+      }),
     );
   }
 }
 
-class ExchangeMasterList extends StatefulWidget {
-  final ValueChanged<ExchangeListItem> onItemSelected;
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-  const ExchangeMasterList({super.key, required this.onItemSelected});
+class _MasterList extends StatefulWidget {
+  final ValueChanged<ExchangeListItem?> onItemSelected;
+
+  const _MasterList({super.key, required this.onItemSelected});
 
   @override
-  State<ExchangeMasterList> createState() => _ExchangeMasterListState();
+  State<_MasterList> createState() => _MasterListState();
 }
 
-class _ExchangeMasterListState extends State<ExchangeMasterList> {
+class _MasterListState extends State<_MasterList> {
+  ExchangeListItem? _selectedItem;
+
+  List<ExchangeListItem> _entriesAll = [];
+  List<ExchangeListItem> _entriesFiltered = [];
+
   late Future<List<ExchangeListItem>> _dbFuture;
 
-  List<ExchangeListItem> _allEntries = [];
-  List<ExchangeListItem> _filteredEntries = [];
-
-  final TextEditingController _searchController = TextEditingController();
-
-  int _selectedIndex = -1;
-
   Future<List<ExchangeListItem>> fetchExchanges() async {
-    final api = Openapi();
-
-    final responseFuture = api.getExchangeApi().getExchanges().timeout(
+    final responseFuture = Openapi().getExchangeApi().getExchanges().timeout(
       const Duration(seconds: 10),
     );
 
@@ -189,21 +134,27 @@ class _ExchangeMasterListState extends State<ExchangeMasterList> {
 
   void _onRefresh() {
     setState(() {
-      _allEntries = [];
-      _filteredEntries = [];
+      _entriesAll = [];
+      _entriesFiltered = [];
+
+      _selectedItem = null;
+
+      widget.onItemSelected(null);
 
       _dbFuture = fetchExchanges();
     });
   }
 
-  void onNew() {}
+  //----------------------------------------------------------------------------
+
+  final TextEditingController _searchController = TextEditingController();
 
   void _filterListe(String searchText) {
     setState(() {
       if (searchText.isEmpty) {
-        _filteredEntries = _allEntries;
+        _entriesFiltered = _entriesAll;
       } else {
-        _filteredEntries = _allEntries.where((entry) {
+        _entriesFiltered = _entriesAll.where((entry) {
           String searchTextLower = searchText.toLowerCase();
 
           return entry.shortcode.toLowerCase().contains(searchTextLower) ||
@@ -212,6 +163,12 @@ class _ExchangeMasterListState extends State<ExchangeMasterList> {
       }
     });
   }
+
+  //----------------------------------------------------------------------------
+
+  void onNew() {}
+
+  //----------------------------------------------------------------------------
 
   @override
   void initState() {
@@ -238,10 +195,51 @@ class _ExchangeMasterListState extends State<ExchangeMasterList> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Fehler: ${snapshot.error}'));
           } else if (snapshot.hasData) {
-            if (_allEntries.isEmpty) {
-              _allEntries = snapshot.data!;
-              _filteredEntries = _allEntries;
+            if (_entriesAll.isEmpty) {
+              _entriesAll = snapshot.data!;
+              _entriesFiltered = _entriesAll;
             }
+
+            //------------------------------------------------------------------
+
+            if (_entriesFiltered.isNotEmpty) {
+              if (_selectedItem != null) {
+                ExchangeListItem? foundItem = _entriesFiltered.where((entry) {
+                  return entry.id == _selectedItem!.id;
+                }).firstOrNull;
+
+                if (foundItem == null) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    setState(() {
+                      _selectedItem = _entriesFiltered[0];
+                    });
+
+                    widget.onItemSelected(_entriesFiltered[0]);
+                  });
+                }
+              } else {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  setState(() {
+                    _selectedItem = _entriesFiltered[0];
+                  });
+
+                  widget.onItemSelected(_entriesFiltered[0]);
+                });
+              }
+            } else {
+              if (_selectedItem != null) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  setState(() {
+                    _selectedItem = null;
+                  });
+
+                  widget.onItemSelected(null);
+                });
+              }
+            }
+
+            //------------------------------------------------------------------
+
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0.0),
               child: Column(
@@ -303,7 +301,7 @@ class _ExchangeMasterListState extends State<ExchangeMasterList> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            "${_filteredEntries.length}",
+                            "${_entriesFiltered.length}",
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               // color: Colors.blue,
@@ -340,30 +338,30 @@ class _ExchangeMasterListState extends State<ExchangeMasterList> {
                     ),
                   ),
                   //------------------------------------------------------------
-                  // List of item or message, if list is empty
+                  // List of items or message, if list is empty
                   //------------------------------------------------------------
                   Expanded(
                     child: ClipRect(
-                      child: _filteredEntries.isEmpty
+                      child: _entriesFiltered.isEmpty
                           ? const Center(child: Text("Keine Börsen vorhanden."))
                           : ListView.separated(
-                              itemCount: _filteredEntries.length,
+                              itemCount: _entriesFiltered.length,
                               separatorBuilder: (_, __) =>
                                   const Divider(height: 1),
                               itemBuilder: (context, index) {
-                                final exchangeListItem =
-                                    _filteredEntries[index];
-                                final isSelected = _selectedIndex == index;
+                                final listItem = _entriesFiltered[index];
+                                final isSelected =
+                                    _selectedItem?.id == listItem.id;
                                 return ListTile(
                                   leading: CircleAvatar(
                                     child: Text(
-                                      exchangeListItem.shortcode
+                                      listItem.shortcode
                                           .substring(0, 1)
                                           .toUpperCase(),
                                     ),
                                   ),
-                                  title: Text(exchangeListItem.shortcode),
-                                  subtitle: Text(exchangeListItem.name),
+                                  title: Text(listItem.shortcode),
+                                  subtitle: Text(listItem.name),
                                   selected: isSelected,
                                   selectedTileColor: Theme.of(context)
                                       .colorScheme
@@ -374,10 +372,10 @@ class _ExchangeMasterListState extends State<ExchangeMasterList> {
                                   ),
                                   onTap: () {
                                     setState(() {
-                                      _selectedIndex = index;
+                                      _selectedItem = listItem;
                                     });
 
-                                    widget.onItemSelected(exchangeListItem);
+                                    widget.onItemSelected(listItem);
                                   },
                                 );
                               },
@@ -394,6 +392,9 @@ class _ExchangeMasterListState extends State<ExchangeMasterList> {
     );
   }
 }
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 class ExchangeMasterPanel extends StatelessWidget {
   const ExchangeMasterPanel({
@@ -483,13 +484,15 @@ class ExchangeMasterPanel extends StatelessWidget {
                   flex: 3,
                   child: selectedExchange == null
                       ? const Center(child: Text('Bitte Datensatz auswählen.'))
+                      : const Center(child: Text('??????? TEST ???????.')),
+                  /*
                       : ExchangeEditorPanel(
                           key: ValueKey(selectedExchange!.id),
                           exchange: selectedExchange!,
                           onSaved: onRefresh,
                           onDelete: () =>
                               onDeleteExchange(selectedExchange!.id),
-                        ),
+                        ),*/
                 ),
               ],
             ),
@@ -505,7 +508,8 @@ class ExchangeEditorPanel extends StatefulWidget {
     super.key,
   });
 
-  final ExchangeListItem exchange;
+  final Exchange exchange;
+
   final Future<void> Function() onSaved;
   final Future<void> Function() onDelete;
 
@@ -515,27 +519,30 @@ class ExchangeEditorPanel extends StatefulWidget {
 
 class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _nameController;
+
   late final TextEditingController _shortcodeController;
+  late final TextEditingController _nameController;
   late final TextEditingController _flagsController;
+
   bool _saving = false;
 
   void _syncControllers() {
     final exchange = widget.exchange;
-    _nameController.text = exchange.name;
+
     _shortcodeController.text = exchange.shortcode;
-    // _flagsController.text = exchange.flags.toString();
+    _nameController.text = exchange.name;
+    _flagsController.text = exchange.flags.toString();
   }
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.exchange.name);
     _shortcodeController = TextEditingController(
       text: widget.exchange.shortcode,
     );
+    _nameController = TextEditingController(text: widget.exchange.name);
     _flagsController = TextEditingController(
-      text: "Dummy", // widget.exchange.flags.toString(),
+      text: widget.exchange.flags.toString(),
     );
   }
 
@@ -549,11 +556,15 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
 
   @override
   void dispose() {
-    _nameController.dispose();
     _shortcodeController.dispose();
+    _nameController.dispose();
     _flagsController.dispose();
     super.dispose();
   }
+
+  //----------------------------------------------------------------------------
+  // Save a (modified) record to database
+  //----------------------------------------------------------------------------
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
@@ -562,8 +573,8 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
     try {
       final payload = ExchangeNoPK(
         (b) => b
-          ..name = _nameController.text.trim()
           ..shortcode = _shortcodeController.text.trim().toUpperCase()
+          ..name = _nameController.text.trim()
           ..flags = int.tryParse(_flagsController.text) ?? 0,
       );
 
@@ -581,6 +592,10 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
       if (mounted) setState(() => _saving = false);
     }
   }
+
+  //----------------------------------------------------------------------------
+  // Delete a record from database
+  //----------------------------------------------------------------------------
 
   Future<void> _delete() async {
     final confirmed = await showDialog<bool>(
@@ -623,16 +638,23 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
             ),
             const SizedBox(height: 16),
             TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
+              maxLength: 8,
+              controller: _shortcodeController,
+              decoration: const InputDecoration(labelText: 'Kürzel'),
+              inputFormatters: [
+                TextInputFormatter.withFunction((_, newValue) {
+                  return newValue.copyWith(text: newValue.text.toUpperCase());
+                }),
+              ],
               validator: (value) => (value == null || value.trim().isEmpty)
                   ? 'Pflichtfeld'
                   : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
-              controller: _shortcodeController,
-              decoration: const InputDecoration(labelText: 'Shortcode'),
+              maxLength: 80,
+              controller: _nameController,
+              decoration: const InputDecoration(labelText: 'Name'),
               validator: (value) => (value == null || value.trim().isEmpty)
                   ? 'Pflichtfeld'
                   : null,
@@ -671,30 +693,6 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _DetailRow extends StatelessWidget {
-  const _DetailRow({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 150,
-            child: Text(label, style: Theme.of(context).textTheme.labelLarge),
-          ),
-          Expanded(child: Text(value)),
-        ],
       ),
     );
   }

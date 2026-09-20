@@ -1,185 +1,125 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:openapi/openapi.dart';
 
 import 'country_form_dialog.dart';
 
-class CountryDetailPage extends StatelessWidget {
-  const CountryDetailPage({
-    required this.country,
-    required this.onRefresh,
-    required this.onDelete,
-    super.key,
-  });
-
-  final Country country;
-  final Future<void> Function() onRefresh;
-  final Future<void> Function(String id) onDelete;
+class CountryDataModule extends StatefulWidget {
+  const CountryDataModule({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(country.name),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              final result = await showDialog<bool>(
-                context: context,
-                builder: (_) => CountryFormDialog(country: country),
-              );
-              if (result == true) {
-                await onRefresh();
-                if (context.mounted) Navigator.of(context).pop();
-              }
-            },
-            icon: const Icon(Icons.edit),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: CountryDetailPanel(
-          country: country,
-          onRefresh: onRefresh,
-          onEdit: () async {
-            final result = await showDialog<bool>(
-              context: context,
-              builder: (_) => CountryFormDialog(country: country),
-            );
-            if (result == true) {
-              await onRefresh();
-              if (context.mounted) Navigator.of(context).pop();
-            }
-          },
-          onDelete: () => onDelete(country.id),
-        ),
-      ),
-    );
-  }
+  State<CountryDataModule> createState() => _DataModuleState();
 }
 
-class CountryDetailPanel extends StatelessWidget {
-  const CountryDetailPanel({
-    required this.country,
-    required this.onRefresh,
-    required this.onEdit,
-    required this.onDelete,
-    super.key,
-  });
+class _DataModuleState extends State<CountryDataModule> {
+  Country? _selectedItem;
 
-  final Country country;
-  final Future<void> Function() onRefresh;
-  final Future<void> Function() onEdit;
-  final Future<void> Function() onDelete;
+  void onItemSelected(CountryListItem? item) async {
+    if (item != null) {
+      if ((_selectedItem == null) || (_selectedItem!.id != item.id)) {
+        print("An item was selected: ${item.id}");
+
+        final api = Openapi();
+
+        Country? newItem;
+
+        try {
+          final response = await api
+              .getCountryApi()
+              .getCountryById(id: item.id)
+              .timeout(const Duration(seconds: 10));
+
+          newItem = response.data;
+        } finally {
+          setState(() {
+            _selectedItem = newItem;
+          });
+        }
+      }
+    } else {
+      if (_selectedItem != null) {
+        print("An item was deselected");
+
+        setState(() {
+          _selectedItem = null;
+        });
+      }
+    }
+  }
+
+  //----------------------------------------------------------------------------
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final rows = [
-      _DetailRow(label: 'ID', value: country.id),
-      _DetailRow(label: 'Shortcode', value: country.shortcode),
-      _DetailRow(label: 'Name', value: country.name),
-      _DetailRow(label: 'Flags', value: country.flags.toString()),
-      _DetailRow(
-        label: 'IBAN Länge',
-        value: country.ibanlenth?.toString() ?? '—',
-      ),
-      _DetailRow(label: 'Risk Type', value: country.risktype.toString()),
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const Icon(Icons.flag, size: 28),
-            const SizedBox(width: 12),
-            Text(
-              country.name,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: ListView.separated(
-              itemCount: rows.length,
-              separatorBuilder: (_, _) => const Divider(height: 1),
-              itemBuilder: (context, index) => rows[index],
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            FilledButton.icon(
-              onPressed: onEdit,
-              icon: const Icon(Icons.edit),
-              label: const Text('Bearbeiten'),
-            ),
-            const SizedBox(width: 12),
-            OutlinedButton.icon(
-              onPressed: () async {
-                final confirmed = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Land löschen?'),
-                    content: const Text('Die Daten werden dauerhaft entfernt.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Abbrechen'),
-                      ),
-                      FilledButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Löschen'),
-                      ),
-                    ],
+    return LayoutBuilder(
+      builder: ((context, constraints) {
+        if (constraints.maxWidth >= 768) {
+          return Scaffold(
+            body: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: _MasterList(
+                    // selectItem: provider.selectedItem,
+                    onItemSelected: onItemSelected,
                   ),
-                );
-                if (confirmed == true) {
-                  await onDelete();
-                  await onRefresh();
-                }
-              },
-              icon: const Icon(Icons.delete_outline),
-              label: const Text('Löschen'),
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(
+                  flex: 3,
+                  child: _selectedItem == null
+                      ? const Center(child: Text("Wähle einen Eintrag aus!"))
+                      : CountryEditorPanel(
+                          country: _selectedItem!,
+                          onSaved: () async {},
+                          onDelete: () async {},
+                        ),
+                  /*
+                      DetailView(
+                      item: selectedItem,
+                      isDirty: isDirty
+                      onchanged: (dirty) => ????
+                      )
+                      */
+                ),
+              ],
             ),
-          ],
-        ),
-      ],
+          );
+        } else {
+          return Center(child: Text("SmallScreen"));
+        }
+      }),
     );
   }
 }
 
-class CountryMasterList extends StatefulWidget {
-  final ValueChanged<CountryListItem> onItemSelected;
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-  const CountryMasterList({super.key, required this.onItemSelected});
+class _MasterList extends StatefulWidget {
+  final ValueChanged<CountryListItem?> onItemSelected;
+
+  const _MasterList({super.key, required this.onItemSelected});
 
   @override
-  State<CountryMasterList> createState() => _CountryMasterListState();
+  State<_MasterList> createState() => _MasterListState();
 }
 
-class _CountryMasterListState extends State<CountryMasterList> {
+class _MasterListState extends State<_MasterList> {
+  CountryListItem? _selectedItem;
+
+  List<CountryListItem> _entriesAll = [];
+  List<CountryListItem> _entriesFiltered = [];
+
   late Future<List<CountryListItem>> _dbFuture;
 
-  List<CountryListItem> _allEntries = [];
-  List<CountryListItem> _filteredEntries = [];
-
-  final TextEditingController _searchController = TextEditingController();
-
-  int _selectedIndex = -1;
-
   Future<List<CountryListItem>> fetchCountries() async {
-    final api = Openapi();
-
-    final responseFuture = api.getCountryApi().getCountries().timeout(
+    final responseFuture = Openapi().getCountryApi().getCountries().timeout(
       const Duration(seconds: 10),
     );
 
@@ -194,21 +134,27 @@ class _CountryMasterListState extends State<CountryMasterList> {
 
   void _onRefresh() {
     setState(() {
-      _allEntries = [];
-      _filteredEntries = [];
+      _entriesAll = [];
+      _entriesFiltered = [];
+
+      _selectedItem = null;
+
+      widget.onItemSelected(null);
 
       _dbFuture = fetchCountries();
     });
   }
 
-  void onNew() {}
+  //----------------------------------------------------------------------------
+
+  final TextEditingController _searchController = TextEditingController();
 
   void _filterListe(String searchText) {
     setState(() {
       if (searchText.isEmpty) {
-        _filteredEntries = _allEntries;
+        _entriesFiltered = _entriesAll;
       } else {
-        _filteredEntries = _allEntries.where((entry) {
+        _entriesFiltered = _entriesAll.where((entry) {
           String searchTextLower = searchText.toLowerCase();
 
           return entry.shortcode.toLowerCase().contains(searchTextLower) ||
@@ -217,6 +163,12 @@ class _CountryMasterListState extends State<CountryMasterList> {
       }
     });
   }
+
+  //----------------------------------------------------------------------------
+
+  void onNew() {}
+
+  //----------------------------------------------------------------------------
 
   @override
   void initState() {
@@ -243,10 +195,51 @@ class _CountryMasterListState extends State<CountryMasterList> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Fehler: ${snapshot.error}'));
           } else if (snapshot.hasData) {
-            if (_allEntries.isEmpty) {
-              _allEntries = snapshot.data!;
-              _filteredEntries = _allEntries;
+            if (_entriesAll.isEmpty) {
+              _entriesAll = snapshot.data!;
+              _entriesFiltered = _entriesAll;
             }
+
+            //------------------------------------------------------------------
+
+            if (_entriesFiltered.isNotEmpty) {
+              if (_selectedItem != null) {
+                CountryListItem? foundItem = _entriesFiltered.where((entry) {
+                  return entry.id == _selectedItem!.id;
+                }).firstOrNull;
+
+                if (foundItem == null) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    setState(() {
+                      _selectedItem = _entriesFiltered[0];
+                    });
+
+                    widget.onItemSelected(_entriesFiltered[0]);
+                  });
+                }
+              } else {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  setState(() {
+                    _selectedItem = _entriesFiltered[0];
+                  });
+
+                  widget.onItemSelected(_entriesFiltered[0]);
+                });
+              }
+            } else {
+              if (_selectedItem != null) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  setState(() {
+                    _selectedItem = null;
+                  });
+
+                  widget.onItemSelected(null);
+                });
+              }
+            }
+
+            //------------------------------------------------------------------
+
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0.0),
               child: Column(
@@ -308,7 +301,7 @@ class _CountryMasterListState extends State<CountryMasterList> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            "${_filteredEntries.length}",
+                            "${_entriesFiltered.length}",
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               // color: Colors.blue,
@@ -349,25 +342,26 @@ class _CountryMasterListState extends State<CountryMasterList> {
                   //------------------------------------------------------------
                   Expanded(
                     child: ClipRect(
-                      child: _filteredEntries.isEmpty
+                      child: _entriesFiltered.isEmpty
                           ? const Center(child: Text("Keine Länder vorhanden."))
                           : ListView.separated(
-                              itemCount: _filteredEntries.length,
+                              itemCount: _entriesFiltered.length,
                               separatorBuilder: (_, __) =>
                                   const Divider(height: 1),
                               itemBuilder: (context, index) {
-                                final countryListItem = _filteredEntries[index];
-                                final isSelected = _selectedIndex == index;
+                                final listItem = _entriesFiltered[index];
+                                final isSelected =
+                                    _selectedItem?.id == listItem.id;
                                 return ListTile(
                                   leading: CircleAvatar(
                                     child: Text(
-                                      countryListItem.shortcode
+                                      listItem.shortcode
                                           .substring(0, 1)
                                           .toUpperCase(),
                                     ),
                                   ),
-                                  title: Text(countryListItem.shortcode),
-                                  subtitle: Text(countryListItem.name),
+                                  title: Text(listItem.shortcode),
+                                  subtitle: Text(listItem.name),
                                   selected: isSelected,
                                   selectedTileColor: Theme.of(context)
                                       .colorScheme
@@ -378,10 +372,10 @@ class _CountryMasterListState extends State<CountryMasterList> {
                                   ),
                                   onTap: () {
                                     setState(() {
-                                      _selectedIndex = index;
+                                      _selectedItem = listItem;
                                     });
 
-                                    widget.onItemSelected(countryListItem);
+                                    widget.onItemSelected(listItem);
                                   },
                                 );
                               },
@@ -398,6 +392,9 @@ class _CountryMasterListState extends State<CountryMasterList> {
     );
   }
 }
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 class CountryMasterPanel extends StatelessWidget {
   const CountryMasterPanel({
@@ -487,12 +484,14 @@ class CountryMasterPanel extends StatelessWidget {
                   flex: 3,
                   child: selectedCountry == null
                       ? const Center(child: Text('Bitte Datensatz auswählen.'))
+                      : const Center(child: Text('Bitte Datensatz auswählen.')),
+                  /*
                       : CountryEditorPanel(
                           key: ValueKey(selectedCountry!.id),
                           country: selectedCountry!,
                           onSaved: onRefresh,
                           onDelete: () => onDeleteCountry(selectedCountry!.id),
-                        ),
+                        ),*/
                 ),
               ],
             ),
@@ -508,7 +507,8 @@ class CountryEditorPanel extends StatefulWidget {
     super.key,
   });
 
-  final CountryListItem country;
+  final Country country;
+
   final Future<void> Function() onSaved;
   final Future<void> Function() onDelete;
 
@@ -518,8 +518,8 @@ class CountryEditorPanel extends StatefulWidget {
 
 class _CountryEditorPanelState extends State<CountryEditorPanel> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _nameController;
   late final TextEditingController _shortcodeController;
+  late final TextEditingController _nameController;
   late final TextEditingController _flagsController;
   late final TextEditingController _ibanLengthController;
   late final TextEditingController _riskTypeController;
@@ -527,27 +527,25 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
 
   void _syncControllers() {
     final country = widget.country;
-    _nameController.text = country.name;
     _shortcodeController.text = country.shortcode;
-    // _flagsController.text = country.flags.toString();
-    // _ibanLengthController.text = country.ibanlenth?.toString() ?? '';
-    // _riskTypeController.text = country.risktype.toString();
+    _nameController.text = country.name;
+    _flagsController.text = country.flags.toString();
+    _ibanLengthController.text = country.ibanlenth?.toString() ?? '';
+    _riskTypeController.text = country.risktype.toString();
   }
 
   @override
   void initState() {
     super.initState();
     final country = widget.country;
-    _nameController = TextEditingController(text: country.name);
     _shortcodeController = TextEditingController(text: country.shortcode);
-    _flagsController = TextEditingController(
-      text: "Dummy",
-    ); // country.flags.toString());
+    _nameController = TextEditingController(text: country.name);
+    _flagsController = TextEditingController(text: country.flags.toString());
     _ibanLengthController = TextEditingController(
-      text: "Dummy", // country.ibanlenth?.toString() ?? '',
+      text: country.ibanlenth?.toString() ?? '',
     );
     _riskTypeController = TextEditingController(
-      text: "Dummy", // country.risktype.toString(),
+      text: country.risktype.toString(),
     );
   }
 
@@ -561,8 +559,8 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
 
   @override
   void dispose() {
-    _nameController.dispose();
     _shortcodeController.dispose();
+    _nameController.dispose();
     _flagsController.dispose();
     _ibanLengthController.dispose();
     _riskTypeController.dispose();
@@ -576,8 +574,8 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
     try {
       final payload = CountryNoPK(
         (b) => b
-          ..name = _nameController.text.trim()
           ..shortcode = _shortcodeController.text.trim().toUpperCase()
+          ..name = _nameController.text.trim()
           ..flags = int.tryParse(_flagsController.text) ?? 0
           ..risktype = int.tryParse(_riskTypeController.text) ?? 0
           ..ibanlenth = int.tryParse(
@@ -646,16 +644,23 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
             ),
             const SizedBox(height: 16),
             TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
+              maxLength: 2,
+              controller: _shortcodeController,
+              decoration: const InputDecoration(labelText: 'Kürzel'),
+              inputFormatters: [
+                TextInputFormatter.withFunction((_, newValue) {
+                  return newValue.copyWith(text: newValue.text.toUpperCase());
+                }),
+              ],
               validator: (value) => (value == null || value.trim().isEmpty)
                   ? 'Pflichtfeld'
                   : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
-              controller: _shortcodeController,
-              decoration: const InputDecoration(labelText: 'Shortcode'),
+              maxLength: 30,
+              controller: _nameController,
+              decoration: const InputDecoration(labelText: 'Name'),
               validator: (value) => (value == null || value.trim().isEmpty)
                   ? 'Pflichtfeld'
                   : null,
@@ -712,30 +717,6 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _DetailRow extends StatelessWidget {
-  const _DetailRow({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 150,
-            child: Text(label, style: Theme.of(context).textTheme.labelLarge),
-          ),
-          Expanded(child: Text(value)),
-        ],
       ),
     );
   }
