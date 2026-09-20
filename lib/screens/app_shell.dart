@@ -1,9 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:openapi/openapi.dart';
-import 'package:provider/provider.dart';
-import 'package:rbsclone_flutter/repositories/country_repository.dart';
-import 'package:rbsclone_flutter/repositories/custodian_repository.dart';
-import 'package:rbsclone_flutter/repositories/exchange_repository.dart';
 import 'package:rbsclone_flutter/widgets/hierarchical_navigation_menu.dart';
 import 'package:rbsclone_flutter/widgets/placeholder_page.dart';
 import 'package:rbsclone_flutter/widgets/adaptive_layout.dart';
@@ -257,11 +252,7 @@ class _AppShellState extends State<AppShell> {
         return const PlaceholderPage(title: 'Willkommen!');
 
       case 'Länder':
-        return CountryMasterList(
-          onItemSelected: (_) {
-            print("Item selected");
-          },
-        );
+        return CountryDataModule();
       /*
         return CountryMasterPanel(
           countries: _countries,
@@ -289,11 +280,13 @@ class _AppShellState extends State<AppShell> {
         );
 */
       case 'Lagerstellen':
+        return CustodianDataModule();
+      /*
         return CustodianMasterList(
           onItemSelected: (_) {
             print("Item selected");
           },
-        );
+        );*/
       /*
         return CustodianMasterPanel(
           custodians: _custodians,
@@ -325,11 +318,13 @@ class _AppShellState extends State<AppShell> {
         );
         */
       case 'Börsen':
+        return ExchangeDataModule();
+      /*
         return ExchangeMasterList(
           onItemSelected: (_) {
             print("Item selected");
           },
-        );
+        );*/
       /*
         return ExchangeMasterPanel(
           exchanges: _exchanges,
