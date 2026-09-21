@@ -16,7 +16,6 @@ class RbsCloneApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         useMaterial3: true,
       ),
-      // home: const AppShell(),
       home: const ConnectionGateKeeper(),
     );
   }
@@ -48,23 +47,22 @@ class _ConnectionGateKeeperState extends State<ConnectionGateKeeper> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ValueListenableBuilder<bool?>(
-        valueListenable: _connectivityService.connectionStatus,
-        builder: (context, isConected, snapshot) {
-          if (isConected == null) {
-            return const WaitScreen();
-          } else if (isConected) {
-            // return const WelcomeScreen();
-            return const AppShell();
-          } else {
-            return const ErrorScreen();
-          }
-        },
-      ),
+    return ValueListenableBuilder<bool?>(
+      valueListenable: _connectivityService.connectionStatus,
+      builder: (context, isConected, snapshot) {
+        if (isConected == null) {
+          return const WaitScreen();
+        } else if (!isConected) {
+          return const ErrorScreen();
+        } else {
+          return const AppScreen();
+        }
+      },
     );
   }
 }
+
+//------------------------------------------------------------------------------
 
 class ConnectivityService {
   final UtilitiesApi _utilitiesApi = Openapi().getUtilitiesApi();
@@ -84,7 +82,6 @@ class ConnectivityService {
 
       return response.statusCode == HttpStatus.ok;
     } catch (e) {
-      // Handle any exceptions that may occur during the connectivity check
       return false;
     }
   }
@@ -122,7 +119,9 @@ class ConnectivityService {
 
         await Future.delayed(Duration(seconds: delay));
 
-        isConnected = await checkConnectivity(_delayShort - 1);
+        if (_isMonitoring) {
+          isConnected = await checkConnectivity(_delayShort - 1);
+        }
       }
     }
   }
@@ -132,99 +131,81 @@ class ConnectivityService {
   }
 }
 
+//------------------------------------------------------------------------------
+
 class WaitScreen extends StatelessWidget {
   const WaitScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.yellow.shade50,
-      child: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 80,
-              height: 80,
-              child: Padding(
-                padding: EdgeInsets.all(10.0),
-                child: CircularProgressIndicator(),
-              ),
+    return Scaffold(
+      body: SafeArea(
+        child: Container(
+          color: Colors.yellow.shade50,
+          child: const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  "Checking server connection...",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  "Trying to connect to Server",
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
-            SizedBox(height: 16),
-            Text(
-              "Checking server connection...",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 8),
-            Text(
-              "Trying to connect to the Server",
-              textAlign: TextAlign.center,
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.blue.shade50,
-      child: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 80),
-            SizedBox(height: 16),
-            Text(
-              "Welcome to RbsClone!",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 8),
-            Text(
-              "You are connected to the Server",
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//------------------------------------------------------------------------------
 
 class ErrorScreen extends StatelessWidget {
   const ErrorScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.red.shade50,
-      child: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.cloud_off, color: Colors.red, size: 80),
-              SizedBox(height: 16),
-              Text(
-                "Connection Error",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
+    return Scaffold(
+      body: SafeArea(
+        child: Container(
+          color: Colors.red.shade50,
+          child: const Center(
+            child: Padding(
+              padding: EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.cloud_off, color: Colors.red, size: 80),
+                  SizedBox(height: 16),
+                  Text(
+                    "Connection Error",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "Unable to connect to server",
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
-              SizedBox(height: 8),
-              Text(
-                "Unable to connect to the server",
-                textAlign: TextAlign.center,
-              ),
-            ],
+            ),
           ),
         ),
       ),

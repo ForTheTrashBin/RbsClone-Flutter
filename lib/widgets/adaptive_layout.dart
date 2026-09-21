@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 /// - Tablet: 600 - 1200 dp
 /// - Desktop: >= 1200 dp
 class ResponsiveBreakpoints {
-  static const double mobileMax = 600;
+  static const double mobileMax = 800;
   static const double tabletMax = 1200;
 
   static bool isMobile(BuildContext context) {

@@ -5,7 +5,9 @@ import 'package:openapi/openapi.dart';
 import 'country_form_dialog.dart';
 
 class CountryDataModule extends StatefulWidget {
-  const CountryDataModule({super.key});
+  const CountryDataModule(this.showBoth, {super.key});
+
+  final bool showBoth;
 
   @override
   State<CountryDataModule> createState() => _DataModuleState();
@@ -17,8 +19,6 @@ class _DataModuleState extends State<CountryDataModule> {
   void onItemSelected(CountryListItem? item) async {
     if (item != null) {
       if ((_selectedItem == null) || (_selectedItem!.id != item.id)) {
-        print("An item was selected: ${item.id}");
-
         final api = Openapi();
 
         Country? newItem;
@@ -38,8 +38,6 @@ class _DataModuleState extends State<CountryDataModule> {
       }
     } else {
       if (_selectedItem != null) {
-        print("An item was deselected");
-
         setState(() {
           _selectedItem = null;
         });
@@ -56,45 +54,33 @@ class _DataModuleState extends State<CountryDataModule> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: ((context, constraints) {
-        if (constraints.maxWidth >= 768) {
-          return Scaffold(
-            body: Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: _MasterList(
-                    // selectItem: provider.selectedItem,
-                    onItemSelected: onItemSelected,
+    if (widget.showBoth) {
+      return Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: _MasterList(onItemSelected, widget.showBoth),
+          ),
+          const VerticalDivider(width: 1),
+          Expanded(
+            flex: 3,
+            child: _selectedItem == null
+                ? const Center(child: Text("Wähle einen Eintrag aus!"))
+                : CountryEditorPanel(
+                    country: _selectedItem!,
+                    onSaved: () async {},
+                    onDelete: () async {},
                   ),
-                ),
-                const VerticalDivider(width: 1),
-                Expanded(
-                  flex: 3,
-                  child: _selectedItem == null
-                      ? const Center(child: Text("Wähle einen Eintrag aus!"))
-                      : CountryEditorPanel(
-                          country: _selectedItem!,
-                          onSaved: () async {},
-                          onDelete: () async {},
-                        ),
-                  /*
-                      DetailView(
-                      item: selectedItem,
-                      isDirty: isDirty
-                      onchanged: (dirty) => ????
-                      )
-                      */
-                ),
-              ],
-            ),
-          );
-        } else {
-          return Center(child: Text("SmallScreen"));
-        }
-      }),
-    );
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Expanded(child: _MasterList(onItemSelected, widget.showBoth)),
+        ],
+      );
+    }
   }
 }
 
@@ -104,7 +90,9 @@ class _DataModuleState extends State<CountryDataModule> {
 class _MasterList extends StatefulWidget {
   final ValueChanged<CountryListItem?> onItemSelected;
 
-  const _MasterList({super.key, required this.onItemSelected});
+  final bool showBoth;
+
+  const _MasterList(this.onItemSelected, this.showBoth);
 
   @override
   State<_MasterList> createState() => _MasterListState();
@@ -138,6 +126,8 @@ class _MasterListState extends State<_MasterList> {
       _entriesFiltered = [];
 
       _selectedItem = null;
+
+      _searchController.clear();
 
       widget.onItemSelected(null);
 
@@ -245,39 +235,6 @@ class _MasterListState extends State<_MasterList> {
               child: Column(
                 children: [
                   //------------------------------------------------------------
-                  // Title & refresh
-                  //------------------------------------------------------------
-                  Container(
-                    height: 56.0,
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            "Länder",
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onPrimaryContainer,
-                                ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.refresh),
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onPrimaryContainer,
-                          onPressed: _onRefresh,
-                        ),
-                      ],
-                    ),
-                  ),
-                  //------------------------------------------------------------
                   // Count & search
                   //------------------------------------------------------------
                   Container(
@@ -334,6 +291,14 @@ class _MasterListState extends State<_MasterList> {
                             ),
                           ),
                         ),
+                        const SizedBox(width: 6),
+                        IconButton(
+                          icon: const Icon(Icons.refresh),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimaryContainer,
+                          onPressed: _onRefresh,
+                        ),
                       ],
                     ),
                   ),
@@ -362,6 +327,9 @@ class _MasterListState extends State<_MasterList> {
                                   ),
                                   title: Text(listItem.shortcode),
                                   subtitle: Text(listItem.name),
+                                  trailing: !widget.showBoth
+                                      ? const Icon(Icons.chevron_right)
+                                      : null,
                                   selected: isSelected,
                                   selectedTileColor: Theme.of(context)
                                       .colorScheme
