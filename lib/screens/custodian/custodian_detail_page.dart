@@ -1,8 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:openapi/openapi.dart';
-
-import 'custodian_form_dialog.dart';
 
 class CustodianDataModule extends StatefulWidget {
   const CustodianDataModule(this.showBoth, {super.key});
@@ -14,32 +13,65 @@ class CustodianDataModule extends StatefulWidget {
 }
 
 class _DataModuleState extends State<CustodianDataModule> {
-  Custodian? _selectedItem;
+  CustodianListItem? _selectedListItem;
 
-  void onItemSelected(CustodianListItem? item) async {
+  Future<Custodian?>? _detailFuture;
+
+  Future<Custodian?> getDetail(CustodianListItem? item) async {
     if (item != null) {
-      if ((_selectedItem == null) || (_selectedItem!.id != item.id)) {
-        final api = Openapi();
+      try {
+        final Response<Custodian> response = await Openapi()
+            .getCustodianApi()
+            .getCustodianById(id: item.id)
+            .timeout(Duration(seconds: 10));
 
-        Custodian? newItem;
-
-        try {
-          final response = await api
-              .getCustodianApi()
-              .getCustodianById(id: item.id)
-              .timeout(const Duration(seconds: 10));
-
-          newItem = response.data;
-        } finally {
-          setState(() {
-            _selectedItem = newItem;
-          });
+        if (response.statusCode == 200) {
+          return response.data;
+        } else {
+          throw Exception("Wrong state!");
         }
+      } catch (e) {
+        rethrow;
       }
     } else {
-      if (_selectedItem != null) {
+      throw Exception("No data!");
+    }
+  }
+
+  Widget _buildDetail(CustodianListItem? item) {
+    return FutureBuilder<Custodian?>(
+      future: _detailFuture,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return CustodianEditorPanel(
+            showBoth: widget.showBoth,
+            custodian: snapshot.data!,
+            countries: _countries,
+            onSaved: () async {},
+            onDelete: () async {},
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text("Fehler beim Laden: ${snapshot.error}"));
+        }
+
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+
+  void onItemSelected(CustodianListItem? item) {
+    if (item != null) {
+      if ((_selectedListItem == null) || (_selectedListItem!.id != item.id)) {
         setState(() {
-          _selectedItem = null;
+          _detailFuture = getDetail(_selectedListItem = item);
+        });
+      }
+    } else {
+      if (_selectedListItem != null) {
+        setState(() {
+          _detailFuture = getDetail(_selectedListItem = null);
         });
       }
     }
@@ -83,26 +115,37 @@ class _DataModuleState extends State<CustodianDataModule> {
         children: [
           Expanded(
             flex: 2,
-            child: _MasterList(onItemSelected, widget.showBoth),
+            child: _MasterList(
+              selectedListItem: _selectedListItem,
+              showBoth: widget.showBoth,
+              itemSelectedCallback: onItemSelected,
+            ),
           ),
           const VerticalDivider(width: 1),
-          Expanded(
-            flex: 3,
-            child: _selectedItem == null
-                ? const Center(child: Text("Wähle einen Eintrag aus!"))
-                : CustodianEditorPanel(
-                    custodian: _selectedItem!,
-                    countries: _countries,
-                    onSaved: () async {},
-                    onDelete: () async {},
-                  ),
-          ),
+          Expanded(flex: 3, child: _buildDetail(_selectedListItem)),
         ],
       );
     } else {
       return Row(
         children: [
-          Expanded(child: _MasterList(onItemSelected, widget.showBoth)),
+          Expanded(
+            child: _MasterList(
+              selectedListItem: _selectedListItem,
+              showBoth: widget.showBoth,
+              itemSelectedCallback: (item) {
+                onItemSelected(item);
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return _buildDetail(_selectedListItem);
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       );
     }
@@ -113,19 +156,23 @@ class _DataModuleState extends State<CustodianDataModule> {
 //------------------------------------------------------------------------------
 
 class _MasterList extends StatefulWidget {
-  final ValueChanged<CustodianListItem?> onItemSelected;
+  final CustodianListItem? selectedListItem;
 
   final bool showBoth;
 
-  const _MasterList(this.onItemSelected, this.showBoth);
+  final ValueChanged<CustodianListItem?> itemSelectedCallback;
+
+  const _MasterList({
+    required this.selectedListItem,
+    required this.showBoth,
+    required this.itemSelectedCallback,
+  });
 
   @override
   State<_MasterList> createState() => _MasterListState();
 }
 
 class _MasterListState extends State<_MasterList> {
-  CustodianListItem? _selectedItem;
-
   List<CustodianListItem> _entriesAll = [];
   List<CustodianListItem> _entriesFiltered = [];
 
@@ -150,11 +197,9 @@ class _MasterListState extends State<_MasterList> {
       _entriesAll = [];
       _entriesFiltered = [];
 
-      _selectedItem = null;
-
       _searchController.clear();
 
-      widget.onItemSelected(null);
+      widget.itemSelectedCallback(null);
 
       _dbFuture = fetchCustodians();
     });
@@ -218,37 +263,25 @@ class _MasterListState extends State<_MasterList> {
             //------------------------------------------------------------------
 
             if (_entriesFiltered.isNotEmpty) {
-              if (_selectedItem != null) {
+              if (widget.selectedListItem != null) {
                 CustodianListItem? foundItem = _entriesFiltered.where((entry) {
-                  return entry.id == _selectedItem!.id;
+                  return entry.id == widget.selectedListItem!.id;
                 }).firstOrNull;
 
                 if (foundItem == null) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    setState(() {
-                      _selectedItem = _entriesFiltered[0];
-                    });
-
-                    widget.onItemSelected(_entriesFiltered[0]);
+                    widget.itemSelectedCallback(_entriesFiltered[0]);
                   });
                 }
               } else {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  setState(() {
-                    _selectedItem = _entriesFiltered[0];
-                  });
-
-                  widget.onItemSelected(_entriesFiltered[0]);
+                  widget.itemSelectedCallback(_entriesFiltered[0]);
                 });
               }
             } else {
-              if (_selectedItem != null) {
+              if (widget.selectedListItem != null) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  setState(() {
-                    _selectedItem = null;
-                  });
-
-                  widget.onItemSelected(null);
+                  widget.itemSelectedCallback(null);
                 });
               }
             }
@@ -343,7 +376,7 @@ class _MasterListState extends State<_MasterList> {
                               itemBuilder: (context, index) {
                                 final listItem = _entriesFiltered[index];
                                 final isSelected =
-                                    _selectedItem?.id == listItem.id;
+                                    widget.selectedListItem?.id == listItem.id;
                                 return ListTile(
                                   leading: CircleAvatar(
                                     child: Text(
@@ -366,11 +399,7 @@ class _MasterListState extends State<_MasterList> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   onTap: () {
-                                    setState(() {
-                                      _selectedItem = listItem;
-                                    });
-
-                                    widget.onItemSelected(listItem);
+                                    widget.itemSelectedCallback(listItem);
                                   },
                                 );
                               },
@@ -391,115 +420,9 @@ class _MasterListState extends State<_MasterList> {
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-class CustodianMasterPanel extends StatelessWidget {
-  const CustodianMasterPanel({
-    required this.custodians,
-    required this.countries,
-    required this.loading,
-    required this.error,
-    required this.selectedCustodian,
-    required this.onSelectCustodian,
-    required this.onRefresh,
-    required this.onNewCustodian,
-    required this.onEditCustodian,
-    required this.onDeleteCustodian,
-    super.key,
-  });
-
-  final List<CustodianListItem> custodians;
-  final List<CountryListItem> countries;
-  final bool loading;
-  final String? error;
-  final CustodianListItem? selectedCustodian;
-  final ValueChanged<CustodianListItem> onSelectCustodian;
-  final Future<void> Function() onRefresh;
-  final Future<void> Function() onNewCustodian;
-  final Future<void> Function(Custodian custodian) onEditCustodian;
-  final Future<void> Function(String id) onDeleteCustodian;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lagerstellen'),
-        actions: [
-          IconButton(onPressed: onRefresh, icon: const Icon(Icons.refresh)),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          final result = await showDialog<bool>(
-            context: context,
-            builder: (_) => CustodianFormDialog(countries: countries),
-          );
-          if (result == true) {
-            await onRefresh();
-          }
-        },
-        label: const Text('Neu'),
-        icon: const Icon(Icons.add),
-      ),
-      body: loading
-          ? const Center(child: CircularProgressIndicator())
-          : error != null
-          ? Center(child: Text(error!))
-          : custodians.isEmpty
-          ? const Center(child: Text('Keine Lagerstellen vorhanden.'))
-          : Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: ListView.separated(
-                    itemCount: custodians.length,
-                    separatorBuilder: (_, _) => const Divider(height: 1),
-                    itemBuilder: (context, index) {
-                      final custodian = custodians[index];
-                      final isSelected = selectedCustodian?.id == custodian.id;
-                      return ListTile(
-                        selected: isSelected,
-                        selectedTileColor: isSelected
-                            ? Theme.of(context).colorScheme.primaryContainer
-                                  .withOpacity(0.55)
-                            : null,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        leading: CircleAvatar(
-                          child: Text(
-                            custodian.shortcode.substring(0, 1).toUpperCase(),
-                          ),
-                        ),
-                        title: Text(custodian.shortcode),
-                        subtitle: Text(custodian.name),
-                        onTap: () => onSelectCustodian(custodian),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  flex: 3,
-                  child: selectedCustodian == null
-                      ? const Center(child: Text('Bitte Datensatz auswählen.'))
-                      : const Center(child: Text('Bitte Datensatz auswählen.')),
-                  /*
-                      : CustodianEditorPanel(
-                          key: ValueKey(selectedCustodian!.id),
-                          custodian: selectedCustodian!,
-                          countries: countries,
-                          onSaved: onRefresh,
-                          onDelete: () =>
-                              onDeleteCustodian(selectedCustodian!.id),
-                        ), */
-                ),
-              ],
-            ),
-    );
-  }
-}
-
 class CustodianEditorPanel extends StatefulWidget {
   const CustodianEditorPanel({
+    required this.showBoth,
     required this.custodian,
     required this.countries,
     required this.onSaved,
@@ -507,8 +430,11 @@ class CustodianEditorPanel extends StatefulWidget {
     super.key,
   });
 
+  final bool showBoth;
+
   final Custodian custodian;
   final List<CountryListItem> countries;
+
   final Future<void> Function() onSaved;
   final Future<void> Function() onDelete;
 
@@ -632,7 +558,7 @@ class _CustodianEditorPanelState extends State<CustodianEditorPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    Widget content = Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -732,5 +658,31 @@ class _CustodianEditorPanelState extends State<CustodianEditorPanel> {
         ),
       ),
     );
+
+    if (widget.showBoth) {
+      return content;
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("RbsClone"),
+              Opacity(
+                opacity: 0.7,
+                child: Text(
+                  "Stammdaten - Lagerstellen",
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    fontSize:
+                        Theme.of(context).textTheme.titleLarge!.fontSize! * 0.7,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        body: SafeArea(child: content),
+      );
+    }
   }
 }

@@ -1,8 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:openapi/openapi.dart';
-
-import 'exchange_form_dialog.dart';
 
 class ExchangeDataModule extends StatefulWidget {
   const ExchangeDataModule(this.showBoth, {super.key});
@@ -14,32 +13,64 @@ class ExchangeDataModule extends StatefulWidget {
 }
 
 class _DataModuleState extends State<ExchangeDataModule> {
-  Exchange? _selectedItem;
+  ExchangeListItem? _selectedListItem;
 
-  void onItemSelected(ExchangeListItem? item) async {
+  Future<Exchange?>? _detailFuture;
+
+  Future<Exchange?> getDetail(ExchangeListItem? item) async {
     if (item != null) {
-      if ((_selectedItem == null) || (_selectedItem!.id != item.id)) {
-        final api = Openapi();
+      try {
+        final Response<Exchange> response = await Openapi()
+            .getExchangeApi()
+            .getExchangeById(id: item.id)
+            .timeout(Duration(seconds: 10));
 
-        Exchange? newItem;
-
-        try {
-          final response = await api
-              .getExchangeApi()
-              .getExchangeById(id: item.id)
-              .timeout(const Duration(seconds: 10));
-
-          newItem = response.data;
-        } finally {
-          setState(() {
-            _selectedItem = newItem;
-          });
+        if (response.statusCode == 200) {
+          return response.data;
+        } else {
+          throw Exception("Wrong state!");
         }
+      } catch (e) {
+        rethrow;
       }
     } else {
-      if (_selectedItem != null) {
+      throw Exception("No data!");
+    }
+  }
+
+  Widget _buildDetail(ExchangeListItem? item) {
+    return FutureBuilder<Exchange?>(
+      future: _detailFuture,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return ExchangeEditorPanel(
+            showBoth: widget.showBoth,
+            exchange: snapshot.data!,
+            onSaved: () async {},
+            onDelete: () async {},
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text("Fehler beim Laden: ${snapshot.error}"));
+        }
+
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+
+  void onItemSelected(ExchangeListItem? item) {
+    if (item != null) {
+      if ((_selectedListItem == null) || (_selectedListItem!.id != item.id)) {
         setState(() {
-          _selectedItem = null;
+          _detailFuture = getDetail(_selectedListItem = item);
+        });
+      }
+    } else {
+      if (_selectedListItem != null) {
+        setState(() {
+          _detailFuture = getDetail(_selectedListItem = null);
         });
       }
     }
@@ -48,36 +79,43 @@ class _DataModuleState extends State<ExchangeDataModule> {
   //----------------------------------------------------------------------------
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     if (widget.showBoth) {
       return Row(
         children: [
           Expanded(
             flex: 2,
-            child: _MasterList(onItemSelected, widget.showBoth),
+            child: _MasterList(
+              selectedListItem: _selectedListItem,
+              showBoth: widget.showBoth,
+              itemSelectedCallback: onItemSelected,
+            ),
           ),
           const VerticalDivider(width: 1),
-          Expanded(
-            flex: 3,
-            child: _selectedItem == null
-                ? const Center(child: Text("Wähle einen Eintrag aus!"))
-                : ExchangeEditorPanel(
-                    exchange: _selectedItem!,
-                    onSaved: () async {},
-                    onDelete: () async {},
-                  ),
-          ),
+          Expanded(flex: 3, child: _buildDetail(_selectedListItem)),
         ],
       );
     } else {
       return Row(
         children: [
-          Expanded(child: _MasterList(onItemSelected, widget.showBoth)),
+          Expanded(
+            child: _MasterList(
+              selectedListItem: _selectedListItem,
+              showBoth: widget.showBoth,
+              itemSelectedCallback: (item) {
+                onItemSelected(item);
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return _buildDetail(_selectedListItem);
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       );
     }
@@ -88,19 +126,23 @@ class _DataModuleState extends State<ExchangeDataModule> {
 //------------------------------------------------------------------------------
 
 class _MasterList extends StatefulWidget {
-  final ValueChanged<ExchangeListItem?> onItemSelected;
+  final ExchangeListItem? selectedListItem;
 
   final bool showBoth;
 
-  const _MasterList(this.onItemSelected, this.showBoth);
+  final ValueChanged<ExchangeListItem?> itemSelectedCallback;
+
+  const _MasterList({
+    required this.selectedListItem,
+    required this.showBoth,
+    required this.itemSelectedCallback,
+  });
 
   @override
   State<_MasterList> createState() => _MasterListState();
 }
 
 class _MasterListState extends State<_MasterList> {
-  ExchangeListItem? _selectedItem;
-
   List<ExchangeListItem> _entriesAll = [];
   List<ExchangeListItem> _entriesFiltered = [];
 
@@ -125,11 +167,9 @@ class _MasterListState extends State<_MasterList> {
       _entriesAll = [];
       _entriesFiltered = [];
 
-      _selectedItem = null;
-
       _searchController.clear();
 
-      widget.onItemSelected(null);
+      widget.itemSelectedCallback(null);
 
       _dbFuture = fetchExchanges();
     });
@@ -193,37 +233,25 @@ class _MasterListState extends State<_MasterList> {
             //------------------------------------------------------------------
 
             if (_entriesFiltered.isNotEmpty) {
-              if (_selectedItem != null) {
+              if (widget.selectedListItem != null) {
                 ExchangeListItem? foundItem = _entriesFiltered.where((entry) {
-                  return entry.id == _selectedItem!.id;
+                  return entry.id == widget.selectedListItem!.id;
                 }).firstOrNull;
 
                 if (foundItem == null) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    setState(() {
-                      _selectedItem = _entriesFiltered[0];
-                    });
-
-                    widget.onItemSelected(_entriesFiltered[0]);
+                    widget.itemSelectedCallback(_entriesFiltered[0]);
                   });
                 }
               } else {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  setState(() {
-                    _selectedItem = _entriesFiltered[0];
-                  });
-
-                  widget.onItemSelected(_entriesFiltered[0]);
+                  widget.itemSelectedCallback(_entriesFiltered[0]);
                 });
               }
             } else {
-              if (_selectedItem != null) {
+              if (widget.selectedListItem != null) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  setState(() {
-                    _selectedItem = null;
-                  });
-
-                  widget.onItemSelected(null);
+                  widget.itemSelectedCallback(null);
                 });
               }
             }
@@ -316,7 +344,7 @@ class _MasterListState extends State<_MasterList> {
                               itemBuilder: (context, index) {
                                 final listItem = _entriesFiltered[index];
                                 final isSelected =
-                                    _selectedItem?.id == listItem.id;
+                                    widget.selectedListItem?.id == listItem.id;
                                 return ListTile(
                                   leading: CircleAvatar(
                                     child: Text(
@@ -339,11 +367,7 @@ class _MasterListState extends State<_MasterList> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   onTap: () {
-                                    setState(() {
-                                      _selectedItem = listItem;
-                                    });
-
-                                    widget.onItemSelected(listItem);
+                                    widget.itemSelectedCallback(listItem);
                                   },
                                 );
                               },
@@ -364,117 +388,16 @@ class _MasterListState extends State<_MasterList> {
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-class ExchangeMasterPanel extends StatelessWidget {
-  const ExchangeMasterPanel({
-    required this.exchanges,
-    required this.loading,
-    required this.error,
-    required this.selectedExchange,
-    required this.onSelectExchange,
-    required this.onRefresh,
-    required this.onNewExchange,
-    required this.onEditExchange,
-    required this.onDeleteExchange,
-    super.key,
-  });
-
-  final List<ExchangeListItem> exchanges;
-  final bool loading;
-  final String? error;
-  final ExchangeListItem? selectedExchange;
-  final ValueChanged<ExchangeListItem> onSelectExchange;
-  final Future<void> Function() onRefresh;
-  final Future<void> Function() onNewExchange;
-  final Future<void> Function(Exchange exchange) onEditExchange;
-  final Future<void> Function(String id) onDeleteExchange;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Exchange'),
-        actions: [
-          IconButton(onPressed: onRefresh, icon: const Icon(Icons.refresh)),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          final result = await showDialog<bool>(
-            context: context,
-            builder: (_) => const ExchangeFormDialog(),
-          );
-          if (result == true) {
-            await onRefresh();
-          }
-        },
-        label: const Text('Neu'),
-        icon: const Icon(Icons.add),
-      ),
-      body: loading
-          ? const Center(child: CircularProgressIndicator())
-          : error != null
-          ? Center(child: Text(error!))
-          : exchanges.isEmpty
-          ? const Center(child: Text('Keine Börsen vorhanden.'))
-          : Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: ListView.separated(
-                    itemCount: exchanges.length,
-                    separatorBuilder: (_, _) => const Divider(height: 1),
-                    itemBuilder: (context, index) {
-                      final exchange = exchanges[index];
-                      final isSelected = selectedExchange?.id == exchange.id;
-                      return ListTile(
-                        selected: isSelected,
-                        selectedTileColor: isSelected
-                            ? Theme.of(context).colorScheme.primaryContainer
-                                  .withOpacity(0.55)
-                            : null,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        leading: CircleAvatar(
-                          child: Text(
-                            exchange.shortcode.substring(0, 1).toUpperCase(),
-                          ),
-                        ),
-                        title: Text(exchange.shortcode),
-                        subtitle: Text(exchange.name),
-                        onTap: () => onSelectExchange(exchange),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  flex: 3,
-                  child: selectedExchange == null
-                      ? const Center(child: Text('Bitte Datensatz auswählen.'))
-                      : const Center(child: Text('??????? TEST ???????.')),
-                  /*
-                      : ExchangeEditorPanel(
-                          key: ValueKey(selectedExchange!.id),
-                          exchange: selectedExchange!,
-                          onSaved: onRefresh,
-                          onDelete: () =>
-                              onDeleteExchange(selectedExchange!.id),
-                        ),*/
-                ),
-              ],
-            ),
-    );
-  }
-}
-
 class ExchangeEditorPanel extends StatefulWidget {
   const ExchangeEditorPanel({
+    required this.showBoth,
     required this.exchange,
     required this.onSaved,
     required this.onDelete,
     super.key,
   });
+
+  final bool showBoth;
 
   final Exchange exchange;
 
@@ -590,7 +513,7 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final Widget content = Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -663,5 +586,31 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
         ),
       ),
     );
+
+    if (widget.showBoth) {
+      return content;
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("RbsClone"),
+              Opacity(
+                opacity: 0.7,
+                child: Text(
+                  "Stammdaten - Börsen",
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    fontSize:
+                        Theme.of(context).textTheme.titleLarge!.fontSize! * 0.7,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        body: SafeArea(child: content),
+      );
+    }
   }
 }

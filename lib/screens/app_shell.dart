@@ -363,9 +363,9 @@ class _AppScreenState extends State<AppScreen> {
             ),
           ],
         ),
-        scrolledUnderElevation: 0,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        // scrolledUnderElevation: 0,
+        // backgroundColor: Colors.transparent,
+        // elevation: 0,
       ),
       drawer: Drawer(
         child: NavigationMenu(
