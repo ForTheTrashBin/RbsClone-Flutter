@@ -15,80 +15,17 @@ class ExchangeDataModule extends StatefulWidget {
 class _DataModuleState extends State<ExchangeDataModule> {
   ExchangeListItem? _selectedListItem;
 
-  Future<Exchange?>? _detailFuture;
-
-  Future<Exchange?> getDetail(ExchangeListItem? item) async {
-    if (item != null) {
-      try {
-        final openapi = Openapi();
-
-        openapi.dio.options.connectTimeout = const Duration(seconds: 10);
-        openapi.dio.options.receiveTimeout = const Duration(seconds: 15);
-        openapi.dio.options.sendTimeout = const Duration(seconds: 5);
-
-        final response = await openapi.getExchangeApi().getExchangeById(
-          id: item.id,
-        );
-
-        if (response.statusCode == 200) {
-          return response.data;
-        } else {
-          throw Exception("Wrong state!");
-        }
-      } on DioException catch (e) {
-        if ((e.type == DioExceptionType.badResponse) && (e.response != null)) {
-          if (e.response!.statusCode == 404) {
-            return null;
-          }
-        }
-        rethrow;
-      } catch (e) {
-        rethrow;
-      }
-    } else {
-      throw Exception("No data!");
-    }
-  }
-
-  Widget _buildDetail(ExchangeListItem? item) {
-    return FutureBuilder<Exchange?>(
-      future: _detailFuture,
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-            return const Center(child: CircularProgressIndicator());
-          default:
-            if (snapshot.hasError) {
-              return Center(child: Text('Fehler: ${snapshot.error}'));
-            }
-
-            if (snapshot.hasData) {
-              return ExchangeEditorPanel(
-                showBoth: widget.showBoth,
-                exchange: snapshot.data!,
-                onSaved: () async {},
-                onDelete: () async {},
-              );
-            }
-
-            return Center(child: Text('Keine Daten gefunden'));
-        }
-      },
-    );
-  }
-
   void onItemSelected(ExchangeListItem? item) {
     if (item != null) {
       if ((_selectedListItem == null) || (_selectedListItem!.id != item.id)) {
         setState(() {
-          _detailFuture = getDetail(_selectedListItem = item);
+          _selectedListItem = item;
         });
       }
     } else {
       if (_selectedListItem != null) {
         setState(() {
-          _detailFuture = getDetail(_selectedListItem = null);
+          _selectedListItem = null;
         });
       }
     }
@@ -104,13 +41,19 @@ class _DataModuleState extends State<ExchangeDataModule> {
           Expanded(
             flex: 2,
             child: _MasterList(
-              selectedListItem: _selectedListItem,
               showBoth: widget.showBoth,
+              selectedListItem: _selectedListItem,
               itemSelectedCallback: onItemSelected,
             ),
           ),
           const VerticalDivider(width: 1),
-          Expanded(flex: 3, child: _buildDetail(_selectedListItem)),
+          Expanded(
+            flex: 3,
+            child: ExchangeEditorPanel(
+              showBoth: widget.showBoth,
+              listItem: _selectedListItem,
+            ),
+          ),
         ],
       );
     } else {
@@ -118,8 +61,8 @@ class _DataModuleState extends State<ExchangeDataModule> {
         children: [
           Expanded(
             child: _MasterList(
-              selectedListItem: _selectedListItem,
               showBoth: widget.showBoth,
+              selectedListItem: _selectedListItem,
               itemSelectedCallback: (item) {
                 onItemSelected(item);
 
@@ -127,7 +70,10 @@ class _DataModuleState extends State<ExchangeDataModule> {
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return _buildDetail(_selectedListItem);
+                      return ExchangeEditorPanel(
+                        showBoth: widget.showBoth,
+                        listItem: _selectedListItem,
+                      );
                     },
                   ),
                 );
@@ -144,15 +90,15 @@ class _DataModuleState extends State<ExchangeDataModule> {
 //------------------------------------------------------------------------------
 
 class _MasterList extends StatefulWidget {
-  final ExchangeListItem? selectedListItem;
-
   final bool showBoth;
+
+  final ExchangeListItem? selectedListItem;
 
   final ValueChanged<ExchangeListItem?> itemSelectedCallback;
 
   const _MasterList({
-    required this.selectedListItem,
     required this.showBoth,
+    required this.selectedListItem,
     required this.itemSelectedCallback,
   });
 
@@ -167,9 +113,13 @@ class _MasterListState extends State<_MasterList> {
   late Future<List<ExchangeListItem>> _dbFuture;
 
   Future<List<ExchangeListItem>> fetchExchanges() async {
-    final responseFuture = Openapi().getExchangeApi().getExchanges().timeout(
-      const Duration(seconds: 10),
-    );
+    final openapi = Openapi();
+
+    openapi.dio.options.connectTimeout = const Duration(seconds: 10);
+    openapi.dio.options.receiveTimeout = const Duration(seconds: 15);
+    // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
+
+    final responseFuture = openapi.getExchangeApi().getExchanges();
 
     final minWaitFuture = Future.delayed(Duration(milliseconds: 600));
 
@@ -409,23 +359,293 @@ class _MasterListState extends State<_MasterList> {
 class ExchangeEditorPanel extends StatefulWidget {
   const ExchangeEditorPanel({
     required this.showBoth,
-    required this.exchange,
-    required this.onSaved,
-    required this.onDelete,
+    required this.listItem,
     super.key,
   });
 
   final bool showBoth;
 
-  final Exchange exchange;
-
-  final Future<void> Function() onSaved;
-  final Future<void> Function() onDelete;
+  final ExchangeListItem? listItem;
 
   @override
   State<ExchangeEditorPanel> createState() => _ExchangeEditorPanelState();
 }
 
+class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
+  final _formKey = GlobalKey<FormState>();
+
+  final _shortcodeController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _flagsController = TextEditingController();
+
+  late Future<Exchange?> _dbReadFuture;
+
+  Future<Exchange?> _dbRead(ExchangeListItem? item) async {
+    if (item != null) {
+      try {
+        final openapi = Openapi();
+
+        openapi.dio.options.connectTimeout = const Duration(seconds: 10);
+        openapi.dio.options.receiveTimeout = const Duration(seconds: 15);
+        // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
+
+        final response = await openapi.getExchangeApi().getExchangeById(
+          id: item.id,
+        );
+
+        if (response.statusCode == 200) {
+          return response.data;
+        }
+      } on DioException catch (e) {
+        if ((e.type == DioExceptionType.badResponse) && (e.response != null)) {
+          if (e.response!.statusCode == 404) {
+            return null;
+          }
+        }
+        rethrow;
+      } catch (e) {
+        rethrow;
+      }
+    }
+
+    return null;
+  }
+
+  bool _saving = false;
+
+  Future<void> _dbSave() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() => _saving = true);
+      try {
+        final payload = ExchangeNoPK(
+          (b) => b
+            ..shortcode = _shortcodeController.text.trim().toUpperCase()
+            ..name = _nameController.text.trim()
+            ..flags = int.tryParse(_flagsController.text) ?? 0,
+        );
+
+        await Openapi().getExchangeApi().updateExchange(
+          id: widget.listItem!.id, // TODO NULL-Value
+          exchangeNoPK: payload,
+        );
+        // await widget.onSaved(); TODO Message tp parent
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Speichern fehlgeschlagen: $e')));
+      } finally {
+        if (mounted) setState(() => _saving = false);
+      }
+    }
+  }
+
+  //----------------------------------------------------------------------------
+  // Delete a record from database
+  //----------------------------------------------------------------------------
+
+  Future<void> _dbDelete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Börse löschen?'),
+        content: const Text('Die Daten werden dauerhaft entfernt.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Abbrechen'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Löschen'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    // await widget.onDelete(); TODO message to parent
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _dbReadFuture = _dbRead(widget.listItem);
+  }
+
+  @override
+  void didUpdateWidget(covariant ExchangeEditorPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.listItem != widget.listItem) {
+      _dbReadFuture = _dbRead(widget.listItem);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget content() {
+      return FutureBuilder<Exchange?>(
+        future: _dbReadFuture,
+        builder: (context, snapshot) {
+          bool isLoading = true;
+
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+            case ConnectionState.active:
+            case ConnectionState.waiting:
+              break;
+            case ConnectionState.done:
+              if (snapshot.hasError) {
+                return Center(child: Text('Fehler: ${snapshot.error}'));
+              }
+
+              if (snapshot.hasData) {
+                final data = snapshot.data!;
+
+                _shortcodeController.text = data.shortcode;
+                _nameController.text = data.name;
+                _flagsController.text = data.flags.toString();
+
+                isLoading = false;
+              }
+          }
+
+          return Stack(
+            children: [
+              Container(
+                padding: EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: ListView(
+                    children: [
+                      Text(
+                        'Datensatz bearbeiten',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        maxLength: 8,
+                        controller: _shortcodeController,
+                        decoration: const InputDecoration(
+                          labelText: 'Kürzel',
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                        ),
+                        inputFormatters: [
+                          TextInputFormatter.withFunction((_, newValue) {
+                            return newValue.copyWith(
+                              text: newValue.text.toUpperCase(),
+                            );
+                          }),
+                        ],
+                        validator: (value) =>
+                            (value == null || value.trim().isEmpty)
+                            ? 'Pflichtfeld'
+                            : null,
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        maxLength: 80,
+                        controller: _nameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Name',
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                        ),
+                        validator: (value) =>
+                            (value == null || value.trim().isEmpty)
+                            ? 'Pflichtfeld'
+                            : null,
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: _flagsController,
+                        decoration: const InputDecoration(
+                          labelText: 'Flags',
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                        ),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Pflichtfeld';
+                          }
+                          return int.tryParse(value) == null
+                              ? 'Zahl erforderlich'
+                              : null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          FilledButton.icon(
+                            onPressed: _saving ? null : _dbSave,
+                            icon: _saving
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.save),
+                            label: Text(_saving ? 'Speichert...' : 'Speichern'),
+                          ),
+                          const SizedBox(width: 12),
+                          OutlinedButton.icon(
+                            onPressed: _dbDelete,
+                            icon: const Icon(Icons.delete_outline),
+                            label: const Text('Löschen'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (isLoading)
+                Container(
+                  color: Colors.white.withAlpha(50),
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+            ],
+          );
+        },
+      );
+    }
+
+    if (widget.showBoth) {
+      return content();
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("RbsClone"),
+              Opacity(
+                opacity: 0.7,
+                child: Text(
+                  "Stammdaten - Börsen",
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    fontSize:
+                        Theme.of(context).textTheme.titleLarge!.fontSize! * 0.7,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Row(children: [Expanded(child: content())]),
+          ),
+        ),
+      );
+    }
+  }
+}
+/*
 class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
   final _formKey = GlobalKey<FormState>();
 
@@ -623,8 +843,14 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
             ],
           ),
         ),
-        body: SafeArea(child: content),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Row(children: [Expanded(child: content)]),
+          ),
+        ),
       );
     }
   }
 }
+*/
