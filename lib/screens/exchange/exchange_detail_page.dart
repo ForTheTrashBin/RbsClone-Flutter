@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:openapi/openapi.dart';
@@ -20,10 +19,15 @@ class _DataModuleState extends State<ExchangeDataModule> {
   Future<Exchange?> getDetail(ExchangeListItem? item) async {
     if (item != null) {
       try {
-        final Response<Exchange> response = await Openapi()
-            .getExchangeApi()
-            .getExchangeById(id: item.id)
-            .timeout(Duration(seconds: 10));
+        final openapi = Openapi();
+
+        openapi.dio.options.connectTimeout = const Duration(seconds: 10);
+        openapi.dio.options.receiveTimeout = const Duration(seconds: 15);
+        openapi.dio.options.sendTimeout = const Duration(seconds: 5);
+
+        final response = await openapi.getExchangeApi().getExchangeById(
+          id: item.id,
+        );
 
         if (response.statusCode == 200) {
           return response.data;
@@ -42,20 +46,26 @@ class _DataModuleState extends State<ExchangeDataModule> {
     return FutureBuilder<Exchange?>(
       future: _detailFuture,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return ExchangeEditorPanel(
-            showBoth: widget.showBoth,
-            exchange: snapshot.data!,
-            onSaved: () async {},
-            onDelete: () async {},
-          );
-        }
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return const Center(child: CircularProgressIndicator());
+          default:
+            if (snapshot.hasError) {
+              return Center(child: Text('Fehler: ${snapshot.error}'));
+            }
 
-        if (snapshot.hasError) {
-          return Center(child: Text("Fehler beim Laden: ${snapshot.error}"));
-        }
+            if (snapshot.hasData) {
+              return ExchangeEditorPanel(
+                showBoth: widget.showBoth,
+                exchange: snapshot.data!,
+                onSaved: () async {},
+                onDelete: () async {},
+              );
+            }
 
-        return const Center(child: CircularProgressIndicator());
+            return Center(child: Text('Keine Daten gefunden'));
+        }
       },
     );
   }
@@ -457,30 +467,30 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
   // Save a (modified) record to database
   //----------------------------------------------------------------------------
 
-  Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
+  Future<void> _dbSave() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() => _saving = true);
+      try {
+        final payload = ExchangeNoPK(
+          (b) => b
+            ..shortcode = _shortcodeController.text.trim().toUpperCase()
+            ..name = _nameController.text.trim()
+            ..flags = int.tryParse(_flagsController.text) ?? 0,
+        );
 
-    setState(() => _saving = true);
-    try {
-      final payload = ExchangeNoPK(
-        (b) => b
-          ..shortcode = _shortcodeController.text.trim().toUpperCase()
-          ..name = _nameController.text.trim()
-          ..flags = int.tryParse(_flagsController.text) ?? 0,
-      );
-
-      await Openapi().getExchangeApi().updateExchange(
-        id: widget.exchange.id,
-        exchangeNoPK: payload,
-      );
-      await widget.onSaved();
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Speichern fehlgeschlagen: $e')));
-    } finally {
-      if (mounted) setState(() => _saving = false);
+        await Openapi().getExchangeApi().updateExchange(
+          id: widget.exchange.id,
+          exchangeNoPK: payload,
+        );
+        await widget.onSaved();
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Speichern fehlgeschlagen: $e')));
+      } finally {
+        if (mounted) setState(() => _saving = false);
+      }
     }
   }
 
@@ -488,7 +498,7 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
   // Delete a record from database
   //----------------------------------------------------------------------------
 
-  Future<void> _delete() async {
+  Future<void> _dbDelete() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -515,10 +525,6 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
   Widget build(BuildContext context) {
     final Widget content = Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
-      ),
       child: Form(
         key: _formKey,
         child: ListView(
@@ -564,7 +570,7 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
             Row(
               children: [
                 FilledButton.icon(
-                  onPressed: _saving ? null : _save,
+                  onPressed: _saving ? null : _dbSave,
                   icon: _saving
                       ? const SizedBox(
                           width: 16,
@@ -576,7 +582,7 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
                 ),
                 const SizedBox(width: 12),
                 OutlinedButton.icon(
-                  onPressed: _delete,
+                  onPressed: _dbDelete,
                   icon: const Icon(Icons.delete_outline),
                   label: const Text('Löschen'),
                 ),

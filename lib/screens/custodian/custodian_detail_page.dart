@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:openapi/openapi.dart';
@@ -20,10 +19,15 @@ class _DataModuleState extends State<CustodianDataModule> {
   Future<Custodian?> getDetail(CustodianListItem? item) async {
     if (item != null) {
       try {
-        final Response<Custodian> response = await Openapi()
-            .getCustodianApi()
-            .getCustodianById(id: item.id)
-            .timeout(Duration(seconds: 10));
+        final openapi = Openapi();
+
+        openapi.dio.options.connectTimeout = const Duration(seconds: 10);
+        openapi.dio.options.receiveTimeout = const Duration(seconds: 15);
+        openapi.dio.options.sendTimeout = const Duration(seconds: 5);
+
+        final response = await openapi.getCustodianApi().getCustodianById(
+          id: item.id,
+        );
 
         if (response.statusCode == 200) {
           return response.data;
@@ -42,21 +46,27 @@ class _DataModuleState extends State<CustodianDataModule> {
     return FutureBuilder<Custodian?>(
       future: _detailFuture,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return CustodianEditorPanel(
-            showBoth: widget.showBoth,
-            custodian: snapshot.data!,
-            countries: _countries,
-            onSaved: () async {},
-            onDelete: () async {},
-          );
-        }
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return const Center(child: CircularProgressIndicator());
+          default:
+            if (snapshot.hasError) {
+              return Center(child: Text('Fehler: ${snapshot.error}'));
+            }
 
-        if (snapshot.hasError) {
-          return Center(child: Text("Fehler beim Laden: ${snapshot.error}"));
-        }
+            if (snapshot.hasData) {
+              return CustodianEditorPanel(
+                showBoth: widget.showBoth,
+                custodian: snapshot.data!,
+                countries: _countries,
+                onSaved: () async {},
+                onDelete: () async {},
+              );
+            }
 
-        return const Center(child: CircularProgressIndicator());
+            return Center(child: Text('Keine Daten gefunden'));
+        }
       },
     );
   }
@@ -498,42 +508,43 @@ class _CustodianEditorPanelState extends State<CustodianEditorPanel> {
     super.dispose();
   }
 
-  Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
-    if (_selectedCountryId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bitte ein Land auswählen.')),
-      );
-      return;
-    }
+  Future<void> _dbSave() async {
+    if (!_formKey.currentState!.validate()) {
+      if (_selectedCountryId.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Bitte ein Land auswählen.')),
+        );
+        return;
+      }
 
-    setState(() => _saving = true);
-    try {
-      final payload = CustodianNoPK(
-        (b) => b
-          ..shortcode = _shortcodeController.text.trim().toUpperCase()
-          ..name = _nameController.text.trim()
-          ..flags = int.tryParse(_flagsController.text) ?? 0
-          ..depotno = _depotNoController.text.trim()
-          ..idcountry = _selectedCountryId,
-      );
+      setState(() => _saving = true);
+      try {
+        final payload = CustodianNoPK(
+          (b) => b
+            ..shortcode = _shortcodeController.text.trim().toUpperCase()
+            ..name = _nameController.text.trim()
+            ..flags = int.tryParse(_flagsController.text) ?? 0
+            ..depotno = _depotNoController.text.trim()
+            ..idcountry = _selectedCountryId,
+        );
 
-      await Openapi().getCustodianApi().updateCustodian(
-        id: widget.custodian.id,
-        custodianNoPK: payload,
-      );
-      await widget.onSaved();
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Speichern fehlgeschlagen: $e')));
-    } finally {
-      if (mounted) setState(() => _saving = false);
+        await Openapi().getCustodianApi().updateCustodian(
+          id: widget.custodian.id,
+          custodianNoPK: payload,
+        );
+        await widget.onSaved();
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Speichern fehlgeschlagen: $e')));
+      } finally {
+        if (mounted) setState(() => _saving = false);
+      }
     }
   }
 
-  Future<void> _delete() async {
+  Future<void> _dbDelete() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -560,10 +571,6 @@ class _CustodianEditorPanelState extends State<CustodianEditorPanel> {
   Widget build(BuildContext context) {
     Widget content = Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
-      ),
       child: Form(
         key: _formKey,
         child: ListView(
@@ -636,7 +643,7 @@ class _CustodianEditorPanelState extends State<CustodianEditorPanel> {
             Row(
               children: [
                 FilledButton.icon(
-                  onPressed: _saving ? null : _save,
+                  onPressed: _saving ? null : _dbSave,
                   icon: _saving
                       ? const SizedBox(
                           width: 16,
@@ -648,7 +655,7 @@ class _CustodianEditorPanelState extends State<CustodianEditorPanel> {
                 ),
                 const SizedBox(width: 12),
                 OutlinedButton.icon(
-                  onPressed: _delete,
+                  onPressed: _dbDelete,
                   icon: const Icon(Icons.delete_outline),
                   label: const Text('Löschen'),
                 ),
