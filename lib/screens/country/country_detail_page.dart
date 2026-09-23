@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:openapi/openapi.dart';
@@ -34,6 +35,13 @@ class _DataModuleState extends State<CountryDataModule> {
         } else {
           throw Exception("Wrong state!");
         }
+      } on DioException catch (e) {
+        if ((e.type == DioExceptionType.badResponse) && (e.response != null)) {
+          if (e.response!.statusCode == 404) {
+            return null;
+          }
+        }
+        rethrow;
       } catch (e) {
         rethrow;
       }
