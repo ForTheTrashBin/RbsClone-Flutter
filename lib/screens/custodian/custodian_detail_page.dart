@@ -417,6 +417,11 @@ class _CustodianEditorPanelState extends State<CustodianEditorPanel> {
 
   String? _selectedCountryId;
 
+  //----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+
+  bool _dbReading = false;
+
   late Future<Custodian?> _dbReadFuture;
 
   Future<Custodian?> _dbRead(CustodianListItem? item) async {
@@ -493,6 +498,10 @@ class _CustodianEditorPanelState extends State<CustodianEditorPanel> {
           id: widget.listItem!.id, // TODO NULL-Value
           custodianNoPK: payload,
         );
+
+        setState(() {
+          _dbReadFuture = _dbRead(widget.listItem);
+        });
         // await widget.onSaved(); TODO Message tp parent
       } catch (e) {
         if (!mounted) return;
@@ -592,23 +601,29 @@ class _CustodianEditorPanelState extends State<CustodianEditorPanel> {
             case ConnectionState.none:
             case ConnectionState.active:
             case ConnectionState.waiting:
-              break;
+              _dbReading = true;
             case ConnectionState.done:
               if (snapshot.hasError) {
                 return Center(child: Text('Fehler: ${snapshot.error}'));
               }
 
               if (snapshot.hasData) {
-                final data = snapshot.data!;
+                if (_dbReading) {
+                  final data = snapshot.data!;
 
-                _shortcodeController.text = data.shortcode;
-                _nameController.text = data.name;
-                _flagsController.text = data.flags.toString();
-                _depotNoController.text = data.depotno.toString();
+                  _shortcodeController.text = data.shortcode;
+                  _nameController.text = data.name;
+                  _flagsController.text = data.flags.toString();
+                  _depotNoController.text = data.depotno.toString();
 
-                _selectedCountryId = data.idcountry;
+                  _selectedCountryId = data.idcountry;
+
+                  _dbReading = false;
+                }
 
                 isLoading = false;
+              } else {
+                return Center(child: Text('Keine Daten gefunden'));
               }
           }
 

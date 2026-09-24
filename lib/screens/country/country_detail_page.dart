@@ -380,6 +380,11 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
   final _ibanLengthController = TextEditingController();
   final _riskTypeController = TextEditingController();
 
+  //----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+
+  bool _dbReading = false;
+
   late Future<Country?> _dbReadFuture;
 
   Future<Country?> _dbRead(CountryListItem? item) async {
@@ -453,6 +458,10 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
           id: widget.listItem!.id, // TODO NULL-Value
           countryNoPK: payload,
         );
+
+        setState(() {
+          _dbReadFuture = _dbRead(widget.listItem);
+        });
         // await widget.onSaved(); TODO Message tp parent
       } catch (e) {
         if (!mounted) return;
@@ -550,22 +559,28 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
             case ConnectionState.none:
             case ConnectionState.active:
             case ConnectionState.waiting:
-              break;
+              _dbReading = true;
             case ConnectionState.done:
               if (snapshot.hasError) {
                 return Center(child: Text('Fehler: ${snapshot.error}'));
               }
 
               if (snapshot.hasData) {
-                final data = snapshot.data!;
+                if (_dbReading) {
+                  final data = snapshot.data!;
 
-                _shortcodeController.text = data.shortcode;
-                _nameController.text = data.name;
-                _flagsController.text = data.flags.toString();
-                _ibanLengthController.text = data.ibanlenth?.toString() ?? '';
-                _riskTypeController.text = data.risktype.toString();
+                  _shortcodeController.text = data.shortcode;
+                  _nameController.text = data.name;
+                  _flagsController.text = data.flags.toString();
+                  _ibanLengthController.text = data.ibanlenth?.toString() ?? '';
+                  _riskTypeController.text = data.risktype.toString();
+
+                  _dbReading = false;
+                }
 
                 isLoading = false;
+              } else {
+                return Center(child: Text('Keine Daten gefunden'));
               }
           }
 
