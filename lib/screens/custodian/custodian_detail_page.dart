@@ -31,6 +31,12 @@ class _DataModuleState extends State<CustodianDataModule> {
     }
   }
 
+  void onItemCreated(CustodianListItem? item) {}
+
+  void onItemSaved(CustodianListItem? item) {}
+
+  void onItemDeleted(CustodianListItem? item) {}
+
   //----------------------------------------------------------------------------
 
   List<CountryListItem> _countries = [];
@@ -82,6 +88,9 @@ class _DataModuleState extends State<CustodianDataModule> {
               showBoth: widget.showBoth,
               listItem: _selectedListItem,
               countries: _countries,
+              itemCreatedCallback: onItemCreated,
+              itemSavedCallback: onItemSaved,
+              itemDeletedCallback: onItemDeleted,
             ),
           ),
         ],
@@ -104,6 +113,9 @@ class _DataModuleState extends State<CustodianDataModule> {
                         showBoth: widget.showBoth,
                         listItem: _selectedListItem,
                         countries: _countries,
+                        itemCreatedCallback: onItemCreated,
+                        itemSavedCallback: onItemSaved,
+                        itemDeletedCallback: onItemDeleted,
                       );
                     },
                   ),
@@ -394,6 +406,9 @@ class CustodianEditorPanel extends StatefulWidget {
     required this.showBoth,
     required this.listItem,
     required this.countries,
+    required this.itemCreatedCallback,
+    required this.itemSavedCallback,
+    required this.itemDeletedCallback,
     super.key,
   });
 
@@ -402,6 +417,10 @@ class CustodianEditorPanel extends StatefulWidget {
   final CustodianListItem? listItem;
 
   final List<CountryListItem> countries;
+
+  final ValueChanged<CustodianListItem?> itemCreatedCallback;
+  final ValueChanged<CustodianListItem?> itemSavedCallback;
+  final ValueChanged<CustodianListItem?> itemDeletedCallback;
 
   @override
   State<CustodianEditorPanel> createState() => _CustodianEditorPanelState();
@@ -502,7 +521,15 @@ class _CustodianEditorPanelState extends State<CustodianEditorPanel> {
         setState(() {
           _dbReadFuture = _dbRead(widget.listItem);
         });
-        // await widget.onSaved(); TODO Message tp parent
+
+        final listItem = CustodianListItem(
+          (b) => b
+            ..id = widget.listItem!.id
+            ..shortcode = payload.name
+            ..name = payload.shortcode,
+        );
+
+        widget.itemSavedCallback(listItem);
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(
@@ -552,7 +579,8 @@ class _CustodianEditorPanelState extends State<CustodianEditorPanel> {
         await openapi.getCustodianApi().deleteCustodian(
           id: widget.listItem!.id,
         );
-        // await widget.onSaved(); TODO Message tp parent
+
+        widget.itemDeletedCallback(widget.listItem);
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(

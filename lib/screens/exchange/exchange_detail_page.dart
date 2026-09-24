@@ -31,6 +31,12 @@ class _DataModuleState extends State<ExchangeDataModule> {
     }
   }
 
+  void onItemCreated(ExchangeListItem? item) {}
+
+  void onItemSaved(ExchangeListItem? item) {}
+
+  void onItemDeleted(ExchangeListItem? item) {}
+
   //----------------------------------------------------------------------------
 
   @override
@@ -52,6 +58,9 @@ class _DataModuleState extends State<ExchangeDataModule> {
             child: ExchangeEditorPanel(
               showBoth: widget.showBoth,
               listItem: _selectedListItem,
+              itemCreatedCallback: onItemCreated,
+              itemSavedCallback: onItemSaved,
+              itemDeletedCallback: onItemDeleted,
             ),
           ),
         ],
@@ -73,6 +82,9 @@ class _DataModuleState extends State<ExchangeDataModule> {
                       return ExchangeEditorPanel(
                         showBoth: widget.showBoth,
                         listItem: _selectedListItem,
+                        itemCreatedCallback: onItemCreated,
+                        itemSavedCallback: onItemSaved,
+                        itemDeletedCallback: onItemDeleted,
                       );
                     },
                   ),
@@ -360,12 +372,19 @@ class ExchangeEditorPanel extends StatefulWidget {
   const ExchangeEditorPanel({
     required this.showBoth,
     required this.listItem,
+    required this.itemCreatedCallback,
+    required this.itemSavedCallback,
+    required this.itemDeletedCallback,
     super.key,
   });
 
   final bool showBoth;
 
   final ExchangeListItem? listItem;
+
+  final ValueChanged<ExchangeListItem?> itemCreatedCallback;
+  final ValueChanged<ExchangeListItem?> itemSavedCallback;
+  final ValueChanged<ExchangeListItem?> itemDeletedCallback;
 
   @override
   State<ExchangeEditorPanel> createState() => _ExchangeEditorPanelState();
@@ -454,7 +473,15 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
         setState(() {
           _dbReadFuture = _dbRead(widget.listItem);
         });
-        // await widget.onSaved(); TODO Message tp parent
+
+        final listItem = ExchangeListItem(
+          (b) => b
+            ..id = widget.listItem!.id
+            ..shortcode = payload.name
+            ..name = payload.shortcode,
+        );
+
+        widget.itemSavedCallback(listItem);
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(
@@ -502,7 +529,8 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
 
         // TODO NULL-Value
         await openapi.getExchangeApi().deleteExchange(id: widget.listItem!.id);
-        // await widget.onSaved(); TODO Message tp parent
+
+        widget.itemDeletedCallback(widget.listItem);
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(

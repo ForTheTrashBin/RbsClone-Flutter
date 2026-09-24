@@ -31,6 +31,12 @@ class _DataModuleState extends State<CountryDataModule> {
     }
   }
 
+  void onItemCreated(CountryListItem? item) {}
+
+  void onItemSaved(CountryListItem? item) {}
+
+  void onItemDeleted(CountryListItem? item) {}
+
   //----------------------------------------------------------------------------
 
   @override
@@ -52,6 +58,9 @@ class _DataModuleState extends State<CountryDataModule> {
             child: CountryEditorPanel(
               showBoth: widget.showBoth,
               listItem: _selectedListItem,
+              itemCreatedCallback: onItemCreated,
+              itemSavedCallback: onItemSaved,
+              itemDeletedCallback: onItemDeleted,
             ),
           ),
         ],
@@ -73,6 +82,9 @@ class _DataModuleState extends State<CountryDataModule> {
                       return CountryEditorPanel(
                         showBoth: widget.showBoth,
                         listItem: _selectedListItem,
+                        itemCreatedCallback: onItemCreated,
+                        itemSavedCallback: onItemSaved,
+                        itemDeletedCallback: onItemDeleted,
                       );
                     },
                   ),
@@ -360,12 +372,19 @@ class CountryEditorPanel extends StatefulWidget {
   const CountryEditorPanel({
     required this.showBoth,
     required this.listItem,
+    required this.itemCreatedCallback,
+    required this.itemSavedCallback,
+    required this.itemDeletedCallback,
     super.key,
   });
 
   final bool showBoth;
 
   final CountryListItem? listItem;
+
+  final ValueChanged<CountryListItem?> itemCreatedCallback;
+  final ValueChanged<CountryListItem?> itemSavedCallback;
+  final ValueChanged<CountryListItem?> itemDeletedCallback;
 
   @override
   State<CountryEditorPanel> createState() => _CountryEditorPanelState();
@@ -462,7 +481,15 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
         setState(() {
           _dbReadFuture = _dbRead(widget.listItem);
         });
-        // await widget.onSaved(); TODO Message tp parent
+
+        final listItem = CountryListItem(
+          (b) => b
+            ..id = widget.listItem!.id
+            ..shortcode = payload.name
+            ..name = payload.shortcode,
+        );
+
+        widget.itemSavedCallback(listItem);
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(
@@ -510,7 +537,8 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
 
         // TODO NULL-Value
         await openapi.getCountryApi().deleteCountry(id: widget.listItem!.id);
-        // await widget.onSaved(); TODO Message tp parent
+
+        widget.itemDeletedCallback(widget.listItem);
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(
