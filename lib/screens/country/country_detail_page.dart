@@ -413,11 +413,20 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
     return null;
   }
 
-  bool _saving = false;
+  //----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+
+  bool _dbInserting = false;
+
+  //----------------------------------------------------------------------------
+  // Save an existing record to database
+  //----------------------------------------------------------------------------
+
+  bool _dbSaving = false;
 
   Future<void> _dbSave() async {
     if (_formKey.currentState!.validate()) {
-      setState(() => _saving = true);
+      setState(() => _dbSaving = true);
       try {
         final payload = CountryNoPK(
           (b) => b
@@ -432,7 +441,15 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
             ),
         );
 
-        await Openapi().getCountryApi().updateCountry(
+        //----------------------------------------------------------------------
+
+        final openapi = Openapi();
+
+        openapi.dio.options.connectTimeout = const Duration(seconds: 5);
+        openapi.dio.options.receiveTimeout = const Duration(seconds: 5);
+        // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
+
+        await openapi.getCountryApi().updateCountry(
           id: widget.listItem!.id, // TODO NULL-Value
           countryNoPK: payload,
         );
@@ -443,7 +460,7 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
           context,
         ).showSnackBar(SnackBar(content: Text('Speichern fehlgeschlagen: $e')));
       } finally {
-        if (mounted) setState(() => _saving = false);
+        if (mounted) setState(() => _dbSaving = false);
       }
     }
   }
@@ -452,11 +469,13 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
   // Delete a record from database
   //----------------------------------------------------------------------------
 
+  bool _dbDeleting = false;
+
   Future<void> _dbDelete() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Börse löschen?'),
+        title: const Text('Land löschen?'),
         content: const Text('Die Daten werden dauerhaft entfernt.'),
         actions: [
           TextButton(
@@ -471,9 +490,37 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
       ),
     );
 
-    if (confirmed != true) return;
-    // await widget.onDelete(); TODO message to parent
+    if (confirmed == true) {
+      setState(() => _dbDeleting = true);
+      try {
+        final openapi = Openapi();
+
+        openapi.dio.options.connectTimeout = const Duration(seconds: 5);
+        openapi.dio.options.receiveTimeout = const Duration(seconds: 5);
+        // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
+
+        // TODO NULL-Value
+        await openapi.getCountryApi().deleteCountry(id: widget.listItem!.id);
+        // await widget.onSaved(); TODO Message tp parent
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Löschen fehlgeschlagen: $e')));
+      } finally {
+        if (mounted) setState(() => _dbDeleting = false);
+      }
+    }
   }
+
+  //----------------------------------------------------------------------------
+
+  bool _dbActive() {
+    return _dbInserting || _dbSaving || _dbDeleting;
+  }
+
+  //----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 
   @override
   void initState() {
@@ -614,23 +661,33 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
                       Row(
                         children: [
                           FilledButton.icon(
-                            onPressed: _saving ? null : _dbSave,
-                            icon: _saving
+                            onPressed: _dbActive() ? null : _dbSave,
+                            icon: _dbSaving
                                 ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
+                                    width: 10,
+                                    height: 10,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                     ),
                                   )
                                 : const Icon(Icons.save),
-                            label: Text(_saving ? 'Speichert...' : 'Speichern'),
+                            label: Text(
+                              _dbSaving ? 'Speichert...' : 'Speichern',
+                            ),
                           ),
                           const SizedBox(width: 12),
                           OutlinedButton.icon(
-                            onPressed: _dbDelete,
-                            icon: const Icon(Icons.delete_outline),
-                            label: const Text('Löschen'),
+                            onPressed: _dbActive() ? null : _dbDelete,
+                            icon: _dbDeleting
+                                ? const SizedBox(
+                                    width: 10,
+                                    height: 10,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.delete_outline),
+                            label: Text(_dbDeleting ? 'Löscht...' : 'Löschen'),
                           ),
                         ],
                       ),
