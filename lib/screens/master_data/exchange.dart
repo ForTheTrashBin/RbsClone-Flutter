@@ -180,7 +180,7 @@ class _MasterListState extends State<_MasterList> {
 
   late Future<List<ExchangeListItem>> _dbFuture;
 
-  Future<List<ExchangeListItem>> fetchExchanges() async {
+  Future<List<ExchangeListItem>> fetchListData() async {
     final openapi = Openapi();
 
     openapi.dio.options.connectTimeout = const Duration(seconds: 10);
@@ -207,7 +207,7 @@ class _MasterListState extends State<_MasterList> {
 
       widget.itemSelectedCallback(null);
 
-      _dbFuture = fetchExchanges();
+      _dbFuture = fetchListData();
     });
   }
 
@@ -327,7 +327,7 @@ class _MasterListState extends State<_MasterList> {
   void initState() {
     super.initState();
 
-    _dbFuture = fetchExchanges();
+    _dbFuture = fetchListData();
 
     widget.createNotifier.addListener(_onDataCreated);
     widget.updateNotifier.addListener(_onDataUpdated);
@@ -342,6 +342,8 @@ class _MasterListState extends State<_MasterList> {
 
     super.dispose();
   }
+
+  //----------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -901,212 +903,3 @@ class _EditorPanelState extends State<_EditorPanel> {
     }
   }
 }
-/*
-class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
-  final _formKey = GlobalKey<FormState>();
-
-  late final TextEditingController _shortcodeController;
-  late final TextEditingController _nameController;
-  late final TextEditingController _flagsController;
-
-  bool _saving = false;
-
-  void _syncControllers() {
-    final exchange = widget.exchange;
-
-    _shortcodeController.text = exchange.shortcode;
-    _nameController.text = exchange.name;
-    _flagsController.text = exchange.flags.toString();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _shortcodeController = TextEditingController(
-      text: widget.exchange.shortcode,
-    );
-    _nameController = TextEditingController(text: widget.exchange.name);
-    _flagsController = TextEditingController(
-      text: widget.exchange.flags.toString(),
-    );
-  }
-
-  @override
-  void didUpdateWidget(covariant ExchangeEditorPanel oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.exchange != widget.exchange) {
-      _syncControllers();
-    }
-  }
-
-  @override
-  void dispose() {
-    _shortcodeController.dispose();
-    _nameController.dispose();
-    _flagsController.dispose();
-    super.dispose();
-  }
-
-  //----------------------------------------------------------------------------
-  // Save a (modified) record to database
-  //----------------------------------------------------------------------------
-
-  Future<void> _dbSave() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _saving = true);
-      try {
-        final payload = ExchangeNoPK(
-          (b) => b
-            ..shortcode = _shortcodeController.text.trim().toUpperCase()
-            ..name = _nameController.text.trim()
-            ..flags = int.tryParse(_flagsController.text) ?? 0,
-        );
-
-        await Openapi().getExchangeApi().updateExchange(
-          id: widget.exchange.id,
-          exchangeNoPK: payload,
-        );
-        await widget.onSaved();
-      } catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Speichern fehlgeschlagen: $e')));
-      } finally {
-        if (mounted) setState(() => _saving = false);
-      }
-    }
-  }
-
-  //----------------------------------------------------------------------------
-  // Delete a record from database
-  //----------------------------------------------------------------------------
-
-  Future<void> _dbDelete() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Börse löschen?'),
-        content: const Text('Die Daten werden dauerhaft entfernt.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Abbrechen'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Löschen'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true) return;
-    await widget.onDelete();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final Widget content = Container(
-      padding: const EdgeInsets.all(16),
-      child: Form(
-        key: _formKey,
-        child: ListView(
-          children: [
-            Text(
-              'Datensatz bearbeiten',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              maxLength: 8,
-              controller: _shortcodeController,
-              decoration: const InputDecoration(labelText: 'Kürzel'),
-              inputFormatters: [
-                TextInputFormatter.withFunction((_, newValue) {
-                  return newValue.copyWith(text: newValue.text.toUpperCase());
-                }),
-              ],
-              validator: (value) => (value == null || value.trim().isEmpty)
-                  ? 'Pflichtfeld'
-                  : null,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              maxLength: 80,
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-              validator: (value) => (value == null || value.trim().isEmpty)
-                  ? 'Pflichtfeld'
-                  : null,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _flagsController,
-              decoration: const InputDecoration(labelText: 'Flags'),
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) return 'Pflichtfeld';
-                return int.tryParse(value) == null ? 'Zahl erforderlich' : null;
-              },
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                FilledButton.icon(
-                  onPressed: _saving ? null : _dbSave,
-                  icon: _saving
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.save),
-                  label: Text(_saving ? 'Speichert...' : 'Speichern'),
-                ),
-                const SizedBox(width: 12),
-                OutlinedButton.icon(
-                  onPressed: _dbDelete,
-                  icon: const Icon(Icons.delete_outline),
-                  label: const Text('Löschen'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-
-    if (widget.showBoth) {
-      return content;
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("RbsClone"),
-              Opacity(
-                opacity: 0.7,
-                child: Text(
-                  "Stammdaten - Börsen",
-                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                    fontSize:
-                        Theme.of(context).textTheme.titleLarge!.fontSize! * 0.7,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Row(children: [Expanded(child: content)]),
-          ),
-        ),
-      );
-    }
-  }
-}
-*/
