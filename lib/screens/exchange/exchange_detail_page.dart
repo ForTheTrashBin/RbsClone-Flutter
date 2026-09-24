@@ -34,6 +34,12 @@ class _DataModuleState extends State<ExchangeDataModule> {
 
   //----------------------------------------------------------------------------
 
+  void onNewCallback() {
+    print("**************** _DataModuleState::onNewCallback");
+  }
+
+  //----------------------------------------------------------------------------
+
   final _createNotifier = ValueNotifier<ExchangeListItem?>(null);
 
   void onItemCreated(ExchangeListItem? item) {
@@ -80,6 +86,7 @@ class _DataModuleState extends State<ExchangeDataModule> {
               showBoth: widget.showBoth,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: onItemSelected,
+              newCallback: onNewCallback,
               createNotifier: _createNotifier,
               updateNotifier: _updateNotifier,
               deleteNotifier: _deleteNotifier,
@@ -88,7 +95,7 @@ class _DataModuleState extends State<ExchangeDataModule> {
           const VerticalDivider(width: 1),
           Expanded(
             flex: 3,
-            child: ExchangeEditorPanel(
+            child: _EditorPanel(
               showBoth: widget.showBoth,
               listItem: _selectedListItem,
               itemCreatedCallback: onItemCreated,
@@ -112,7 +119,7 @@ class _DataModuleState extends State<ExchangeDataModule> {
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return ExchangeEditorPanel(
+                      return _EditorPanel(
                         showBoth: widget.showBoth,
                         listItem: _selectedListItem,
                         itemCreatedCallback: onItemCreated,
@@ -123,6 +130,7 @@ class _DataModuleState extends State<ExchangeDataModule> {
                   ),
                 );
               },
+              newCallback: onNewCallback,
               createNotifier: _createNotifier,
               updateNotifier: _updateNotifier,
               deleteNotifier: _deleteNotifier,
@@ -142,6 +150,7 @@ class _MasterList extends StatefulWidget {
     required this.showBoth,
     required this.selectedListItem,
     required this.itemSelectedCallback,
+    required this.newCallback,
     required this.createNotifier,
     required this.updateNotifier,
     required this.deleteNotifier,
@@ -152,6 +161,8 @@ class _MasterList extends StatefulWidget {
   final ExchangeListItem? selectedListItem;
 
   final ValueChanged<ExchangeListItem?> itemSelectedCallback;
+
+  final VoidCallback newCallback;
 
   final ValueNotifier<ExchangeListItem?> createNotifier;
   final ValueNotifier<ExchangeListItem?> updateNotifier;
@@ -220,8 +231,6 @@ class _MasterListState extends State<_MasterList> {
   }
 
   //----------------------------------------------------------------------------
-
-  void onNew() {}
 
   void _onDataCreated() {
     print("***************************** _MasterListState::_onDataCreated");
@@ -338,7 +347,7 @@ class _MasterListState extends State<_MasterList> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: onNew,
+        onPressed: widget.newCallback,
         label: const Text("Neu"),
         icon: const Icon(Icons.add),
       ),
@@ -515,8 +524,8 @@ class _MasterListState extends State<_MasterList> {
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-class ExchangeEditorPanel extends StatefulWidget {
-  const ExchangeEditorPanel({
+class _EditorPanel extends StatefulWidget {
+  const _EditorPanel({
     required this.showBoth,
     required this.listItem,
     required this.itemCreatedCallback,
@@ -534,10 +543,10 @@ class ExchangeEditorPanel extends StatefulWidget {
   final ValueChanged<ExchangeListItem?> itemDeletedCallback;
 
   @override
-  State<ExchangeEditorPanel> createState() => _ExchangeEditorPanelState();
+  State<_EditorPanel> createState() => _EditorPanelState();
 }
 
-class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
+class _EditorPanelState extends State<_EditorPanel> {
   final _formKey = GlobalKey<FormState>();
 
   final _shortcodeController = TextEditingController();
@@ -706,7 +715,7 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
   }
 
   @override
-  void didUpdateWidget(covariant ExchangeEditorPanel oldWidget) {
+  void didUpdateWidget(covariant _EditorPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.listItem != widget.listItem) {
@@ -758,7 +767,7 @@ class _ExchangeEditorPanelState extends State<ExchangeEditorPanel> {
                   child: ListView(
                     children: [
                       Text(
-                        'Datensatz bearbeiten',
+                        'Daten bearbeiten/löschen',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 16),

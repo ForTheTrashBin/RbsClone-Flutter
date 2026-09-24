@@ -34,6 +34,12 @@ class _DataModuleState extends State<CountryDataModule> {
 
   //----------------------------------------------------------------------------
 
+  void onNewCallback() {
+    print("**************** _DataModuleState::onNewCallback");
+  }
+
+  //----------------------------------------------------------------------------
+
   final _createNotifier = ValueNotifier<CountryListItem?>(null);
 
   void onItemCreated(CountryListItem? item) {
@@ -80,6 +86,7 @@ class _DataModuleState extends State<CountryDataModule> {
               showBoth: widget.showBoth,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: onItemSelected,
+              newCallback: onNewCallback,
               createNotifier: _createNotifier,
               updateNotifier: _updateNotifier,
               deleteNotifier: _deleteNotifier,
@@ -88,7 +95,7 @@ class _DataModuleState extends State<CountryDataModule> {
           const VerticalDivider(width: 1),
           Expanded(
             flex: 3,
-            child: CountryEditorPanel(
+            child: _EditorPanel(
               showBoth: widget.showBoth,
               listItem: _selectedListItem,
               itemCreatedCallback: onItemCreated,
@@ -112,7 +119,7 @@ class _DataModuleState extends State<CountryDataModule> {
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return CountryEditorPanel(
+                      return _EditorPanel(
                         showBoth: widget.showBoth,
                         listItem: _selectedListItem,
                         itemCreatedCallback: onItemCreated,
@@ -123,6 +130,7 @@ class _DataModuleState extends State<CountryDataModule> {
                   ),
                 );
               },
+              newCallback: onNewCallback,
               createNotifier: _createNotifier,
               updateNotifier: _updateNotifier,
               deleteNotifier: _deleteNotifier,
@@ -142,6 +150,7 @@ class _MasterList extends StatefulWidget {
     required this.showBoth,
     required this.selectedListItem,
     required this.itemSelectedCallback,
+    required this.newCallback,
     required this.createNotifier,
     required this.updateNotifier,
     required this.deleteNotifier,
@@ -152,6 +161,8 @@ class _MasterList extends StatefulWidget {
   final CountryListItem? selectedListItem;
 
   final ValueChanged<CountryListItem?> itemSelectedCallback;
+
+  final VoidCallback newCallback;
 
   final ValueNotifier<CountryListItem?> createNotifier;
   final ValueNotifier<CountryListItem?> updateNotifier;
@@ -220,8 +231,6 @@ class _MasterListState extends State<_MasterList> {
   }
 
   //----------------------------------------------------------------------------
-
-  void onNew() {}
 
   void _onDataCreated() {
     print("***************************** _MasterListState::_onDataCreated");
@@ -340,7 +349,7 @@ class _MasterListState extends State<_MasterList> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: onNew,
+        onPressed: widget.newCallback,
         label: const Text("Neu"),
         icon: const Icon(Icons.add),
       ),
@@ -517,8 +526,8 @@ class _MasterListState extends State<_MasterList> {
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-class CountryEditorPanel extends StatefulWidget {
-  const CountryEditorPanel({
+class _EditorPanel extends StatefulWidget {
+  const _EditorPanel({
     required this.showBoth,
     required this.listItem,
     required this.itemCreatedCallback,
@@ -536,10 +545,10 @@ class CountryEditorPanel extends StatefulWidget {
   final ValueChanged<CountryListItem?> itemDeletedCallback;
 
   @override
-  State<CountryEditorPanel> createState() => _CountryEditorPanelState();
+  State<_EditorPanel> createState() => _EditorPanelState();
 }
 
-class _CountryEditorPanelState extends State<CountryEditorPanel> {
+class _EditorPanelState extends State<_EditorPanel> {
   final _formKey = GlobalKey<FormState>();
 
   final _shortcodeController = TextEditingController();
@@ -716,7 +725,7 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
   }
 
   @override
-  void didUpdateWidget(covariant CountryEditorPanel oldWidget) {
+  void didUpdateWidget(covariant _EditorPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.listItem != widget.listItem) {
@@ -770,7 +779,7 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
                   child: ListView(
                     children: [
                       Text(
-                        'Datensatz bearbeiten',
+                        'Daten bearbeiten/löschen',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 16),

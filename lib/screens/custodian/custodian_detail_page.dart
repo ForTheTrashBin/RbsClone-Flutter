@@ -34,6 +34,12 @@ class _DataModuleState extends State<CustodianDataModule> {
 
   //----------------------------------------------------------------------------
 
+  void onNewCallback() {
+    print("**************** _DataModuleState::onNewCallback");
+  }
+
+  //----------------------------------------------------------------------------
+
   final _createNotifier = ValueNotifier<CustodianListItem?>(null);
 
   void onItemCreated(CustodianListItem? item) {
@@ -109,6 +115,7 @@ class _DataModuleState extends State<CustodianDataModule> {
               showBoth: widget.showBoth,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: onItemSelected,
+              newCallback: onNewCallback,
               createNotifier: _createNotifier,
               updateNotifier: _updateNotifier,
               deleteNotifier: _deleteNotifier,
@@ -117,7 +124,7 @@ class _DataModuleState extends State<CustodianDataModule> {
           const VerticalDivider(width: 1),
           Expanded(
             flex: 3,
-            child: CustodianEditorPanel(
+            child: _EditorPanel(
               showBoth: widget.showBoth,
               listItem: _selectedListItem,
               countries: _countries,
@@ -142,7 +149,7 @@ class _DataModuleState extends State<CustodianDataModule> {
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return CustodianEditorPanel(
+                      return _EditorPanel(
                         showBoth: widget.showBoth,
                         listItem: _selectedListItem,
                         countries: _countries,
@@ -154,6 +161,7 @@ class _DataModuleState extends State<CustodianDataModule> {
                   ),
                 );
               },
+              newCallback: onNewCallback,
               createNotifier: _createNotifier,
               updateNotifier: _updateNotifier,
               deleteNotifier: _deleteNotifier,
@@ -173,6 +181,7 @@ class _MasterList extends StatefulWidget {
     required this.showBoth,
     required this.selectedListItem,
     required this.itemSelectedCallback,
+    required this.newCallback,
     required this.createNotifier,
     required this.updateNotifier,
     required this.deleteNotifier,
@@ -183,6 +192,8 @@ class _MasterList extends StatefulWidget {
   final CustodianListItem? selectedListItem;
 
   final ValueChanged<CustodianListItem?> itemSelectedCallback;
+
+  final VoidCallback newCallback;
 
   final ValueNotifier<CustodianListItem?> createNotifier;
   final ValueNotifier<CustodianListItem?> updateNotifier;
@@ -251,8 +262,6 @@ class _MasterListState extends State<_MasterList> {
   }
 
   //----------------------------------------------------------------------------
-
-  void onNew() {}
 
   void _onDataCreated() {
     print("***************************** _MasterListState::_onDataCreated");
@@ -369,7 +378,7 @@ class _MasterListState extends State<_MasterList> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: onNew,
+        onPressed: widget.newCallback,
         label: const Text("Neu"),
         icon: const Icon(Icons.add),
       ),
@@ -548,8 +557,8 @@ class _MasterListState extends State<_MasterList> {
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-class CustodianEditorPanel extends StatefulWidget {
-  const CustodianEditorPanel({
+class _EditorPanel extends StatefulWidget {
+  const _EditorPanel({
     required this.showBoth,
     required this.listItem,
     required this.countries,
@@ -570,10 +579,10 @@ class CustodianEditorPanel extends StatefulWidget {
   final ValueChanged<CustodianListItem?> itemDeletedCallback;
 
   @override
-  State<CustodianEditorPanel> createState() => _CustodianEditorPanelState();
+  State<_EditorPanel> createState() => _EditorPanelState();
 }
 
-class _CustodianEditorPanelState extends State<CustodianEditorPanel> {
+class _EditorPanelState extends State<_EditorPanel> {
   final _formKey = GlobalKey<FormState>();
 
   final _shortcodeController = TextEditingController();
@@ -756,7 +765,7 @@ class _CustodianEditorPanelState extends State<CustodianEditorPanel> {
   }
 
   @override
-  void didUpdateWidget(covariant CustodianEditorPanel oldWidget) {
+  void didUpdateWidget(covariant _EditorPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.listItem != widget.listItem) {
@@ -811,7 +820,7 @@ class _CustodianEditorPanelState extends State<CustodianEditorPanel> {
                   child: ListView(
                     children: [
                       Text(
-                        'Datensatz bearbeiten',
+                        'Daten bearbeiten/löschen',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 16),
