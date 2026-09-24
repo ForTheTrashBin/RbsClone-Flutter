@@ -533,7 +533,6 @@ class _EditorPanel extends StatefulWidget {
     required this.itemCreatedCallback,
     required this.itemUpdatedCallback,
     required this.itemDeletedCallback,
-    super.key,
   });
 
   final bool showBoth;
