@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:openapi/openapi.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class CountryDataModule extends StatefulWidget {
   const CountryDataModule(this.showBoth, {super.key});
@@ -31,11 +32,40 @@ class _DataModuleState extends State<CountryDataModule> {
     }
   }
 
-  void onItemCreated(CountryListItem? item) {}
+  //----------------------------------------------------------------------------
 
-  void onItemSaved(CountryListItem? item) {}
+  final _createNotifier = ValueNotifier<CountryListItem?>(null);
 
-  void onItemDeleted(CountryListItem? item) {}
+  void onItemCreated(CountryListItem? item) {
+    _createNotifier.value = item;
+  }
+
+  //----------------------------------------------------------------------------
+
+  final _updateNotifier = ValueNotifier<CountryListItem?>(null);
+
+  void onItemUpdated(CountryListItem? item) {
+    _updateNotifier.value = item;
+  }
+
+  //----------------------------------------------------------------------------
+
+  final _deleteNotifier = ValueNotifier<CountryListItem?>(null);
+
+  void onItemDeleted(CountryListItem? item) {
+    _deleteNotifier.value = item;
+  }
+
+  //----------------------------------------------------------------------------
+
+  @override
+  void dispose() {
+    _deleteNotifier.dispose();
+    _updateNotifier.dispose();
+    _createNotifier.dispose();
+
+    super.dispose();
+  }
 
   //----------------------------------------------------------------------------
 
@@ -50,6 +80,9 @@ class _DataModuleState extends State<CountryDataModule> {
               showBoth: widget.showBoth,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: onItemSelected,
+              createNotifier: _createNotifier,
+              updateNotifier: _updateNotifier,
+              deleteNotifier: _deleteNotifier,
             ),
           ),
           const VerticalDivider(width: 1),
@@ -59,7 +92,7 @@ class _DataModuleState extends State<CountryDataModule> {
               showBoth: widget.showBoth,
               listItem: _selectedListItem,
               itemCreatedCallback: onItemCreated,
-              itemSavedCallback: onItemSaved,
+              itemUpdatedCallback: onItemUpdated,
               itemDeletedCallback: onItemDeleted,
             ),
           ),
@@ -83,13 +116,16 @@ class _DataModuleState extends State<CountryDataModule> {
                         showBoth: widget.showBoth,
                         listItem: _selectedListItem,
                         itemCreatedCallback: onItemCreated,
-                        itemSavedCallback: onItemSaved,
+                        itemUpdatedCallback: onItemUpdated,
                         itemDeletedCallback: onItemDeleted,
                       );
                     },
                   ),
                 );
               },
+              createNotifier: _createNotifier,
+              updateNotifier: _updateNotifier,
+              deleteNotifier: _deleteNotifier,
             ),
           ),
         ],
@@ -102,17 +138,24 @@ class _DataModuleState extends State<CountryDataModule> {
 //------------------------------------------------------------------------------
 
 class _MasterList extends StatefulWidget {
+  const _MasterList({
+    required this.showBoth,
+    required this.selectedListItem,
+    required this.itemSelectedCallback,
+    required this.createNotifier,
+    required this.updateNotifier,
+    required this.deleteNotifier,
+  });
+
   final bool showBoth;
 
   final CountryListItem? selectedListItem;
 
   final ValueChanged<CountryListItem?> itemSelectedCallback;
 
-  const _MasterList({
-    required this.showBoth,
-    required this.selectedListItem,
-    required this.itemSelectedCallback,
-  });
+  final ValueNotifier<CountryListItem?> createNotifier;
+  final ValueNotifier<CountryListItem?> updateNotifier;
+  final ValueNotifier<CountryListItem?> deleteNotifier;
 
   @override
   State<_MasterList> createState() => _MasterListState();
@@ -121,6 +164,8 @@ class _MasterList extends StatefulWidget {
 class _MasterListState extends State<_MasterList> {
   List<CountryListItem> _entriesAll = [];
   List<CountryListItem> _entriesFiltered = [];
+
+  final ItemScrollController _itemScrollController = ItemScrollController();
 
   late Future<List<CountryListItem>> _dbFuture;
 
@@ -178,6 +223,80 @@ class _MasterListState extends State<_MasterList> {
 
   void onNew() {}
 
+  void _onDataCreated() {
+    print("***************************** _MasterListState::_onDataCreated");
+  }
+
+  void _scrollToItem(String id) {
+    final index = _entriesFiltered.indexWhere((entry) {
+      return entry.id == id;
+    });
+
+    if (index >= 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_itemScrollController.isAttached) {
+          _itemScrollController.scrollTo(
+            index: index,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+            alignment: 0.1,
+          );
+        }
+      });
+    }
+  }
+
+  void _onDataUpdated() {
+    final listItem = widget.updateNotifier.value;
+
+    if (listItem != null) {
+      final indexAll = _entriesAll.indexWhere((entry) {
+        return entry.id == listItem.id;
+      });
+
+      final indexFiltered = _entriesFiltered.indexWhere((entry) {
+        return entry.id == listItem.id;
+      });
+
+      if ((indexAll >= 0) && (indexFiltered >= 0)) {
+        bool needSort =
+            ((_entriesAll[indexAll].shortcode != listItem.shortcode) ||
+            (_entriesFiltered[indexFiltered].shortcode != listItem.shortcode));
+
+        setState(() {
+          _entriesAll[indexAll] = listItem;
+          _entriesFiltered[indexFiltered] = listItem;
+
+          if (needSort) {
+            _entriesAll.sort((a, b) {
+              return a.shortcode.toUpperCase().compareTo(
+                b.shortcode.toUpperCase(),
+              );
+            });
+
+            _entriesFiltered.sort((a, b) {
+              return a.shortcode.toUpperCase().compareTo(
+                b.shortcode.toUpperCase(),
+              );
+            });
+          }
+        });
+
+        if (needSort) {
+          _scrollToItem(listItem.id);
+        }
+      }
+    } else {
+      _onRefresh();
+    }
+  }
+
+  void _onDataDeleted() {
+    print("***************************** _MasterListState::_onDataDeleted");
+
+    final listItem = widget.updateNotifier.value;
+  }
+
   //----------------------------------------------------------------------------
 
   @override
@@ -185,9 +304,22 @@ class _MasterListState extends State<_MasterList> {
     super.initState();
 
     _dbFuture = fetchCountries();
+
+    widget.createNotifier.addListener(_onDataCreated);
+    widget.updateNotifier.addListener(_onDataUpdated);
+    widget.deleteNotifier.addListener(_onDataDeleted);
   }
 
-  // TODO: Premium-UX, Paket: shimmer, um das Flackern beim Update zu vermeiden
+  @override
+  void dispose() {
+    widget.deleteNotifier.removeListener(_onDataDeleted);
+    widget.updateNotifier.removeListener(_onDataUpdated);
+    widget.createNotifier.removeListener(_onDataCreated);
+
+    super.dispose();
+  }
+
+  //----------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -317,8 +449,9 @@ class _MasterListState extends State<_MasterList> {
                     child: ClipRect(
                       child: _entriesFiltered.isEmpty
                           ? const Center(child: Text("Keine Länder vorhanden."))
-                          : ListView.separated(
+                          : ScrollablePositionedList.separated(
                               itemCount: _entriesFiltered.length,
+                              itemScrollController: _itemScrollController,
                               separatorBuilder: (_, __) =>
                                   const Divider(height: 1),
                               itemBuilder: (context, index) {
@@ -326,6 +459,7 @@ class _MasterListState extends State<_MasterList> {
                                 final isSelected =
                                     widget.selectedListItem?.id == listItem.id;
                                 return ListTile(
+                                  key: ValueKey(listItem.id),
                                   leading: CircleAvatar(
                                     child: Text(
                                       listItem.shortcode
@@ -373,7 +507,7 @@ class CountryEditorPanel extends StatefulWidget {
     required this.showBoth,
     required this.listItem,
     required this.itemCreatedCallback,
-    required this.itemSavedCallback,
+    required this.itemUpdatedCallback,
     required this.itemDeletedCallback,
     super.key,
   });
@@ -383,7 +517,7 @@ class CountryEditorPanel extends StatefulWidget {
   final CountryListItem? listItem;
 
   final ValueChanged<CountryListItem?> itemCreatedCallback;
-  final ValueChanged<CountryListItem?> itemSavedCallback;
+  final ValueChanged<CountryListItem?> itemUpdatedCallback;
   final ValueChanged<CountryListItem?> itemDeletedCallback;
 
   @override
@@ -485,11 +619,11 @@ class _CountryEditorPanelState extends State<CountryEditorPanel> {
         final listItem = CountryListItem(
           (b) => b
             ..id = widget.listItem!.id
-            ..shortcode = payload.name
-            ..name = payload.shortcode,
+            ..shortcode = payload.shortcode
+            ..name = payload.name,
         );
 
-        widget.itemSavedCallback(listItem);
+        widget.itemUpdatedCallback(listItem);
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(
