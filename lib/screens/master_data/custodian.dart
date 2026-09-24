@@ -211,6 +211,8 @@ class _MasterListState extends State<_MasterList> {
 
   late Future<List<CustodianListItem>> _dbFuture;
 
+  late TextEditingController _searchController;
+
   Future<List<CustodianListItem>> fetchListData() async {
     final openapi = Openapi();
 
@@ -243,8 +245,6 @@ class _MasterListState extends State<_MasterList> {
   }
 
   //----------------------------------------------------------------------------
-
-  final TextEditingController _searchController = TextEditingController();
 
   void _filterListe(String searchText) {
     setState(() {
@@ -360,6 +360,8 @@ class _MasterListState extends State<_MasterList> {
 
     _dbFuture = fetchListData();
 
+    _searchController = TextEditingController();
+
     widget.createNotifier.addListener(_onDataCreated);
     widget.updateNotifier.addListener(_onDataUpdated);
     widget.deleteNotifier.addListener(_onDataDeleted);
@@ -367,6 +369,8 @@ class _MasterListState extends State<_MasterList> {
 
   @override
   void dispose() {
+    _searchController.dispose();
+
     widget.deleteNotifier.removeListener(_onDataDeleted);
     widget.updateNotifier.removeListener(_onDataUpdated);
     widget.createNotifier.removeListener(_onDataCreated);
@@ -584,10 +588,10 @@ class _EditorPanel extends StatefulWidget {
 class _EditorPanelState extends State<_EditorPanel> {
   final _formKey = GlobalKey<FormState>();
 
-  final _shortcodeController = TextEditingController();
-  final _nameController = TextEditingController();
-  final _flagsController = TextEditingController();
-  final _depotNoController = TextEditingController();
+  late TextEditingController _shortcodeController;
+  late TextEditingController _nameController;
+  late TextEditingController _flagsController;
+  late TextEditingController _depotNoController;
 
   String? _selectedCountryId;
 
@@ -761,6 +765,21 @@ class _EditorPanelState extends State<_EditorPanel> {
     super.initState();
 
     _dbReadFuture = _dbRead(widget.listItem);
+
+    _shortcodeController = TextEditingController();
+    _nameController = TextEditingController();
+    _flagsController = TextEditingController();
+    _depotNoController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _shortcodeController.dispose();
+    _nameController.dispose();
+    _flagsController.dispose();
+    _depotNoController.dispose();
+
+    super.dispose();
   }
 
   @override
