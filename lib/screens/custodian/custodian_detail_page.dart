@@ -323,9 +323,24 @@ class _MasterListState extends State<_MasterList> {
   }
 
   void _onDataDeleted() {
-    print("***************************** _MasterListState::_onDataDeleted");
+    final listItem = widget.deleteNotifier.value;
 
-    final listItem = widget.updateNotifier.value;
+    if (listItem != null) {
+      final indexAll = _entriesAll.indexWhere((entry) {
+        return entry.id == listItem.id;
+      });
+
+      final indexFiltered = _entriesFiltered.indexWhere((entry) {
+        return entry.id == listItem.id;
+      });
+
+      if ((indexAll >= 0) && (indexFiltered >= 0)) {
+        setState(() {
+          _entriesAll.removeAt(indexAll);
+          _entriesFiltered.removeAt(indexFiltered);
+        });
+      }
+    }
   }
 
   //----------------------------------------------------------------------------
