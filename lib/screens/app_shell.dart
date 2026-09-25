@@ -3,9 +3,9 @@ import 'package:rbsclone_flutter/widgets/custom_appbar.dart';
 import 'package:rbsclone_flutter/widgets/hierarchical_navigation_menu.dart';
 import 'package:rbsclone_flutter/widgets/placeholder_page.dart';
 
-import 'master/country/module.dart';
-import 'master/custodian/module.dart';
-import 'master/exchange/module.dart';
+import 'master/country/country_module.dart';
+import 'master/custodian/custodian_module.dart';
+import 'master/exchange/exchange_module.dart';
 
 /// Breakpoints for responsive Design
 /// - Mobile: < 600 dp (Smartphones)

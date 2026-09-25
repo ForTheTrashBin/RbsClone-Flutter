@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:openapi/openapi.dart';
-import 'package:rbsclone_flutter/screens/master/exchange/detail.dart';
-import 'package:rbsclone_flutter/screens/master/exchange/list.dart';
+import 'package:rbsclone_flutter/screens/master/exchange/exchange_detail.dart';
+import 'package:rbsclone_flutter/screens/master/exchange/exchange_list.dart';
 
 //------------------------------------------------------------------------------
 

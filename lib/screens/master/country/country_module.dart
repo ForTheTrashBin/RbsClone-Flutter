@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:openapi/openapi.dart';
-import 'package:rbsclone_flutter/screens/master/country/detail.dart';
-import 'package:rbsclone_flutter/screens/master/country/list.dart';
+import 'package:rbsclone_flutter/screens/master/country/country_detail.dart';
+import 'package:rbsclone_flutter/screens/master/country/country_list.dart';
 
 //------------------------------------------------------------------------------
 

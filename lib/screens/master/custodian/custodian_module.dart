@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:openapi/openapi.dart';
-import 'package:rbsclone_flutter/screens/master/custodian/detail.dart';
-import 'package:rbsclone_flutter/screens/master/custodian/list.dart';
+import 'package:rbsclone_flutter/screens/master/custodian/custodian_detail.dart';
+import 'package:rbsclone_flutter/screens/master/custodian/custodian_list.dart';
 
 //------------------------------------------------------------------------------
 
