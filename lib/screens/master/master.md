@@ -1,5 +1,3 @@
-master_data
-
 RbsCloneApp                                                                     Stateless
     MaterialApp
         ConnectionGateKeeper                                                    Stateful
