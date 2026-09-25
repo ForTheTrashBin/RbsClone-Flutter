@@ -3,9 +3,9 @@ import 'package:rbsclone_flutter/widgets/hierarchical_navigation_menu.dart';
 import 'package:rbsclone_flutter/widgets/placeholder_page.dart';
 import 'package:rbsclone_flutter/widgets/adaptive_layout.dart';
 
-import 'master_data/country.dart';
-import 'master_data/custodian.dart';
-import 'master_data/exchange.dart';
+import 'master/country/country.dart';
+import 'master/custodian/custodian.dart';
+import 'master/exchange/exchange.dart';
 
 class AppScreen extends StatefulWidget {
   const AppScreen({super.key});
