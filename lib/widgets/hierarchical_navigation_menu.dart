@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum NavigationId { Welcome, Country, Custodian, Exchange, Default }
+enum NavigationId { welcome, country, custodian, exchange, other }
 
 class NavigationItem {
   final String title;
@@ -15,7 +15,7 @@ class NavigationItem {
     required this.title,
     this.subtitle,
     required this.icon,
-    this.navigationId = NavigationId.Default,
+    this.navigationId = NavigationId.other,
     this.children = const [],
   });
 }
@@ -81,19 +81,19 @@ class _NavigationMenuState extends State<NavigationMenu> {
             title: 'Länder',
             subtitle: 'Länderstammdaten',
             icon: Icons.flag,
-            navigationId: NavigationId.Country,
+            navigationId: NavigationId.country,
           ),
           NavigationItem(
             title: 'Lagerstellen',
             subtitle: 'Lagerstellenstammdaten',
             icon: Icons.person,
-            navigationId: NavigationId.Custodian,
+            navigationId: NavigationId.custodian,
           ),
           NavigationItem(
             title: 'Börsen',
             subtitle: 'Börsenstammdaten',
             icon: Icons.currency_exchange,
-            navigationId: NavigationId.Exchange,
+            navigationId: NavigationId.exchange,
           ),
         ],
       ),

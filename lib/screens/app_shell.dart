@@ -21,7 +21,7 @@ class _AppScreenState extends State<AppScreen> {
 
   /// Welcher Menü-Item ist aktuell ausgewählt?
 
-  NavigationId _navigationId = NavigationId.Welcome;
+  NavigationId _navigationId = NavigationId.welcome;
 
   String _caption = "Bitte wählen Sie ein Funktion aus!";
   /*
@@ -91,10 +91,10 @@ class _AppScreenState extends State<AppScreen> {
   /// Gibt den aktuellen Hauptinhalt basierend auf der Auswahl zurück
   Widget _buildMainContent(bool showBoth) {
     switch (_navigationId) {
-      case NavigationId.Welcome:
+      case NavigationId.welcome:
         return const PlaceholderPage(title: 'Willkommen!');
 
-      case NavigationId.Country:
+      case NavigationId.country:
         return CountryDataModule(showBoth);
       /*
         return CountryMasterPanel(
@@ -122,7 +122,7 @@ class _AppScreenState extends State<AppScreen> {
           onDeleteCountry: _deleteCountry,
         );
 */
-      case NavigationId.Custodian:
+      case NavigationId.custodian:
         return CustodianDataModule(showBoth);
       /*
         return CustodianMasterList(
@@ -160,7 +160,7 @@ class _AppScreenState extends State<AppScreen> {
           onDeleteCustodian: _deleteCustodian,
         );
         */
-      case NavigationId.Exchange:
+      case NavigationId.exchange:
         return ExchangeDataModule(showBoth);
       /*
         return ExchangeMasterList(
