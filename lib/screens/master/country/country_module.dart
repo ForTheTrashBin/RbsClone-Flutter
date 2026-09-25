@@ -6,13 +6,15 @@ import 'package:rbsclone_flutter/screens/master/country/country_list.dart';
 //------------------------------------------------------------------------------
 
 class CountryDataModule extends StatefulWidget {
-  const CountryDataModule(
-    this.mobileMode, {
+  const CountryDataModule({
+    required this.mobileMode,
+    required this.enabled,
     required this.menuEnableCallback,
     super.key,
   });
 
   final bool mobileMode;
+  final bool enabled;
 
   final ValueChanged<bool> menuEnableCallback;
 
@@ -43,6 +45,8 @@ class _DataModuleState extends State<CountryDataModule> {
 
   void onNewCallback() {
     print("**************** _DataModuleState::onNewCallback");
+
+    widget.menuEnableCallback(false);
   }
 
   //----------------------------------------------------------------------------
@@ -59,6 +63,8 @@ class _DataModuleState extends State<CountryDataModule> {
 
   void onItemUpdated(CountryListItem? item) {
     _updateNotifier.value = item;
+
+    widget.menuEnableCallback(true);
   }
 
   //----------------------------------------------------------------------------
@@ -90,6 +96,7 @@ class _DataModuleState extends State<CountryDataModule> {
           Expanded(
             child: MasterList(
               mobileMode: widget.mobileMode,
+              enabled: widget.enabled,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: (item) {
                 onItemSelected(item);
@@ -124,6 +131,7 @@ class _DataModuleState extends State<CountryDataModule> {
             flex: 2,
             child: MasterList(
               mobileMode: widget.mobileMode,
+              enabled: widget.enabled,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: onItemSelected,
               newCallback: onNewCallback,

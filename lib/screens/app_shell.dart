@@ -64,16 +64,25 @@ class _AppScreenState extends State<AppScreen> {
         return const PlaceholderPage(title: 'Willkommen!');
 
       case NavigationId.country:
-        return CountryDataModule(mobileMode, menuEnableCallback: onMenuEnable);
+        return CountryDataModule(
+          mobileMode: mobileMode,
+          enabled: menuEnabled,
+          menuEnableCallback: onMenuEnable,
+        );
 
       case NavigationId.custodian:
         return CustodianDataModule(
-          mobileMode,
+          mobileMode: mobileMode,
+          enabled: menuEnabled,
           menuEnableCallback: onMenuEnable,
         );
 
       case NavigationId.exchange:
-        return ExchangeDataModule(mobileMode, menuEnableCallback: onMenuEnable);
+        return ExchangeDataModule(
+          mobileMode: mobileMode,
+          enabled: menuEnabled,
+          menuEnableCallback: onMenuEnable,
+        );
 
       default:
         return const PlaceholderPage(title: 'In Arbeit');
@@ -87,7 +96,7 @@ class _AppScreenState extends State<AppScreen> {
       appBar: CustomAppBar(_caption, drawerEnabled: menuEnabled),
       drawer: Drawer(
         child: NavigationMenu(
-          menuEnabled: menuEnabled,
+          enabled: menuEnabled,
           onItemSelected: (item) {
             if (item.children.isEmpty) {
               setState(() {
@@ -116,7 +125,7 @@ class _AppScreenState extends State<AppScreen> {
       appBar: CustomAppBar(_caption, drawerEnabled: menuEnabled),
       drawer: Drawer(
         child: NavigationMenu(
-          menuEnabled: menuEnabled,
+          enabled: menuEnabled,
           onItemSelected: (item) {
             if (item.children.isEmpty) {
               setState(() {
@@ -151,7 +160,7 @@ class _AppScreenState extends State<AppScreen> {
               SizedBox(
                 width: 250,
                 child: NavigationMenu(
-                  menuEnabled: menuEnabled,
+                  enabled: menuEnabled,
                   onItemSelected: (item) {
                     if (item.children.isEmpty) {
                       setState(() {
@@ -163,7 +172,6 @@ class _AppScreenState extends State<AppScreen> {
                   selectedNavigationId: _navigationId,
                 ),
               ),
-              const SizedBox(width: 16),
               Expanded(child: _buildMainContent(false)),
             ],
           ),

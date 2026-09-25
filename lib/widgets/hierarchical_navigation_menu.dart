@@ -26,7 +26,7 @@ class NavigationMenu extends StatefulWidget {
   const NavigationMenu({
     required this.onItemSelected,
     this.selectedNavigationId,
-    this.menuEnabled = true,
+    this.enabled = true,
     super.key,
   });
 
@@ -34,7 +34,7 @@ class NavigationMenu extends StatefulWidget {
 
   final NavigationId? selectedNavigationId;
 
-  final bool menuEnabled;
+  final bool enabled;
 
   @override
   State<NavigationMenu> createState() => _NavigationMenuState();
@@ -160,15 +160,31 @@ class _NavigationMenuState extends State<NavigationMenu> {
 
   @override
   Widget build(BuildContext context) {
-    // return _buildFullMode(widget.items);
-    return Container(
-      //color: Colors.grey.shade300,
-      child: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, item) {
-          return _buildRecursive(context, items[item], "", 0);
-        },
-      ),
+    return Stack(
+      children: [
+        IgnorePointer(
+          ignoring: !widget.enabled,
+          child: ListView.builder(
+            itemCount: items.length,
+            itemBuilder: (context, item) {
+              return _buildRecursive(context, items[item], "", 0);
+            },
+          ),
+        ),
+
+        Positioned.fill(
+          child: IgnorePointer(
+            ignoring: true,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 246),
+              curve: Curves.fastOutSlowIn,
+              color: widget.enabled
+                  ? Colors.transparent
+                  : Theme.of(context).colorScheme.scrim.withValues(alpha: 0.35),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -187,7 +203,6 @@ class _NavigationMenuState extends State<NavigationMenu> {
 
     if (item.children.isNotEmpty) {
       return ExpansionTile(
-        enabled: widget.menuEnabled,
         childrenPadding: EdgeInsets.only(left: 16.0),
         leading: Icon(item.icon),
         title: Text(
@@ -209,7 +224,6 @@ class _NavigationMenuState extends State<NavigationMenu> {
       item.caption = caption;
 
       return ListTile(
-        enabled: widget.menuEnabled,
         leading: Icon(item.icon),
         title: Text(
           item.title,
@@ -222,7 +236,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
             ? Text(item.subtitle!, style: TextStyle(fontSize: 10))
             : null,
         selected:
-            widget.menuEnabled &&
+            widget.enabled &&
             (widget.selectedNavigationId == item.navigationId),
         selectedTileColor: Theme.of(context).colorScheme.primaryContainer
             .withValues(alpha: 0.3),

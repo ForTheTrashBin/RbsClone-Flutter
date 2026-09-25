@@ -6,13 +6,15 @@ import 'package:rbsclone_flutter/screens/master/exchange/exchange_list.dart';
 //------------------------------------------------------------------------------
 
 class ExchangeDataModule extends StatefulWidget {
-  const ExchangeDataModule(
-    this.mobileMode, {
+  const ExchangeDataModule({
+    required this.mobileMode,
+    required this.enabled,
     required this.menuEnableCallback,
     super.key,
   });
 
   final bool mobileMode;
+  final bool enabled;
 
   final ValueChanged<bool> menuEnableCallback;
 
@@ -60,9 +62,9 @@ class _DataModuleState extends State<ExchangeDataModule> {
   final _updateNotifier = ValueNotifier<ExchangeListItem?>(null);
 
   void onItemUpdated(ExchangeListItem? item) {
-    widget.menuEnableCallback(true);
-
     _updateNotifier.value = item;
+
+    widget.menuEnableCallback(true);
   }
 
   //----------------------------------------------------------------------------
@@ -94,6 +96,7 @@ class _DataModuleState extends State<ExchangeDataModule> {
           Expanded(
             child: MasterList(
               mobileMode: widget.mobileMode,
+              enabled: widget.enabled,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: (item) {
                 onItemSelected(item);
@@ -128,6 +131,7 @@ class _DataModuleState extends State<ExchangeDataModule> {
             flex: 2,
             child: MasterList(
               mobileMode: widget.mobileMode,
+              enabled: widget.enabled,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: onItemSelected,
               newCallback: onNewCallback,

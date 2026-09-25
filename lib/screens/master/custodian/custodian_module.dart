@@ -6,13 +6,15 @@ import 'package:rbsclone_flutter/screens/master/custodian/custodian_list.dart';
 //------------------------------------------------------------------------------
 
 class CustodianDataModule extends StatefulWidget {
-  const CustodianDataModule(
-    this.mobileMode, {
+  const CustodianDataModule({
+    required this.mobileMode,
+    required this.enabled,
     required this.menuEnableCallback,
     super.key,
   });
 
   final bool mobileMode;
+  final bool enabled;
 
   final ValueChanged<bool> menuEnableCallback;
 
@@ -43,6 +45,8 @@ class _DataModuleState extends State<CustodianDataModule> {
 
   void onNewCallback() {
     print("**************** _DataModuleState::onNewCallback");
+
+    widget.menuEnableCallback(false);
   }
 
   //----------------------------------------------------------------------------
@@ -59,6 +63,8 @@ class _DataModuleState extends State<CustodianDataModule> {
 
   void onItemUpdated(CustodianListItem? item) {
     _updateNotifier.value = item;
+
+    widget.menuEnableCallback(true);
   }
 
   //----------------------------------------------------------------------------
@@ -119,6 +125,7 @@ class _DataModuleState extends State<CustodianDataModule> {
           Expanded(
             child: MasterList(
               mobileMode: widget.mobileMode,
+              enabled: widget.enabled,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: (item) {
                 onItemSelected(item);
@@ -154,6 +161,7 @@ class _DataModuleState extends State<CustodianDataModule> {
             flex: 2,
             child: MasterList(
               mobileMode: widget.mobileMode,
+              enabled: widget.enabled,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: onItemSelected,
               newCallback: onNewCallback,

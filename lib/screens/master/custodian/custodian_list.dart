@@ -7,6 +7,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 class MasterList extends StatefulWidget {
   const MasterList({
     required this.mobileMode,
+    required this.enabled,
     required this.selectedListItem,
     required this.itemSelectedCallback,
     required this.newCallback,
@@ -17,6 +18,7 @@ class MasterList extends StatefulWidget {
   });
 
   final bool mobileMode;
+  final bool enabled;
 
   final CustodianListItem? selectedListItem;
 
@@ -209,180 +211,211 @@ class _MasterListState extends State<MasterList> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: widget.newCallback,
-        label: const Text("Neu"),
-        icon: const Icon(Icons.add),
-      ),
-      body: FutureBuilder<List<CustodianListItem>>(
-        future: _dbFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Fehler: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            if (_entriesAll.isEmpty) {
-              _entriesAll = snapshot.data!;
-              _entriesFiltered = _entriesAll;
-            }
+    return Stack(
+      children: [
+        IgnorePointer(
+          ignoring: !widget.enabled,
+          child: Scaffold(
+            floatingActionButton: widget.enabled
+                ? FloatingActionButton.extended(
+                    onPressed: widget.newCallback,
+                    label: const Text("Neu"),
+                    icon: const Icon(Icons.add),
+                  )
+                : null,
+            body: FutureBuilder<List<CustodianListItem>>(
+              future: _dbFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Fehler: ${snapshot.error}'));
+                } else if (snapshot.hasData) {
+                  if (_entriesAll.isEmpty) {
+                    _entriesAll = snapshot.data!;
+                    _entriesFiltered = _entriesAll;
+                  }
 
-            //------------------------------------------------------------------
+                  //------------------------------------------------------------------
 
-            if (_entriesFiltered.isNotEmpty) {
-              if (widget.selectedListItem != null) {
-                CustodianListItem? foundItem = _entriesFiltered.where((entry) {
-                  return entry.id == widget.selectedListItem!.id;
-                }).firstOrNull;
+                  if (_entriesFiltered.isNotEmpty) {
+                    if (widget.selectedListItem != null) {
+                      CustodianListItem? foundItem = _entriesFiltered.where((
+                        entry,
+                      ) {
+                        return entry.id == widget.selectedListItem!.id;
+                      }).firstOrNull;
 
-                if (foundItem == null) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    widget.itemSelectedCallback(_entriesFiltered[0]);
-                  });
-                }
-              } else {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  widget.itemSelectedCallback(_entriesFiltered[0]);
-                });
-              }
-            } else {
-              if (widget.selectedListItem != null) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  widget.itemSelectedCallback(null);
-                });
-              }
-            }
+                      if (foundItem == null) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          widget.itemSelectedCallback(_entriesFiltered[0]);
+                        });
+                      }
+                    } else {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        widget.itemSelectedCallback(_entriesFiltered[0]);
+                      });
+                    }
+                  } else {
+                    if (widget.selectedListItem != null) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        widget.itemSelectedCallback(null);
+                      });
+                    }
+                  }
 
-            //------------------------------------------------------------------
+                  //------------------------------------------------------------------
 
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0.0),
-              child: Column(
-                children: [
-                  //------------------------------------------------------------
-                  // Count & search
-                  //------------------------------------------------------------
-                  Container(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    padding: const EdgeInsets.only(
-                      left: 16.0,
-                      right: 12.0,
-                      bottom: 12.0,
-                    ),
-                    child: Row(
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: Column(
                       children: [
+                        //------------------------------------------------------------
+                        // Count & search
+                        //------------------------------------------------------------
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          padding: const EdgeInsets.only(
+                            left: 16.0,
+                            right: 12.0,
+                            bottom: 12.0,
                           ),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primaryContainer,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            "${_entriesFiltered.length}",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              // color: Colors.blue,
-                            ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  "${_entriesFiltered.length}",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    // color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextField(
+                                  controller: _searchController,
+                                  onChanged: _filterListe,
+                                  decoration: InputDecoration(
+                                    hintText: "Suchen...",
+                                    prefixIcon: const Icon(Icons.search),
+                                    suffixIcon:
+                                        _searchController.text.isNotEmpty
+                                        ? IconButton(
+                                            icon: Icon(Icons.clear, size: 20),
+                                            onPressed: () {
+                                              _searchController.clear();
+                                              _filterListe("");
+                                            },
+                                          )
+                                        : null,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              IconButton(
+                                icon: const Icon(Icons.refresh),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                onPressed: _onRefresh,
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        //------------------------------------------------------------
+                        // List of items or message, if list is empty
+                        //------------------------------------------------------------
                         Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: _filterListe,
-                            decoration: InputDecoration(
-                              hintText: "Suchen...",
-                              prefixIcon: const Icon(Icons.search),
-                              suffixIcon: _searchController.text.isNotEmpty
-                                  ? IconButton(
-                                      icon: Icon(Icons.clear, size: 20),
-                                      onPressed: () {
-                                        _searchController.clear();
-                                        _filterListe("");
-                                      },
-                                    )
-                                  : null,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 8,
-                              ),
-                            ),
+                          child: ClipRect(
+                            child: _entriesFiltered.isEmpty
+                                ? const Center(
+                                    child: Text(
+                                      "Keine Lagerstellen vorhanden.",
+                                    ),
+                                  )
+                                : ScrollablePositionedList.separated(
+                                    itemCount: _entriesFiltered.length,
+                                    itemScrollController: _itemScrollController,
+                                    separatorBuilder: (_, _) =>
+                                        const Divider(height: 1),
+                                    itemBuilder: (context, index) {
+                                      final listItem = _entriesFiltered[index];
+                                      final isSelected =
+                                          widget.enabled &&
+                                          (widget.selectedListItem?.id ==
+                                              listItem.id);
+                                      return ListTile(
+                                        key: ValueKey(listItem.id),
+                                        leading: CircleAvatar(
+                                          child: Text(
+                                            listItem.shortcode
+                                                .substring(0, 1)
+                                                .toUpperCase(),
+                                          ),
+                                        ),
+                                        title: Text(listItem.shortcode),
+                                        subtitle: Text(listItem.name),
+                                        trailing: widget.mobileMode
+                                            ? const Icon(Icons.chevron_right)
+                                            : null,
+                                        selected: isSelected,
+                                        selectedTileColor: Theme.of(context)
+                                            .colorScheme
+                                            .primaryContainer
+                                            .withValues(alpha: 0.55),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        onTap: () {
+                                          widget.itemSelectedCallback(listItem);
+                                        },
+                                      );
+                                    },
+                                  ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        IconButton(
-                          icon: const Icon(Icons.refresh),
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onPrimaryContainer,
-                          onPressed: _onRefresh,
                         ),
                       ],
                     ),
-                  ),
-                  //------------------------------------------------------------
-                  // List of items or message, if list is empty
-                  //------------------------------------------------------------
-                  Expanded(
-                    child: ClipRect(
-                      child: _entriesFiltered.isEmpty
-                          ? const Center(
-                              child: Text("Keine Lagerstellen vorhanden."),
-                            )
-                          : ScrollablePositionedList.separated(
-                              itemCount: _entriesFiltered.length,
-                              itemScrollController: _itemScrollController,
-                              separatorBuilder: (_, _) =>
-                                  const Divider(height: 1),
-                              itemBuilder: (context, index) {
-                                final listItem = _entriesFiltered[index];
-                                final isSelected =
-                                    widget.selectedListItem?.id == listItem.id;
-                                return ListTile(
-                                  key: ValueKey(listItem.id),
-                                  leading: CircleAvatar(
-                                    child: Text(
-                                      listItem.shortcode
-                                          .substring(0, 1)
-                                          .toUpperCase(),
-                                    ),
-                                  ),
-                                  title: Text(listItem.shortcode),
-                                  subtitle: Text(listItem.name),
-                                  trailing: widget.mobileMode
-                                      ? const Icon(Icons.chevron_right)
-                                      : null,
-                                  selected: isSelected,
-                                  selectedTileColor: Theme.of(context)
-                                      .colorScheme
-                                      .primaryContainer
-                                      .withValues(alpha: 0.55),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  onTap: () {
-                                    widget.itemSelectedCallback(listItem);
-                                  },
-                                );
-                              },
-                            ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-          return const SizedBox.shrink();
-        },
-      ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ),
+
+        Positioned.fill(
+          child: IgnorePointer(
+            ignoring: true,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 246),
+              curve: Curves.fastOutSlowIn,
+              color: widget.enabled
+                  ? Colors.transparent
+                  : Theme.of(context).colorScheme.scrim.withValues(alpha: 0.35),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
