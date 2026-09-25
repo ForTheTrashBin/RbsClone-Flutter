@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:openapi/openapi.dart';
-import 'package:rbsclone_flutter/screens/master/exchange/exchange_detail.dart';
-import 'package:rbsclone_flutter/screens/master/exchange/exchange_list.dart';
+import 'package:rbsclone_flutter/screens/master/custodian/detail.dart';
+import 'package:rbsclone_flutter/screens/master/custodian/list.dart';
 
 //------------------------------------------------------------------------------
 
-class ExchangeDataModule extends StatefulWidget {
-  const ExchangeDataModule(this.showBoth, {super.key});
+class CustodianDataModule extends StatefulWidget {
+  const CustodianDataModule(this.showBoth, {super.key});
 
   final bool showBoth;
 
   @override
-  State<ExchangeDataModule> createState() => _DataModuleState();
+  State<CustodianDataModule> createState() => _DataModuleState();
 }
 
-class _DataModuleState extends State<ExchangeDataModule> {
-  ExchangeListItem? _selectedListItem;
+class _DataModuleState extends State<CustodianDataModule> {
+  CustodianListItem? _selectedListItem;
 
-  void onItemSelected(ExchangeListItem? item) {
+  void onItemSelected(CustodianListItem? item) {
     if (item != null) {
       if ((_selectedListItem == null) || (_selectedListItem!.id != item.id)) {
         setState(() {
@@ -41,25 +41,25 @@ class _DataModuleState extends State<ExchangeDataModule> {
 
   //----------------------------------------------------------------------------
 
-  final _createNotifier = ValueNotifier<ExchangeListItem?>(null);
+  final _createNotifier = ValueNotifier<CustodianListItem?>(null);
 
-  void onItemCreated(ExchangeListItem? item) {
+  void onItemCreated(CustodianListItem? item) {
     _createNotifier.value = item;
   }
 
   //----------------------------------------------------------------------------
 
-  final _updateNotifier = ValueNotifier<ExchangeListItem?>(null);
+  final _updateNotifier = ValueNotifier<CustodianListItem?>(null);
 
-  void onItemUpdated(ExchangeListItem? item) {
+  void onItemUpdated(CustodianListItem? item) {
     _updateNotifier.value = item;
   }
 
   //----------------------------------------------------------------------------
 
-  final _deleteNotifier = ValueNotifier<ExchangeListItem?>(null);
+  final _deleteNotifier = ValueNotifier<CustodianListItem?>(null);
 
-  void onItemDeleted(ExchangeListItem? item) {
+  void onItemDeleted(CustodianListItem? item) {
     _deleteNotifier.value = item;
   }
 
@@ -75,6 +75,35 @@ class _DataModuleState extends State<ExchangeDataModule> {
   }
 
   //----------------------------------------------------------------------------
+
+  List<CountryListItem> _countries = [];
+
+  void readCountries() async {
+    final api = Openapi();
+
+    List<CountryListItem> newList = [];
+
+    try {
+      final response = await api.getCountryApi().getCountries().timeout(
+        const Duration(seconds: 10),
+      );
+
+      newList = response.data?.toList() ?? const <CountryListItem>[];
+    } finally {
+      setState(() {
+        _countries = newList;
+      });
+    }
+  }
+
+  //----------------------------------------------------------------------------
+
+  @override
+  void initState() {
+    super.initState();
+
+    readCountries();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +128,7 @@ class _DataModuleState extends State<ExchangeDataModule> {
             child: MasterDetail(
               showBoth: widget.showBoth,
               listItem: _selectedListItem,
+              countries: _countries,
               itemCreatedCallback: onItemCreated,
               itemUpdatedCallback: onItemUpdated,
               itemDeletedCallback: onItemDeleted,
@@ -123,6 +153,7 @@ class _DataModuleState extends State<ExchangeDataModule> {
                       return MasterDetail(
                         showBoth: widget.showBoth,
                         listItem: _selectedListItem,
+                        countries: _countries,
                         itemCreatedCallback: onItemCreated,
                         itemUpdatedCallback: onItemUpdated,
                         itemDeletedCallback: onItemDeleted,

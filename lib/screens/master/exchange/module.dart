@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:openapi/openapi.dart';
-import 'package:rbsclone_flutter/screens/master/country/country_detail.dart';
-import 'package:rbsclone_flutter/screens/master/country/country_list.dart';
+import 'package:rbsclone_flutter/screens/master/exchange/detail.dart';
+import 'package:rbsclone_flutter/screens/master/exchange/list.dart';
 
 //------------------------------------------------------------------------------
 
-class CountryDataModule extends StatefulWidget {
-  const CountryDataModule(this.showBoth, {super.key});
+class ExchangeDataModule extends StatefulWidget {
+  const ExchangeDataModule(this.showBoth, {super.key});
 
   final bool showBoth;
 
   @override
-  State<CountryDataModule> createState() => _DataModuleState();
+  State<ExchangeDataModule> createState() => _DataModuleState();
 }
 
-class _DataModuleState extends State<CountryDataModule> {
-  CountryListItem? _selectedListItem;
+class _DataModuleState extends State<ExchangeDataModule> {
+  ExchangeListItem? _selectedListItem;
 
-  void onItemSelected(CountryListItem? item) {
+  void onItemSelected(ExchangeListItem? item) {
     if (item != null) {
       if ((_selectedListItem == null) || (_selectedListItem!.id != item.id)) {
         setState(() {
@@ -41,25 +41,25 @@ class _DataModuleState extends State<CountryDataModule> {
 
   //----------------------------------------------------------------------------
 
-  final _createNotifier = ValueNotifier<CountryListItem?>(null);
+  final _createNotifier = ValueNotifier<ExchangeListItem?>(null);
 
-  void onItemCreated(CountryListItem? item) {
+  void onItemCreated(ExchangeListItem? item) {
     _createNotifier.value = item;
   }
 
   //----------------------------------------------------------------------------
 
-  final _updateNotifier = ValueNotifier<CountryListItem?>(null);
+  final _updateNotifier = ValueNotifier<ExchangeListItem?>(null);
 
-  void onItemUpdated(CountryListItem? item) {
+  void onItemUpdated(ExchangeListItem? item) {
     _updateNotifier.value = item;
   }
 
   //----------------------------------------------------------------------------
 
-  final _deleteNotifier = ValueNotifier<CountryListItem?>(null);
+  final _deleteNotifier = ValueNotifier<ExchangeListItem?>(null);
 
-  void onItemDeleted(CountryListItem? item) {
+  void onItemDeleted(ExchangeListItem? item) {
     _deleteNotifier.value = item;
   }
 
