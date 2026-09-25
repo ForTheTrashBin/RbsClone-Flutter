@@ -6,9 +6,15 @@ import 'package:rbsclone_flutter/screens/master/custodian/list.dart';
 //------------------------------------------------------------------------------
 
 class CustodianDataModule extends StatefulWidget {
-  const CustodianDataModule(this.showBoth, {super.key});
+  const CustodianDataModule(
+    this.mobileMode, {
+    required this.menuEnableCallback,
+    super.key,
+  });
 
-  final bool showBoth;
+  final bool mobileMode;
+
+  final ValueChanged<bool> menuEnableCallback;
 
   @override
   State<CustodianDataModule> createState() => _DataModuleState();
@@ -107,41 +113,12 @@ class _DataModuleState extends State<CustodianDataModule> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.showBoth) {
-      return Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: MasterList(
-              showBoth: widget.showBoth,
-              selectedListItem: _selectedListItem,
-              itemSelectedCallback: onItemSelected,
-              newCallback: onNewCallback,
-              createNotifier: _createNotifier,
-              updateNotifier: _updateNotifier,
-              deleteNotifier: _deleteNotifier,
-            ),
-          ),
-          const VerticalDivider(width: 1),
-          Expanded(
-            flex: 3,
-            child: MasterDetail(
-              showBoth: widget.showBoth,
-              listItem: _selectedListItem,
-              countries: _countries,
-              itemCreatedCallback: onItemCreated,
-              itemUpdatedCallback: onItemUpdated,
-              itemDeletedCallback: onItemDeleted,
-            ),
-          ),
-        ],
-      );
-    } else {
+    if (widget.mobileMode) {
       return Row(
         children: [
           Expanded(
             child: MasterList(
-              showBoth: widget.showBoth,
+              mobileMode: widget.mobileMode,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: (item) {
                 onItemSelected(item);
@@ -151,7 +128,7 @@ class _DataModuleState extends State<CustodianDataModule> {
                   MaterialPageRoute(
                     builder: (context) {
                       return MasterDetail(
-                        showBoth: widget.showBoth,
+                        mobileMode: widget.mobileMode,
                         listItem: _selectedListItem,
                         countries: _countries,
                         itemCreatedCallback: onItemCreated,
@@ -166,6 +143,35 @@ class _DataModuleState extends State<CustodianDataModule> {
               createNotifier: _createNotifier,
               updateNotifier: _updateNotifier,
               deleteNotifier: _deleteNotifier,
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: MasterList(
+              mobileMode: widget.mobileMode,
+              selectedListItem: _selectedListItem,
+              itemSelectedCallback: onItemSelected,
+              newCallback: onNewCallback,
+              createNotifier: _createNotifier,
+              updateNotifier: _updateNotifier,
+              deleteNotifier: _deleteNotifier,
+            ),
+          ),
+          const VerticalDivider(width: 1),
+          Expanded(
+            flex: 3,
+            child: MasterDetail(
+              mobileMode: widget.mobileMode,
+              listItem: _selectedListItem,
+              countries: _countries,
+              itemCreatedCallback: onItemCreated,
+              itemUpdatedCallback: onItemUpdated,
+              itemDeletedCallback: onItemDeleted,
             ),
           ),
         ],

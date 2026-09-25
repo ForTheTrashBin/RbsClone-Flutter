@@ -6,9 +6,15 @@ import 'package:rbsclone_flutter/screens/master/country/list.dart';
 //------------------------------------------------------------------------------
 
 class CountryDataModule extends StatefulWidget {
-  const CountryDataModule(this.showBoth, {super.key});
+  const CountryDataModule(
+    this.mobileMode, {
+    required this.menuEnableCallback,
+    super.key,
+  });
 
-  final bool showBoth;
+  final bool mobileMode;
+
+  final ValueChanged<bool> menuEnableCallback;
 
   @override
   State<CountryDataModule> createState() => _DataModuleState();
@@ -78,40 +84,12 @@ class _DataModuleState extends State<CountryDataModule> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.showBoth) {
-      return Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: MasterList(
-              showBoth: widget.showBoth,
-              selectedListItem: _selectedListItem,
-              itemSelectedCallback: onItemSelected,
-              newCallback: onNewCallback,
-              createNotifier: _createNotifier,
-              updateNotifier: _updateNotifier,
-              deleteNotifier: _deleteNotifier,
-            ),
-          ),
-          const VerticalDivider(width: 1),
-          Expanded(
-            flex: 3,
-            child: MasterDetail(
-              showBoth: widget.showBoth,
-              listItem: _selectedListItem,
-              itemCreatedCallback: onItemCreated,
-              itemUpdatedCallback: onItemUpdated,
-              itemDeletedCallback: onItemDeleted,
-            ),
-          ),
-        ],
-      );
-    } else {
+    if (widget.mobileMode) {
       return Row(
         children: [
           Expanded(
             child: MasterList(
-              showBoth: widget.showBoth,
+              mobileMode: widget.mobileMode,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: (item) {
                 onItemSelected(item);
@@ -121,7 +99,7 @@ class _DataModuleState extends State<CountryDataModule> {
                   MaterialPageRoute(
                     builder: (context) {
                       return MasterDetail(
-                        showBoth: widget.showBoth,
+                        mobileMode: widget.mobileMode,
                         listItem: _selectedListItem,
                         itemCreatedCallback: onItemCreated,
                         itemUpdatedCallback: onItemUpdated,
@@ -135,6 +113,34 @@ class _DataModuleState extends State<CountryDataModule> {
               createNotifier: _createNotifier,
               updateNotifier: _updateNotifier,
               deleteNotifier: _deleteNotifier,
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: MasterList(
+              mobileMode: widget.mobileMode,
+              selectedListItem: _selectedListItem,
+              itemSelectedCallback: onItemSelected,
+              newCallback: onNewCallback,
+              createNotifier: _createNotifier,
+              updateNotifier: _updateNotifier,
+              deleteNotifier: _deleteNotifier,
+            ),
+          ),
+          const VerticalDivider(width: 1),
+          Expanded(
+            flex: 3,
+            child: MasterDetail(
+              mobileMode: widget.mobileMode,
+              listItem: _selectedListItem,
+              itemCreatedCallback: onItemCreated,
+              itemUpdatedCallback: onItemUpdated,
+              itemDeletedCallback: onItemDeleted,
             ),
           ),
         ],

@@ -6,9 +6,15 @@ import 'package:rbsclone_flutter/screens/master/exchange/list.dart';
 //------------------------------------------------------------------------------
 
 class ExchangeDataModule extends StatefulWidget {
-  const ExchangeDataModule(this.showBoth, {super.key});
+  const ExchangeDataModule(
+    this.mobileMode, {
+    required this.menuEnableCallback,
+    super.key,
+  });
 
-  final bool showBoth;
+  final bool mobileMode;
+
+  final ValueChanged<bool> menuEnableCallback;
 
   @override
   State<ExchangeDataModule> createState() => _DataModuleState();
@@ -37,6 +43,8 @@ class _DataModuleState extends State<ExchangeDataModule> {
 
   void onNewCallback() {
     print("**************** _DataModuleState::onNewCallback");
+
+    widget.menuEnableCallback(false);
   }
 
   //----------------------------------------------------------------------------
@@ -52,6 +60,8 @@ class _DataModuleState extends State<ExchangeDataModule> {
   final _updateNotifier = ValueNotifier<ExchangeListItem?>(null);
 
   void onItemUpdated(ExchangeListItem? item) {
+    widget.menuEnableCallback(true);
+
     _updateNotifier.value = item;
   }
 
@@ -78,40 +88,12 @@ class _DataModuleState extends State<ExchangeDataModule> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.showBoth) {
-      return Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: MasterList(
-              showBoth: widget.showBoth,
-              selectedListItem: _selectedListItem,
-              itemSelectedCallback: onItemSelected,
-              newCallback: onNewCallback,
-              createNotifier: _createNotifier,
-              updateNotifier: _updateNotifier,
-              deleteNotifier: _deleteNotifier,
-            ),
-          ),
-          const VerticalDivider(width: 1),
-          Expanded(
-            flex: 3,
-            child: MasterDetail(
-              showBoth: widget.showBoth,
-              listItem: _selectedListItem,
-              itemCreatedCallback: onItemCreated,
-              itemUpdatedCallback: onItemUpdated,
-              itemDeletedCallback: onItemDeleted,
-            ),
-          ),
-        ],
-      );
-    } else {
+    if (widget.mobileMode) {
       return Row(
         children: [
           Expanded(
             child: MasterList(
-              showBoth: widget.showBoth,
+              mobileMode: widget.mobileMode,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: (item) {
                 onItemSelected(item);
@@ -121,7 +103,7 @@ class _DataModuleState extends State<ExchangeDataModule> {
                   MaterialPageRoute(
                     builder: (context) {
                       return MasterDetail(
-                        showBoth: widget.showBoth,
+                        mobileMode: widget.mobileMode,
                         listItem: _selectedListItem,
                         itemCreatedCallback: onItemCreated,
                         itemUpdatedCallback: onItemUpdated,
@@ -135,6 +117,34 @@ class _DataModuleState extends State<ExchangeDataModule> {
               createNotifier: _createNotifier,
               updateNotifier: _updateNotifier,
               deleteNotifier: _deleteNotifier,
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: MasterList(
+              mobileMode: widget.mobileMode,
+              selectedListItem: _selectedListItem,
+              itemSelectedCallback: onItemSelected,
+              newCallback: onNewCallback,
+              createNotifier: _createNotifier,
+              updateNotifier: _updateNotifier,
+              deleteNotifier: _deleteNotifier,
+            ),
+          ),
+          const VerticalDivider(width: 1),
+          Expanded(
+            flex: 3,
+            child: MasterDetail(
+              mobileMode: widget.mobileMode,
+              listItem: _selectedListItem,
+              itemCreatedCallback: onItemCreated,
+              itemUpdatedCallback: onItemUpdated,
+              itemDeletedCallback: onItemDeleted,
             ),
           ),
         ],

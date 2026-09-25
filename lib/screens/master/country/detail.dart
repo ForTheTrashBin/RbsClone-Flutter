@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:openapi/openapi.dart';
 import 'package:dio/dio.dart';
+import 'package:rbsclone_flutter/widgets/custom_appbar.dart';
 
 //------------------------------------------------------------------------------
 
 class MasterDetail extends StatefulWidget {
   const MasterDetail({
-    required this.showBoth,
+    required this.mobileMode,
     required this.listItem,
     required this.itemCreatedCallback,
     required this.itemUpdatedCallback,
@@ -15,7 +16,7 @@ class MasterDetail extends StatefulWidget {
     super.key,
   });
 
-  final bool showBoth;
+  final bool mobileMode;
 
   final CountryListItem? listItem;
 
@@ -403,28 +404,9 @@ class _MasetrDetailState extends State<MasterDetail> {
       );
     }
 
-    if (widget.showBoth) {
-      return content();
-    } else {
+    if (widget.mobileMode) {
       return Scaffold(
-        appBar: AppBar(
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("RbsClone"),
-              Opacity(
-                opacity: 0.7,
-                child: Text(
-                  "Stammdaten - Börsen",
-                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                    fontSize:
-                        Theme.of(context).textTheme.titleLarge!.fontSize! * 0.7,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        appBar: CustomAppBar("Stammdaten - Länder"),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.only(top: 8.0),
@@ -432,6 +414,8 @@ class _MasetrDetailState extends State<MasterDetail> {
           ),
         ),
       );
+    } else {
+      return content();
     }
   }
 }

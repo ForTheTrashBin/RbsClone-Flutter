@@ -26,14 +26,15 @@ class NavigationMenu extends StatefulWidget {
   const NavigationMenu({
     required this.onItemSelected,
     this.selectedNavigationId,
+    this.menuEnabled = true,
     super.key,
   });
 
-  /// Callback wenn ein Element ausgewählt wird
   final ValueChanged<NavigationItem> onItemSelected;
 
-  /// Der aktuell ausgewählte Item (für Highlighting)
   final NavigationId? selectedNavigationId;
+
+  final bool menuEnabled;
 
   @override
   State<NavigationMenu> createState() => _NavigationMenuState();
@@ -160,11 +161,14 @@ class _NavigationMenuState extends State<NavigationMenu> {
   @override
   Widget build(BuildContext context) {
     // return _buildFullMode(widget.items);
-    return ListView.builder(
-      itemCount: items.length,
-      itemBuilder: (context, item) {
-        return _buildRecursive(context, items[item], "", 0);
-      },
+    return Container(
+      //color: Colors.grey.shade300,
+      child: ListView.builder(
+        itemCount: items.length,
+        itemBuilder: (context, item) {
+          return _buildRecursive(context, items[item], "", 0);
+        },
+      ),
     );
   }
 
@@ -183,6 +187,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
 
     if (item.children.isNotEmpty) {
       return ExpansionTile(
+        enabled: widget.menuEnabled,
         childrenPadding: EdgeInsets.only(left: 16.0),
         leading: Icon(item.icon),
         title: Text(
@@ -204,29 +209,21 @@ class _NavigationMenuState extends State<NavigationMenu> {
       item.caption = caption;
 
       return ListTile(
+        enabled: widget.menuEnabled,
         leading: Icon(item.icon),
         title: Text(
           item.title,
           style: TextStyle(
             fontSize: (level == 0) ? 16.0 : 14.0,
             fontWeight: FontWeight.w600,
-            color: widget.selectedNavigationId == item.navigationId
-                ? Theme.of(context).colorScheme.primary
-                : null,
           ),
         ),
         subtitle: item.subtitle != null
-            ? Text(
-                item.subtitle!,
-                style: TextStyle(
-                  fontSize: 10,
-                  color: widget.selectedNavigationId == item.navigationId
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-                ),
-              )
+            ? Text(item.subtitle!, style: TextStyle(fontSize: 10))
             : null,
-        selected: widget.selectedNavigationId == item.navigationId,
+        selected:
+            widget.menuEnabled &&
+            (widget.selectedNavigationId == item.navigationId),
         selectedTileColor: Theme.of(context).colorScheme.primaryContainer
             .withValues(alpha: 0.3),
         onTap: () => widget.onItemSelected(item),

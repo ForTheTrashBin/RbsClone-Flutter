@@ -6,7 +6,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class MasterList extends StatefulWidget {
   const MasterList({
-    required this.showBoth,
+    required this.mobileMode,
     required this.selectedListItem,
     required this.itemSelectedCallback,
     required this.newCallback,
@@ -16,7 +16,7 @@ class MasterList extends StatefulWidget {
     super.key,
   });
 
-  final bool showBoth;
+  final bool mobileMode;
 
   final CountryListItem? selectedListItem;
 
@@ -357,7 +357,7 @@ class _MasterListState extends State<MasterList> {
                                   ),
                                   title: Text(listItem.shortcode),
                                   subtitle: Text(listItem.name),
-                                  trailing: !widget.showBoth
+                                  trailing: widget.mobileMode
                                       ? const Icon(Icons.chevron_right)
                                       : null,
                                   selected: isSelected,
