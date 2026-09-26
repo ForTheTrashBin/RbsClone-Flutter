@@ -287,7 +287,7 @@ class _MasterDetailState extends State<MasterDetail> {
                     children: [
                       Text(
                         widget.createMode
-                            ? "Daten erstellen"
+                            ? "Daten neu erstellen"
                             : 'Daten bearbeiten/löschen',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
@@ -331,6 +331,9 @@ class _MasterDetailState extends State<MasterDetail> {
                           labelText: 'Flags',
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                         ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                         keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
@@ -370,14 +373,10 @@ class _MasterDetailState extends State<MasterDetail> {
                           labelText: 'Depotnummer',
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                         ),
-                        keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
                             return 'Pflichtfeld';
                           }
-                          return int.tryParse(value) == null
-                              ? 'Zahl erforderlich'
-                              : null;
                         },
                       ),
                       const SizedBox(height: 20),

@@ -216,9 +216,9 @@ class _MasterListState extends State<MasterList> {
     return Stack(
       children: [
         IgnorePointer(
-          ignoring: !widget.enabled,
+          ignoring: !widget.mobileMode && !widget.enabled,
           child: Scaffold(
-            floatingActionButton: widget.enabled
+            floatingActionButton: widget.mobileMode || widget.enabled
                 ? FloatingActionButton.extended(
                     onPressed: widget.newItemCallback,
                     label: const Text("Neu"),
@@ -358,7 +358,8 @@ class _MasterListState extends State<MasterList> {
                                     itemBuilder: (context, index) {
                                       final listItem = _entriesFiltered[index];
                                       final isSelected =
-                                          widget.enabled &&
+                                          (widget.mobileMode ||
+                                              widget.enabled) &&
                                           (widget.selectedListItem?.id ==
                                               listItem.id);
                                       return ListTile(
@@ -409,7 +410,7 @@ class _MasterListState extends State<MasterList> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 246),
               curve: Curves.fastOutSlowIn,
-              color: widget.enabled
+              color: widget.mobileMode || widget.enabled
                   ? Colors.transparent
                   : Theme.of(context).colorScheme.scrim.withValues(alpha: 0.35),
             ),

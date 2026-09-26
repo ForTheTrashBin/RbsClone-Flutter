@@ -98,11 +98,9 @@ class _MasetrDetailState extends State<MasterDetail> {
             ..name = _nameController.text.trim()
             ..flags = int.tryParse(_flagsController.text) ?? 0
             ..risktype = int.tryParse(_riskTypeController.text) ?? 0
-            ..ibanlenth = int.tryParse(
-              _ibanLengthController.text.isEmpty
-                  ? '0'
-                  : _ibanLengthController.text,
-            ),
+            ..ibanlenth = _ibanLengthController.text.isNotEmpty
+                ? int.tryParse(_ibanLengthController.text)
+                : null,
         );
 
         //----------------------------------------------------------------------
@@ -279,7 +277,7 @@ class _MasetrDetailState extends State<MasterDetail> {
                     children: [
                       Text(
                         widget.createMode
-                            ? "Daten erstellen"
+                            ? "Daten neu erstellen"
                             : 'Daten bearbeiten/löschen',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
@@ -323,6 +321,9 @@ class _MasetrDetailState extends State<MasterDetail> {
                           labelText: 'Flags',
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                         ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                         keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
@@ -340,6 +341,9 @@ class _MasetrDetailState extends State<MasterDetail> {
                           labelText: 'IBAN Länge (optional)',
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                         ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                         keyboardType: TextInputType.number,
                       ),
                       const SizedBox(height: 12),
@@ -349,6 +353,9 @@ class _MasetrDetailState extends State<MasterDetail> {
                           labelText: 'Risk Type',
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                         ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                         keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
