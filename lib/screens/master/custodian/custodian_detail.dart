@@ -9,6 +9,7 @@ import 'package:rbsclone_flutter/widgets/custom_appbar.dart';
 class MasterDetail extends StatefulWidget {
   const MasterDetail({
     required this.mobileMode,
+    required this.createMode,
     required this.listItem,
     required this.countries,
     required this.itemCreatedCallback,
@@ -18,6 +19,7 @@ class MasterDetail extends StatefulWidget {
   });
 
   final bool mobileMode;
+  final bool createMode;
 
   final CustodianListItem? listItem;
 
@@ -284,7 +286,9 @@ class _MasterDetailState extends State<MasterDetail> {
                   child: ListView(
                     children: [
                       Text(
-                        'Daten bearbeiten/löschen',
+                        widget.createMode
+                            ? "Daten erstellen"
+                            : 'Daten bearbeiten/löschen',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 16),

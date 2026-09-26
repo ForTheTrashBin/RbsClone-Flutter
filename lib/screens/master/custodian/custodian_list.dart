@@ -10,7 +10,7 @@ class MasterList extends StatefulWidget {
     required this.enabled,
     required this.selectedListItem,
     required this.itemSelectedCallback,
-    required this.newCallback,
+    required this.newItemCallback,
     required this.createNotifier,
     required this.updateNotifier,
     required this.deleteNotifier,
@@ -24,7 +24,7 @@ class MasterList extends StatefulWidget {
 
   final ValueChanged<CustodianListItem?> itemSelectedCallback;
 
-  final VoidCallback newCallback;
+  final VoidCallback newItemCallback;
 
   final ValueNotifier<CustodianListItem?> createNotifier;
   final ValueNotifier<CustodianListItem?> updateNotifier;
@@ -218,7 +218,7 @@ class _MasterListState extends State<MasterList> {
           child: Scaffold(
             floatingActionButton: widget.enabled
                 ? FloatingActionButton.extended(
-                    onPressed: widget.newCallback,
+                    onPressed: widget.newItemCallback,
                     label: const Text("Neu"),
                     icon: const Icon(Icons.add),
                   )

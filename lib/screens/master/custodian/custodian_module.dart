@@ -41,50 +41,23 @@ class _DataModuleState extends State<CustodianDataModule> {
     }
   }
 
-  //----------------------------------------------------------------------------
+  bool _createMode = false;
 
-  void onNewCallback() {
-    print("**************** _DataModuleState::onNewCallback");
+  void onCreateMode(bool newCreateMode) {
+    if (_createMode != newCreateMode) {
+      setState(() {
+        _createMode = newCreateMode;
+      });
 
-    widget.menuEnableCallback(false);
+      widget.menuEnableCallback(!newCreateMode);
+    }
   }
 
   //----------------------------------------------------------------------------
 
   final _createNotifier = ValueNotifier<CustodianListItem?>(null);
-
-  void onItemCreated(CustodianListItem? item) {
-    _createNotifier.value = item;
-  }
-
-  //----------------------------------------------------------------------------
-
   final _updateNotifier = ValueNotifier<CustodianListItem?>(null);
-
-  void onItemUpdated(CustodianListItem? item) {
-    _updateNotifier.value = item;
-
-    widget.menuEnableCallback(true);
-  }
-
-  //----------------------------------------------------------------------------
-
   final _deleteNotifier = ValueNotifier<CustodianListItem?>(null);
-
-  void onItemDeleted(CustodianListItem? item) {
-    _deleteNotifier.value = item;
-  }
-
-  //----------------------------------------------------------------------------
-
-  @override
-  void dispose() {
-    _deleteNotifier.dispose();
-    _updateNotifier.dispose();
-    _createNotifier.dispose();
-
-    super.dispose();
-  }
 
   //----------------------------------------------------------------------------
 
@@ -118,6 +91,52 @@ class _DataModuleState extends State<CustodianDataModule> {
   }
 
   @override
+  void dispose() {
+    _deleteNotifier.dispose();
+    _updateNotifier.dispose();
+    _createNotifier.dispose();
+
+    super.dispose();
+  }
+
+  //----------------------------------------------------------------------------
+
+  MasterDetail newMasterDetail() {
+    return MasterDetail(
+      mobileMode: widget.mobileMode,
+      createMode: _createMode,
+      listItem: _selectedListItem,
+      countries: _countries,
+      itemCreatedCallback: (item) {
+        _createNotifier.value = item; // Info to list
+      },
+      itemUpdatedCallback: (item) {
+        _updateNotifier.value = item; // Info to list
+
+        onCreateMode(false);
+
+        if (widget.mobileMode) {
+          Navigator.pop(context);
+        }
+      },
+      itemDeletedCallback: (item) {
+        _deleteNotifier.value = item; // Info to list
+      },
+    );
+  }
+
+  void pushMasterDetail() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return newMasterDetail();
+        },
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (widget.mobileMode) {
       return Row(
@@ -130,23 +149,13 @@ class _DataModuleState extends State<CustodianDataModule> {
               itemSelectedCallback: (item) {
                 onItemSelected(item);
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return MasterDetail(
-                        mobileMode: widget.mobileMode,
-                        listItem: _selectedListItem,
-                        countries: _countries,
-                        itemCreatedCallback: onItemCreated,
-                        itemUpdatedCallback: onItemUpdated,
-                        itemDeletedCallback: onItemDeleted,
-                      );
-                    },
-                  ),
-                );
+                pushMasterDetail();
               },
-              newCallback: onNewCallback,
+              newItemCallback: () {
+                onCreateMode(true);
+
+                pushMasterDetail();
+              },
               createNotifier: _createNotifier,
               updateNotifier: _updateNotifier,
               deleteNotifier: _deleteNotifier,
@@ -164,24 +173,16 @@ class _DataModuleState extends State<CustodianDataModule> {
               enabled: widget.enabled,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: onItemSelected,
-              newCallback: onNewCallback,
+              newItemCallback: () {
+                onCreateMode(true);
+              },
               createNotifier: _createNotifier,
               updateNotifier: _updateNotifier,
               deleteNotifier: _deleteNotifier,
             ),
           ),
           const VerticalDivider(width: 1),
-          Expanded(
-            flex: 3,
-            child: MasterDetail(
-              mobileMode: widget.mobileMode,
-              listItem: _selectedListItem,
-              countries: _countries,
-              itemCreatedCallback: onItemCreated,
-              itemUpdatedCallback: onItemUpdated,
-              itemDeletedCallback: onItemDeleted,
-            ),
-          ),
+          Expanded(flex: 3, child: newMasterDetail()),
         ],
       );
     }

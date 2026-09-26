@@ -41,39 +41,23 @@ class _DataModuleState extends State<ExchangeDataModule> {
     }
   }
 
-  //----------------------------------------------------------------------------
+  bool _createMode = false;
 
-  void onNewCallback() {
-    print("**************** _DataModuleState::onNewCallback");
+  void onCreateMode(bool newCreateMode) {
+    if (_createMode != newCreateMode) {
+      setState(() {
+        _createMode = newCreateMode;
+      });
 
-    widget.menuEnableCallback(false);
+      widget.menuEnableCallback(!newCreateMode);
+    }
   }
 
   //----------------------------------------------------------------------------
 
   final _createNotifier = ValueNotifier<ExchangeListItem?>(null);
-
-  void onItemCreated(ExchangeListItem? item) {
-    _createNotifier.value = item;
-  }
-
-  //----------------------------------------------------------------------------
-
   final _updateNotifier = ValueNotifier<ExchangeListItem?>(null);
-
-  void onItemUpdated(ExchangeListItem? item) {
-    _updateNotifier.value = item;
-
-    widget.menuEnableCallback(true);
-  }
-
-  //----------------------------------------------------------------------------
-
   final _deleteNotifier = ValueNotifier<ExchangeListItem?>(null);
-
-  void onItemDeleted(ExchangeListItem? item) {
-    _deleteNotifier.value = item;
-  }
 
   //----------------------------------------------------------------------------
 
@@ -88,6 +72,40 @@ class _DataModuleState extends State<ExchangeDataModule> {
 
   //----------------------------------------------------------------------------
 
+  MasterDetail newMasterDetail() {
+    return MasterDetail(
+      mobileMode: widget.mobileMode,
+      createMode: _createMode,
+      listItem: _selectedListItem,
+      itemCreatedCallback: (item) {
+        _createNotifier.value = item; // Info to list
+      },
+      itemUpdatedCallback: (item) {
+        _updateNotifier.value = item; // Info to list
+
+        onCreateMode(false);
+
+        if (widget.mobileMode) {
+          Navigator.pop(context);
+        }
+      },
+      itemDeletedCallback: (item) {
+        _deleteNotifier.value = item; // Info to list
+      },
+    );
+  }
+
+  void pushMasterDetail() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return newMasterDetail();
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.mobileMode) {
@@ -101,22 +119,13 @@ class _DataModuleState extends State<ExchangeDataModule> {
               itemSelectedCallback: (item) {
                 onItemSelected(item);
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return MasterDetail(
-                        mobileMode: widget.mobileMode,
-                        listItem: _selectedListItem,
-                        itemCreatedCallback: onItemCreated,
-                        itemUpdatedCallback: onItemUpdated,
-                        itemDeletedCallback: onItemDeleted,
-                      );
-                    },
-                  ),
-                );
+                pushMasterDetail();
               },
-              newCallback: onNewCallback,
+              newItemCallback: () {
+                onCreateMode(true);
+
+                pushMasterDetail();
+              },
               createNotifier: _createNotifier,
               updateNotifier: _updateNotifier,
               deleteNotifier: _deleteNotifier,
@@ -134,23 +143,16 @@ class _DataModuleState extends State<ExchangeDataModule> {
               enabled: widget.enabled,
               selectedListItem: _selectedListItem,
               itemSelectedCallback: onItemSelected,
-              newCallback: onNewCallback,
+              newItemCallback: () {
+                onCreateMode(true);
+              },
               createNotifier: _createNotifier,
               updateNotifier: _updateNotifier,
               deleteNotifier: _deleteNotifier,
             ),
           ),
           const VerticalDivider(width: 1),
-          Expanded(
-            flex: 3,
-            child: MasterDetail(
-              mobileMode: widget.mobileMode,
-              listItem: _selectedListItem,
-              itemCreatedCallback: onItemCreated,
-              itemUpdatedCallback: onItemUpdated,
-              itemDeletedCallback: onItemDeleted,
-            ),
-          ),
+          Expanded(flex: 3, child: newMasterDetail()),
         ],
       );
     }
