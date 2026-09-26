@@ -80,7 +80,7 @@ class _MasterListState extends State<MasterList> {
   void _filterListe(String searchText) {
     setState(() {
       if (searchText.isEmpty) {
-        _entriesFiltered = _entriesAll;
+        _entriesFiltered = [..._entriesAll]; // Shallow Copy
       } else {
         _entriesFiltered = _entriesAll.where((entry) {
           String searchTextLower = searchText.toLowerCase();
@@ -233,7 +233,7 @@ class _MasterListState extends State<MasterList> {
                 } else if (snapshot.hasData) {
                   if (_entriesAll.isEmpty) {
                     _entriesAll = snapshot.data!;
-                    _entriesFiltered = _entriesAll;
+                    _entriesFiltered = [..._entriesAll]; // Shallow Copy
                   }
 
                   //------------------------------------------------------------------
