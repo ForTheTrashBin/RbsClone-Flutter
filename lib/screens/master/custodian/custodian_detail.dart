@@ -373,11 +373,10 @@ class _MasterDetailState extends State<MasterDetail> {
                           labelText: 'Depotnummer',
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                         ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Pflichtfeld';
-                          }
-                        },
+                        validator: (value) =>
+                            (value == null || value.trim().isEmpty)
+                            ? 'Pflichtfeld'
+                            : null,
                       ),
                       const SizedBox(height: 20),
                       Row(
