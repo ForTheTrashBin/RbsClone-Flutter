@@ -78,18 +78,22 @@ class _DataModuleState extends State<CountryDataModule> {
       createMode: _createMode,
       listItem: _selectedListItem,
       itemCreatedCallback: (item) {
-        _createNotifier.value = item; // Info to list
-      },
-      itemUpdatedCallback: (item) {
-        _updateNotifier.value = item; // Info to list
-
         onCreateMode(false);
 
         if (widget.mobileMode) {
           Navigator.pop(context);
         }
+
+        _createNotifier.value = item; // Info to list
+      },
+      itemUpdatedCallback: (item) {
+        _updateNotifier.value = item; // Info to list
       },
       itemDeletedCallback: (item) {
+        if (widget.mobileMode) {
+          Navigator.pop(context);
+        }
+
         _deleteNotifier.value = item; // Info to list
       },
     );

@@ -108,18 +108,22 @@ class _DataModuleState extends State<CustodianDataModule> {
       listItem: _selectedListItem,
       countries: _countries,
       itemCreatedCallback: (item) {
-        _createNotifier.value = item; // Info to list
-      },
-      itemUpdatedCallback: (item) {
-        _updateNotifier.value = item; // Info to list
-
         onCreateMode(false);
 
         if (widget.mobileMode) {
           Navigator.pop(context);
         }
+
+        _createNotifier.value = item; // Info to list
+      },
+      itemUpdatedCallback: (item) {
+        _updateNotifier.value = item; // Info to list
       },
       itemDeletedCallback: (item) {
+        if (widget.mobileMode) {
+          Navigator.pop(context);
+        }
+
         _deleteNotifier.value = item; // Info to list
       },
     );

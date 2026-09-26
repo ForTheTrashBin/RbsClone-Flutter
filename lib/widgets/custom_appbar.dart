@@ -3,10 +3,16 @@ import 'package:flutter/material.dart';
 //------------------------------------------------------------------------------
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
-  const CustomAppBar(this.caption, {this.drawerEnabled = true, super.key});
+  const CustomAppBar(
+    this.caption, {
+    this.drawerEnabled = true,
+    this.autoLeading = true,
+    super.key,
+  });
 
   final String caption;
   final bool drawerEnabled;
+  final bool autoLeading;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -21,6 +27,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
     final hasDrawer = Scaffold.of(context).hasDrawer;
 
     return AppBar(
+      automaticallyImplyLeading: widget.autoLeading,
       iconTheme: hasDrawer && !widget.drawerEnabled
           ? IconTheme.of(context)
                 .copyWith(color: IconTheme.of(context).color?.withAlpha(64))

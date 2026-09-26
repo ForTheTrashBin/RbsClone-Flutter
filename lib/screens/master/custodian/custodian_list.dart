@@ -94,10 +94,6 @@ class _MasterListState extends State<MasterList> {
 
   //----------------------------------------------------------------------------
 
-  void _onDataCreated() {
-    print("***************************** _MasterListState::_onDataCreated");
-  }
-
   void _scrollToItem(String id) {
     final index = _entriesFiltered.indexWhere((entry) {
       return entry.id == id;
@@ -114,6 +110,30 @@ class _MasterListState extends State<MasterList> {
           );
         }
       });
+    }
+  }
+
+  void _onDataCreated() {
+    final listItem = widget.createNotifier.value;
+
+    if (listItem != null) {
+      setState(() {
+        _entriesAll.add(listItem);
+
+        _entriesAll.sort((a, b) {
+          return a.shortcode.toUpperCase().compareTo(b.shortcode.toUpperCase());
+        });
+
+        _entriesFiltered.add(listItem);
+
+        _entriesFiltered.sort((a, b) {
+          return a.shortcode.toUpperCase().compareTo(b.shortcode.toUpperCase());
+        });
+      });
+
+      widget.itemSelectedCallback(listItem);
+
+      _scrollToItem(listItem.id);
     }
   }
 
