@@ -10,7 +10,7 @@ void main() {
     //
     // Create a new custodian
     //
-    //Future createCustodian(CustodianNoPK custodianNoPK) async
+    //Future<Custodian> createCustodian(CustodianNoPK custodianNoPK) async
     test('test createCustodian', () async {
       // TODO
     });
@@ -55,7 +55,7 @@ void main() {
     //
     // Update an existing custodian based on the id supplied
     //
-    //Future updateCustodian(String id, CustodianNoPK custodianNoPK) async
+    //Future<Custodian> updateCustodian(String id, CustodianNoPK custodianNoPK) async
     test('test updateCustodian', () async {
       // TODO
     });

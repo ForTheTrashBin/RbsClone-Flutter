@@ -10,7 +10,7 @@ void main() {
     //
     // Create a new exchange
     //
-    //Future createExchange(ExchangeNoPK exchangeNoPK) async
+    //Future<Exchange> createExchange(ExchangeNoPK exchangeNoPK) async
     test('test createExchange', () async {
       // TODO
     });
@@ -55,7 +55,7 @@ void main() {
     //
     // Update an existing exchange based on the id supplied
     //
-    //Future updateExchange(String id, ExchangeNoPK exchangeNoPK) async
+    //Future<Exchange> updateExchange(String id, ExchangeNoPK exchangeNoPK) async
     test('test updateExchange', () async {
       // TODO
     });

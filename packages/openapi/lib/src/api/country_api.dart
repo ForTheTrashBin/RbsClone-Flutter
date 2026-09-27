@@ -13,6 +13,7 @@ import 'package:openapi/src/api_util.dart';
 import 'package:openapi/src/model/country.dart';
 import 'package:openapi/src/model/country_list_item.dart';
 import 'package:openapi/src/model/country_no_pk.dart';
+import 'package:openapi/src/model/country_response_create_header.dart';
 import 'package:openapi/src/model/error_model.dart';
 
 class CountryApi {
@@ -34,9 +35,9 @@ class CountryApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future]
+  /// Returns a [Future] containing a [Response] with a [Country] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<void>> createCountry({
+  Future<Response<Country>> createCountry({
     required CountryNoPK countryNoPK,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -85,7 +86,36 @@ class CountryApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    return _response;
+    Country? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(Country),
+            ) as Country;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<Country>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
   }
 
   /// Delete a single country based on the id supplied
@@ -384,9 +414,9 @@ class CountryApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future]
+  /// Returns a [Future] containing a [Response] with a [Country] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<void>> updateCountry({
+  Future<Response<Country>> updateCountry({
     required String id,
     required CountryNoPK countryNoPK,
     CancelToken? cancelToken,
@@ -439,6 +469,35 @@ class CountryApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    return _response;
+    Country? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(Country),
+            ) as Country;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<Country>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
   }
 }

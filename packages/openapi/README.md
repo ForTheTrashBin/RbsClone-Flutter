@@ -52,7 +52,8 @@ final api = Openapi().getCountryApi();
 final CountryNoPK countryNoPK = ; // CountryNoPK | 
 
 try {
-    api.createCountry(countryNoPK);
+    final response = await api.createCountry(countryNoPK);
+    print(response);
 } on DioException catch (e) {
     print("Exception when calling CountryApi->createCountry: $e\n");
 }
@@ -77,8 +78,8 @@ Class | Method | HTTP request | Description
 [*CustodianApi*](doc/CustodianApi.md) | [**getCustodianByShortcode**](doc/CustodianApi.md#getcustodianbyshortcode) | **GET** /custodian/shortcode/{shortcode} | Get a single custodian based on the shortcode supplied
 [*CustodianApi*](doc/CustodianApi.md) | [**getCustodians**](doc/CustodianApi.md#getcustodians) | **GET** /custodian | Get a list of all custodians
 [*CustodianApi*](doc/CustodianApi.md) | [**updateCustodian**](doc/CustodianApi.md#updatecustodian) | **PUT** /custodian/{id} | Update an existing custodian based on the id supplied
-[*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**getCustodian2ExchangeByIdCustodian**](doc/Custodian2ExchangeApi.md#getcustodian2exchangebyidcustodian) | **GET** /custodian2exchange/idcustodian/{idcustodian} | Get a list of all mappings by idcustodian supplied
-[*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**getCustodian2ExchangeByIdExchange**](doc/Custodian2ExchangeApi.md#getcustodian2exchangebyidexchange) | **GET** /custodian2exchange/idexchange/{idexchange} | Get a list of all mappings by idexchange supplied
+[*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**getCustodian2ExchangeByIdcustodian**](doc/Custodian2ExchangeApi.md#getcustodian2exchangebyidcustodian) | **GET** /custodian2exchange/idcustodian/{idcustodian} | Get a list of all mappings by idcustodian supplied
+[*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**getCustodian2ExchangeByIdexchange**](doc/Custodian2ExchangeApi.md#getcustodian2exchangebyidexchange) | **GET** /custodian2exchange/idexchange/{idexchange} | Get a list of all mappings by idexchange supplied
 [*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**mapCustodians2Exchange**](doc/Custodian2ExchangeApi.md#mapcustodians2exchange) | **PUT** /custodian2exchange/idexchange/{idexchange} | Update the mapping of multiple custodians to a single exchange
 [*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**mapExchanges2Custodian**](doc/Custodian2ExchangeApi.md#mapexchanges2custodian) | **PUT** /custodian2exchange/idcustodian/{idcustodian} | Update the mapping of multiple exchanges to a single custodian
 [*ExchangeApi*](doc/ExchangeApi.md) | [**createExchange**](doc/ExchangeApi.md#createexchange) | **POST** /exchange | Create a new exchange
@@ -96,15 +97,18 @@ Class | Method | HTTP request | Description
  - [Country](doc/Country.md)
  - [CountryListItem](doc/CountryListItem.md)
  - [CountryNoPK](doc/CountryNoPK.md)
+ - [CountryResponseCreateHeader](doc/CountryResponseCreateHeader.md)
  - [Custodian](doc/Custodian.md)
  - [Custodian2Exchange](doc/Custodian2Exchange.md)
  - [CustodianListItem](doc/CustodianListItem.md)
  - [CustodianNoPK](doc/CustodianNoPK.md)
+ - [CustodianResponseCreateHeader](doc/CustodianResponseCreateHeader.md)
  - [ErrorDetail](doc/ErrorDetail.md)
  - [ErrorModel](doc/ErrorModel.md)
  - [Exchange](doc/Exchange.md)
  - [ExchangeListItem](doc/ExchangeListItem.md)
  - [ExchangeNoPK](doc/ExchangeNoPK.md)
+ - [ExchangeResponseCreateHeader](doc/ExchangeResponseCreateHeader.md)
  - [MapCustodian2Exchange](doc/MapCustodian2Exchange.md)
  - [MapExchange2Custodian](doc/MapExchange2Custodian.md)
 

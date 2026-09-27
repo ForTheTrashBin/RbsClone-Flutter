@@ -13,6 +13,7 @@ import 'package:openapi/src/api_util.dart';
 import 'package:openapi/src/model/custodian.dart';
 import 'package:openapi/src/model/custodian_list_item.dart';
 import 'package:openapi/src/model/custodian_no_pk.dart';
+import 'package:openapi/src/model/custodian_response_create_header.dart';
 import 'package:openapi/src/model/error_model.dart';
 
 class CustodianApi {
@@ -34,9 +35,9 @@ class CustodianApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future]
+  /// Returns a [Future] containing a [Response] with a [Custodian] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<void>> createCustodian({
+  Future<Response<Custodian>> createCustodian({
     required CustodianNoPK custodianNoPK,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -85,7 +86,36 @@ class CustodianApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    return _response;
+    Custodian? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(Custodian),
+            ) as Custodian;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<Custodian>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
   }
 
   /// Delete a single custodian based on the id supplied
@@ -384,9 +414,9 @@ class CustodianApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future]
+  /// Returns a [Future] containing a [Response] with a [Custodian] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<void>> updateCustodian({
+  Future<Response<Custodian>> updateCustodian({
     required String id,
     required CustodianNoPK custodianNoPK,
     CancelToken? cancelToken,
@@ -439,6 +469,35 @@ class CustodianApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    return _response;
+    Custodian? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(Custodian),
+            ) as Custodian;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<Custodian>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
   }
 }

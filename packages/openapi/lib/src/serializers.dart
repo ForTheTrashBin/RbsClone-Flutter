@@ -17,15 +17,18 @@ import 'package:openapi/src/model/date.dart';
 import 'package:openapi/src/model/country.dart';
 import 'package:openapi/src/model/country_list_item.dart';
 import 'package:openapi/src/model/country_no_pk.dart';
+import 'package:openapi/src/model/country_response_create_header.dart';
 import 'package:openapi/src/model/custodian.dart';
 import 'package:openapi/src/model/custodian2_exchange.dart';
 import 'package:openapi/src/model/custodian_list_item.dart';
 import 'package:openapi/src/model/custodian_no_pk.dart';
+import 'package:openapi/src/model/custodian_response_create_header.dart';
 import 'package:openapi/src/model/error_detail.dart';
 import 'package:openapi/src/model/error_model.dart';
 import 'package:openapi/src/model/exchange.dart';
 import 'package:openapi/src/model/exchange_list_item.dart';
 import 'package:openapi/src/model/exchange_no_pk.dart';
+import 'package:openapi/src/model/exchange_response_create_header.dart';
 import 'package:openapi/src/model/map_custodian2_exchange.dart';
 import 'package:openapi/src/model/map_exchange2_custodian.dart';
 
@@ -35,15 +38,18 @@ part 'serializers.g.dart';
   Country,
   CountryListItem,
   CountryNoPK,
+  CountryResponseCreateHeader,
   Custodian,
   Custodian2Exchange,
   CustodianListItem,
   CustodianNoPK,
+  CustodianResponseCreateHeader,
   ErrorDetail,
   ErrorModel,
   Exchange,
   ExchangeListItem,
   ExchangeNoPK,
+  ExchangeResponseCreateHeader,
   MapCustodian2Exchange,
   MapExchange2Custodian,
 ])

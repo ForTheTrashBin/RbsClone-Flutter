@@ -10,8 +10,8 @@ void main() {
     //
     // Get a list of all mappings by idcustodian supplied
     //
-    //Future<BuiltList<Custodian2Exchange>> getCustodian2ExchangeByIdCustodian(String idcustodian) async
-    test('test getCustodian2ExchangeByIdCustodian', () async {
+    //Future<BuiltList<Custodian2Exchange>> getCustodian2ExchangeByIdcustodian(String idcustodian) async
+    test('test getCustodian2ExchangeByIdcustodian', () async {
       // TODO
     });
 
@@ -19,8 +19,8 @@ void main() {
     //
     // Get a list of all mappings by idexchange supplied
     //
-    //Future<BuiltList<Custodian2Exchange>> getCustodian2ExchangeByIdExchange(String idexchange) async
-    test('test getCustodian2ExchangeByIdExchange', () async {
+    //Future<BuiltList<Custodian2Exchange>> getCustodian2ExchangeByIdexchange(String idexchange) async
+    test('test getCustodian2ExchangeByIdexchange', () async {
       // TODO
     });
 

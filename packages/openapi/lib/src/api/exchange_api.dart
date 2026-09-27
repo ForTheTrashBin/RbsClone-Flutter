@@ -14,6 +14,7 @@ import 'package:openapi/src/model/error_model.dart';
 import 'package:openapi/src/model/exchange.dart';
 import 'package:openapi/src/model/exchange_list_item.dart';
 import 'package:openapi/src/model/exchange_no_pk.dart';
+import 'package:openapi/src/model/exchange_response_create_header.dart';
 
 class ExchangeApi {
   final Dio _dio;
@@ -34,9 +35,9 @@ class ExchangeApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future]
+  /// Returns a [Future] containing a [Response] with a [Exchange] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<void>> createExchange({
+  Future<Response<Exchange>> createExchange({
     required ExchangeNoPK exchangeNoPK,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -85,7 +86,36 @@ class ExchangeApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    return _response;
+    Exchange? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(Exchange),
+            ) as Exchange;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<Exchange>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
   }
 
   /// Delete a single exchange based on the id supplied
@@ -384,9 +414,9 @@ class ExchangeApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future]
+  /// Returns a [Future] containing a [Response] with a [Exchange] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<void>> updateExchange({
+  Future<Response<Exchange>> updateExchange({
     required String id,
     required ExchangeNoPK exchangeNoPK,
     CancelToken? cancelToken,
@@ -439,6 +469,35 @@ class ExchangeApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    return _response;
+    Exchange? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(Exchange),
+            ) as Exchange;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<Exchange>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
   }
 }

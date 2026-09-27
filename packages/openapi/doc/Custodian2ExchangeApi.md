@@ -9,14 +9,14 @@ All URIs are relative to *https://www.rbsclone.de:8443*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**getCustodian2ExchangeByIdCustodian**](Custodian2ExchangeApi.md#getcustodian2exchangebyidcustodian) | **GET** /custodian2exchange/idcustodian/{idcustodian} | Get a list of all mappings by idcustodian supplied
-[**getCustodian2ExchangeByIdExchange**](Custodian2ExchangeApi.md#getcustodian2exchangebyidexchange) | **GET** /custodian2exchange/idexchange/{idexchange} | Get a list of all mappings by idexchange supplied
+[**getCustodian2ExchangeByIdcustodian**](Custodian2ExchangeApi.md#getcustodian2exchangebyidcustodian) | **GET** /custodian2exchange/idcustodian/{idcustodian} | Get a list of all mappings by idcustodian supplied
+[**getCustodian2ExchangeByIdexchange**](Custodian2ExchangeApi.md#getcustodian2exchangebyidexchange) | **GET** /custodian2exchange/idexchange/{idexchange} | Get a list of all mappings by idexchange supplied
 [**mapCustodians2Exchange**](Custodian2ExchangeApi.md#mapcustodians2exchange) | **PUT** /custodian2exchange/idexchange/{idexchange} | Update the mapping of multiple custodians to a single exchange
 [**mapExchanges2Custodian**](Custodian2ExchangeApi.md#mapexchanges2custodian) | **PUT** /custodian2exchange/idcustodian/{idcustodian} | Update the mapping of multiple exchanges to a single custodian
 
 
-# **getCustodian2ExchangeByIdCustodian**
-> BuiltList<Custodian2Exchange> getCustodian2ExchangeByIdCustodian(idcustodian)
+# **getCustodian2ExchangeByIdcustodian**
+> BuiltList<Custodian2Exchange> getCustodian2ExchangeByIdcustodian(idcustodian)
 
 Get a list of all mappings by idcustodian supplied
 
@@ -30,10 +30,10 @@ final api = Openapi().getCustodian2ExchangeApi();
 final String idcustodian = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | This is one of the two parts of the unique identifier of this data
 
 try {
-    final response = api.getCustodian2ExchangeByIdCustodian(idcustodian);
+    final response = api.getCustodian2ExchangeByIdcustodian(idcustodian);
     print(response);
 } on DioException catch (e) {
-    print('Exception when calling Custodian2ExchangeApi->getCustodian2ExchangeByIdCustodian: $e\n');
+    print('Exception when calling Custodian2ExchangeApi->getCustodian2ExchangeByIdcustodian: $e\n');
 }
 ```
 
@@ -58,8 +58,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getCustodian2ExchangeByIdExchange**
-> BuiltList<Custodian2Exchange> getCustodian2ExchangeByIdExchange(idexchange)
+# **getCustodian2ExchangeByIdexchange**
+> BuiltList<Custodian2Exchange> getCustodian2ExchangeByIdexchange(idexchange)
 
 Get a list of all mappings by idexchange supplied
 
@@ -73,10 +73,10 @@ final api = Openapi().getCustodian2ExchangeApi();
 final String idexchange = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | This is one of the two parts of the unique identifier of this data
 
 try {
-    final response = api.getCustodian2ExchangeByIdExchange(idexchange);
+    final response = api.getCustodian2ExchangeByIdexchange(idexchange);
     print(response);
 } on DioException catch (e) {
-    print('Exception when calling Custodian2ExchangeApi->getCustodian2ExchangeByIdExchange: $e\n');
+    print('Exception when calling Custodian2ExchangeApi->getCustodian2ExchangeByIdexchange: $e\n');
 }
 ```
 

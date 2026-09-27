@@ -10,7 +10,7 @@ void main() {
     //
     // Create a new country
     //
-    //Future createCountry(CountryNoPK countryNoPK) async
+    //Future<Country> createCountry(CountryNoPK countryNoPK) async
     test('test createCountry', () async {
       // TODO
     });
@@ -55,7 +55,7 @@ void main() {
     //
     // Update an existing country based on the id supplied
     //
-    //Future updateCountry(String id, CountryNoPK countryNoPK) async
+    //Future<Country> updateCountry(String id, CountryNoPK countryNoPK) async
     test('test updateCountry', () async {
       // TODO
     });

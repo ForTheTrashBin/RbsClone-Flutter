@@ -37,7 +37,7 @@ class Custodian2ExchangeApi {
   /// Returns a [Future] containing a [Response] with a [BuiltList<Custodian2Exchange>] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<BuiltList<Custodian2Exchange>>>
-      getCustodian2ExchangeByIdCustodian({
+      getCustodian2ExchangeByIdcustodian({
     required String idcustodian,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -118,7 +118,7 @@ class Custodian2ExchangeApi {
   /// Returns a [Future] containing a [Response] with a [BuiltList<Custodian2Exchange>] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<BuiltList<Custodian2Exchange>>>
-      getCustodian2ExchangeByIdExchange({
+      getCustodian2ExchangeByIdexchange({
     required String idexchange,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,

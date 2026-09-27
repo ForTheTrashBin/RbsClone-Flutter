@@ -18,7 +18,7 @@ Method | HTTP request | Description
 
 
 # **createExchange**
-> createExchange(exchangeNoPK)
+> Exchange createExchange(exchangeNoPK)
 
 Create a new exchange
 
@@ -32,7 +32,8 @@ final api = Openapi().getExchangeApi();
 final ExchangeNoPK exchangeNoPK = ; // ExchangeNoPK | 
 
 try {
-    api.createExchange(exchangeNoPK);
+    final response = api.createExchange(exchangeNoPK);
+    print(response);
 } on DioException catch (e) {
     print('Exception when calling ExchangeApi->createExchange: $e\n');
 }
@@ -46,7 +47,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-void (empty response body)
+[**Exchange**](Exchange.md)
 
 ### Authorization
 
@@ -55,7 +56,7 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
- - **Accept**: application/problem+json
+ - **Accept**: application/json, application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -227,7 +228,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **updateExchange**
-> updateExchange(id, exchangeNoPK)
+> Exchange updateExchange(id, exchangeNoPK)
 
 Update an existing exchange based on the id supplied
 
@@ -242,7 +243,8 @@ final String id = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | This is the 
 final ExchangeNoPK exchangeNoPK = ; // ExchangeNoPK | 
 
 try {
-    api.updateExchange(id, exchangeNoPK);
+    final response = api.updateExchange(id, exchangeNoPK);
+    print(response);
 } on DioException catch (e) {
     print('Exception when calling ExchangeApi->updateExchange: $e\n');
 }
@@ -257,7 +259,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-void (empty response body)
+[**Exchange**](Exchange.md)
 
 ### Authorization
 
@@ -266,7 +268,7 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
- - **Accept**: application/problem+json
+ - **Accept**: application/json, application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
