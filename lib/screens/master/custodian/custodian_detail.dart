@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:openapi/openapi.dart';
@@ -82,6 +84,7 @@ class _MasterDetailState extends State<MasterDetail> {
   }
 
   //----------------------------------------------------------------------------
+  // Create a new record
   //----------------------------------------------------------------------------
 
   bool _dbCreating = false;
@@ -112,19 +115,20 @@ class _MasterDetailState extends State<MasterDetail> {
           custodianNoPK: payload,
         );
 
-        if (response.statusCode == 204) {
-          final newId = response.headers["id"];
+        if ((response.statusCode == HttpStatus.created) &&
+            (response.data != null)) {
+          final data = response.data!;
 
-          if (newId != null) {
-            final listItem = CustodianListItem(
-              (b) => b
-                ..id = newId[0]
-                ..shortcode = payload.shortcode
-                ..name = payload.name,
-            );
+          final listItem = CustodianListItem(
+            (b) => b
+              ..id = data.id
+              ..shortcode = data.shortcode
+              ..name = data.name,
+          );
 
-            widget.itemCreatedCallback(listItem);
-          }
+          widget.itemCreatedCallback(listItem);
+        } else {
+          throw Exception("Wrong status or data: ${response.statusCode}");
         }
       } catch (e) {
         if (!mounted) return;
@@ -171,23 +175,25 @@ class _MasterDetailState extends State<MasterDetail> {
         openapi.dio.options.receiveTimeout = const Duration(seconds: 5);
         // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
-        await openapi.getCustodianApi().updateCustodian(
+        final response = await openapi.getCustodianApi().updateCustodian(
           id: widget.listItem!.id, // TODO NULL-Value
           custodianNoPK: payload,
         );
 
-        setState(() {
-          _dbReadFuture = _dbRead(widget.listItem);
-        });
+        if ((response.statusCode == HttpStatus.ok) && (response.data != null)) {
+          final data = response.data!;
 
-        final listItem = CustodianListItem(
-          (b) => b
-            ..id = widget.listItem!.id
-            ..shortcode = payload.shortcode
-            ..name = payload.name,
-        );
+          final listItem = CustodianListItem(
+            (b) => b
+              ..id = data.id
+              ..shortcode = data.shortcode
+              ..name = data.name,
+          );
 
-        widget.itemUpdatedCallback(listItem);
+          widget.itemUpdatedCallback(listItem);
+        } else {
+          throw Exception("Wrong status or data: ${response.statusCode}");
+        }
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(
@@ -234,11 +240,15 @@ class _MasterDetailState extends State<MasterDetail> {
         // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
         // TODO NULL-Value
-        await openapi.getCustodianApi().deleteCustodian(
+        final response = await openapi.getCustodianApi().deleteCustodian(
           id: widget.listItem!.id,
         );
 
-        widget.itemDeletedCallback(widget.listItem);
+        if (response.statusCode == HttpStatus.noContent) {
+          widget.itemDeletedCallback(widget.listItem);
+        } else {
+          throw Exception("Wrong status: ${response.statusCode}");
+        }
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(
@@ -307,9 +317,11 @@ class _MasterDetailState extends State<MasterDetail> {
               ),
               const SizedBox(width: 12),
               OutlinedButton.icon(
-                onPressed: () {
-                  widget.itemCreatedCallback(null);
-                }, // _dbAbbrechen????
+                onPressed: _dbActive()
+                    ? null
+                    : () {
+                        widget.itemCreatedCallback(null);
+                      },
                 icon: const Icon(Icons.delete_outline),
                 label: Text('Abbrechen'),
               ),

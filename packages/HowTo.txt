@@ -8,5 +8,5 @@
 
 5. Resolve the dependencies using the 'dart put get' command
 
-6. To create the package, entter the following command 'dart run build_runner build --delete-conflicting-outputs'
+6. To create the package, enter the following command 'dart run build_runner build --delete-conflicting-outputs'
 
