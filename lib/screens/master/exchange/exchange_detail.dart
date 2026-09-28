@@ -42,6 +42,43 @@ class _MasterDetailState extends State<MasterDetail> {
   //----------------------------------------------------------------------------
   //----------------------------------------------------------------------------
 
+  void setFormDefault() {
+    _shortcodeController.text = '';
+    _nameController.text = '';
+    _flagsController.text = '0';
+  }
+
+  void setFormData(Exchange? data) {
+    if (data != null) {
+      _shortcodeController.text = data.shortcode;
+      _nameController.text = data.name;
+      _flagsController.text = data.flags.toString();
+    } else {
+      setFormDefault();
+    }
+  }
+
+  ExchangeNoPK getFormPayload() {
+    return ExchangeNoPK(
+      (b) => b
+        ..shortcode = _shortcodeController.text.trim().toUpperCase()
+        ..name = _nameController.text.trim()
+        ..flags = int.tryParse(_flagsController.text) ?? 0,
+    );
+  }
+
+  ExchangeListItem getListItem(Exchange data) {
+    return ExchangeListItem(
+      (b) => b
+        ..id = data.id
+        ..shortcode = data.shortcode
+        ..name = data.name,
+    );
+  }
+
+  //----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+
   bool _dbReading = false;
 
   late Future<Exchange?> _dbReadFuture;
@@ -64,7 +101,7 @@ class _MasterDetailState extends State<MasterDetail> {
         }
       } on DioException catch (e) {
         if ((e.type == DioExceptionType.badResponse) && (e.response != null)) {
-          if (e.response!.statusCode == 404) {
+          if (e.response!.statusCode == HttpStatus.notFound) {
             return null;
           }
         }
@@ -88,15 +125,6 @@ class _MasterDetailState extends State<MasterDetail> {
       setState(() => _dbCreating = true);
 
       try {
-        final payload = ExchangeNoPK(
-          (b) => b
-            ..shortcode = _shortcodeController.text.trim().toUpperCase()
-            ..name = _nameController.text.trim()
-            ..flags = int.tryParse(_flagsController.text) ?? 0,
-        );
-
-        //----------------------------------------------------------------------
-
         final openapi = Openapi();
 
         openapi.dio.options.connectTimeout = const Duration(seconds: 5);
@@ -104,21 +132,14 @@ class _MasterDetailState extends State<MasterDetail> {
         // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
         final response = await openapi.getExchangeApi().createExchange(
-          exchangeNoPK: payload,
+          exchangeNoPK: getFormPayload(),
         );
 
         if ((response.statusCode == HttpStatus.created) &&
             (response.data != null)) {
-          final data = response.data!;
+          final responseData = response.data!;
 
-          final listItem = ExchangeListItem(
-            (b) => b
-              ..id = data.id
-              ..shortcode = data.shortcode
-              ..name = data.name,
-          );
-
-          widget.itemCreatedCallback(listItem);
+          widget.itemCreatedCallback(getListItem(responseData));
         } else {
           throw Exception("Wrong status or data: ${response.statusCode}");
         }
@@ -143,15 +164,6 @@ class _MasterDetailState extends State<MasterDetail> {
     if (_formKey.currentState!.validate()) {
       setState(() => _dbSaving = true);
       try {
-        final payload = ExchangeNoPK(
-          (b) => b
-            ..shortcode = _shortcodeController.text.trim().toUpperCase()
-            ..name = _nameController.text.trim()
-            ..flags = int.tryParse(_flagsController.text) ?? 0,
-        );
-
-        //----------------------------------------------------------------------
-
         final openapi = Openapi();
 
         openapi.dio.options.connectTimeout = const Duration(seconds: 5);
@@ -159,21 +171,14 @@ class _MasterDetailState extends State<MasterDetail> {
         // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
         final response = await openapi.getExchangeApi().updateExchange(
-          id: widget.listItem!.id, // TODO NULL-Value
-          exchangeNoPK: payload,
+          id: widget.listItem!.id,
+          exchangeNoPK: getFormPayload(),
         );
 
         if ((response.statusCode == HttpStatus.ok) && (response.data != null)) {
-          final data = response.data!;
+          final responseData = response.data!;
 
-          final listItem = ExchangeListItem(
-            (b) => b
-              ..id = data.id
-              ..shortcode = data.shortcode
-              ..name = data.name,
-          );
-
-          widget.itemUpdatedCallback(listItem);
+          widget.itemUpdatedCallback(getListItem(responseData));
         } else {
           throw Exception("Wrong status or data: ${response.statusCode}");
         }
@@ -222,7 +227,6 @@ class _MasterDetailState extends State<MasterDetail> {
         openapi.dio.options.receiveTimeout = const Duration(seconds: 5);
         // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
-        // TODO NULL-Value
         final response = await openapi.getExchangeApi().deleteExchange(
           id: widget.listItem!.id,
         );
@@ -256,11 +260,17 @@ class _MasterDetailState extends State<MasterDetail> {
   void initState() {
     super.initState();
 
-    _dbReadFuture = _dbRead(widget.listItem);
-
     _shortcodeController = TextEditingController();
     _nameController = TextEditingController();
     _flagsController = TextEditingController();
+
+    if (widget.createMode) {
+      _dbReadFuture = _dbRead(null);
+
+      setFormDefault();
+    } else {
+      _dbReadFuture = _dbRead(widget.listItem);
+    }
   }
 
   @override
@@ -276,8 +286,15 @@ class _MasterDetailState extends State<MasterDetail> {
   void didUpdateWidget(covariant MasterDetail oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.listItem != widget.listItem) {
-      _dbReadFuture = _dbRead(widget.listItem);
+    if (!oldWidget.createMode && widget.createMode) {
+      _dbReadFuture = _dbRead(null);
+
+      setFormDefault();
+    } else {
+      if ((oldWidget.createMode && !widget.createMode) ||
+          (oldWidget.listItem != widget.listItem)) {
+        _dbReadFuture = _dbRead(widget.listItem);
+      }
     }
   }
 
@@ -421,11 +438,7 @@ class _MasterDetailState extends State<MasterDetail> {
 
             if (snapshot.hasData) {
               if (_dbReading) {
-                final data = snapshot.data!;
-
-                _shortcodeController.text = data.shortcode;
-                _nameController.text = data.name;
-                _flagsController.text = data.flags.toString();
+                setFormData(snapshot.data);
 
                 _dbReading = false;
               }

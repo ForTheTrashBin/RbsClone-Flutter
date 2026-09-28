@@ -22,7 +22,8 @@ class MasterList extends StatefulWidget {
 
   final CountryListItem? selectedListItem;
 
-  final ValueChanged<CountryListItem?> itemSelectedCallback;
+  final void Function(CountryListItem? listItem, bool isManual)
+  itemSelectedCallback;
 
   final VoidCallback newItemCallback;
 
@@ -69,7 +70,7 @@ class _MasterListState extends State<MasterList> {
 
       _searchController.clear();
 
-      widget.itemSelectedCallback(null);
+      widget.itemSelectedCallback(null, false);
 
       _dbFuture = fetchListData();
     });
@@ -131,7 +132,7 @@ class _MasterListState extends State<MasterList> {
         });
       });
 
-      widget.itemSelectedCallback(listItem);
+      widget.itemSelectedCallback(listItem, false);
 
       _scrollToItem(listItem.id);
     }
@@ -258,43 +259,35 @@ class _MasterListState extends State<MasterList> {
                     _entriesFiltered = [..._entriesAll]; // Shallow Copy
                   }
 
-                  //------------------------------------------------------------------
+                  //------------------------------------------------------------
+
+                  CountryListItem? foundItem;
 
                   if (_entriesFiltered.isNotEmpty) {
                     if (widget.selectedListItem != null) {
-                      CountryListItem? foundItem = _entriesFiltered.where((
-                        entry,
-                      ) {
+                      foundItem = _entriesFiltered.where((entry) {
                         return entry.id == widget.selectedListItem!.id;
                       }).firstOrNull;
 
-                      if (foundItem == null) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          widget.itemSelectedCallback(_entriesFiltered[0]);
-                        });
-                      }
+                      foundItem ??= _entriesFiltered[0];
                     } else {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        widget.itemSelectedCallback(_entriesFiltered[0]);
-                      });
-                    }
-                  } else {
-                    if (widget.selectedListItem != null) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        widget.itemSelectedCallback(null);
-                      });
+                      foundItem = _entriesFiltered[0];
                     }
                   }
 
-                  //------------------------------------------------------------------
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    widget.itemSelectedCallback(foundItem, false);
+                  });
+
+                  //------------------------------------------------------------
 
                   return Padding(
                     padding: const EdgeInsets.only(top: 16.0),
                     child: Column(
                       children: [
-                        //------------------------------------------------------------
+                        //------------------------------------------------------
                         // Count & search
-                        //------------------------------------------------------------
+                        //------------------------------------------------------
                         Container(
                           color: Theme.of(context).scaffoldBackgroundColor,
                           padding: const EdgeInsets.only(
@@ -361,9 +354,9 @@ class _MasterListState extends State<MasterList> {
                             ],
                           ),
                         ),
-                        //------------------------------------------------------------
+                        //------------------------------------------------------
                         // List of item or message, if list is empty
-                        //------------------------------------------------------------
+                        //------------------------------------------------------
                         Expanded(
                           child: ClipRect(
                             child: _entriesFiltered.isEmpty
@@ -392,7 +385,11 @@ class _MasterListState extends State<MasterList> {
                                           ),
                                         ),
                                         title: Text(listItem.shortcode),
-                                        subtitle: Text(listItem.name),
+                                        subtitle: Text(
+                                          listItem.name,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                         trailing: widget.mobileMode
                                             ? const Icon(Icons.chevron_right)
                                             : null,
@@ -407,7 +404,10 @@ class _MasterListState extends State<MasterList> {
                                           ),
                                         ),
                                         onTap: () {
-                                          widget.itemSelectedCallback(listItem);
+                                          widget.itemSelectedCallback(
+                                            listItem,
+                                            true,
+                                          );
                                         },
                                       );
                                     },

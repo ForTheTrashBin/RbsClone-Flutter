@@ -120,10 +120,10 @@ class _DataModuleState extends State<CountryDataModule> {
               mobileMode: widget.mobileMode,
               enabled: widget.enabled,
               selectedListItem: _selectedListItem,
-              itemSelectedCallback: (item) {
+              itemSelectedCallback: (item, isManual) {
                 onItemSelected(item);
 
-                pushMasterDetail();
+                if (isManual) pushMasterDetail();
               },
               newItemCallback: () {
                 onCreateMode(true);
@@ -146,7 +146,9 @@ class _DataModuleState extends State<CountryDataModule> {
               mobileMode: widget.mobileMode,
               enabled: widget.enabled,
               selectedListItem: _selectedListItem,
-              itemSelectedCallback: onItemSelected,
+              itemSelectedCallback: (item, _) {
+                onItemSelected(item);
+              },
               newItemCallback: () {
                 onCreateMode(true);
               },

@@ -44,6 +44,51 @@ class _MasetrDetailState extends State<MasterDetail> {
   //----------------------------------------------------------------------------
   //----------------------------------------------------------------------------
 
+  void setFormDefault() {
+    _shortcodeController.text = '';
+    _nameController.text = '';
+    _flagsController.text = '0';
+    _ibanLengthController.text = '';
+    _riskTypeController.text = '0';
+  }
+
+  void setFormData(Country? data) {
+    if (data != null) {
+      _shortcodeController.text = data.shortcode;
+      _nameController.text = data.name;
+      _flagsController.text = data.flags.toString();
+      _ibanLengthController.text = data.ibanlenth?.toString() ?? '';
+      _riskTypeController.text = data.risktype.toString();
+    } else {
+      setFormDefault();
+    }
+  }
+
+  CountryNoPK getFormPayload() {
+    return CountryNoPK(
+      (b) => b
+        ..shortcode = _shortcodeController.text.trim().toUpperCase()
+        ..name = _nameController.text.trim()
+        ..flags = int.tryParse(_flagsController.text) ?? 0
+        ..risktype = int.tryParse(_riskTypeController.text) ?? 0
+        ..ibanlenth = _ibanLengthController.text.isNotEmpty
+            ? int.tryParse(_ibanLengthController.text)
+            : null,
+    );
+  }
+
+  CountryListItem getListItem(Country data) {
+    return CountryListItem(
+      (b) => b
+        ..id = data.id
+        ..shortcode = data.shortcode
+        ..name = data.name,
+    );
+  }
+
+  //----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+
   bool _dbReading = false;
 
   late Future<Country?> _dbReadFuture;
@@ -66,7 +111,7 @@ class _MasetrDetailState extends State<MasterDetail> {
         }
       } on DioException catch (e) {
         if ((e.type == DioExceptionType.badResponse) && (e.response != null)) {
-          if (e.response!.statusCode == 404) {
+          if (e.response!.statusCode == HttpStatus.notFound) {
             return null;
           }
         }
@@ -90,19 +135,6 @@ class _MasetrDetailState extends State<MasterDetail> {
       setState(() => _dbCreating = true);
 
       try {
-        final payload = CountryNoPK(
-          (b) => b
-            ..shortcode = _shortcodeController.text.trim().toUpperCase()
-            ..name = _nameController.text.trim()
-            ..flags = int.tryParse(_flagsController.text) ?? 0
-            ..risktype = int.tryParse(_riskTypeController.text) ?? 0
-            ..ibanlenth = _ibanLengthController.text.isNotEmpty
-                ? int.tryParse(_ibanLengthController.text)
-                : null,
-        );
-
-        //----------------------------------------------------------------------
-
         final openapi = Openapi();
 
         openapi.dio.options.connectTimeout = const Duration(seconds: 5);
@@ -110,21 +142,14 @@ class _MasetrDetailState extends State<MasterDetail> {
         // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
         final response = await openapi.getCountryApi().createCountry(
-          countryNoPK: payload,
+          countryNoPK: getFormPayload(),
         );
 
         if ((response.statusCode == HttpStatus.created) &&
             (response.data != null)) {
-          final data = response.data!;
+          final responseData = response.data!;
 
-          final listItem = CountryListItem(
-            (b) => b
-              ..id = data.id
-              ..shortcode = data.shortcode
-              ..name = data.name,
-          );
-
-          widget.itemCreatedCallback(listItem);
+          widget.itemCreatedCallback(getListItem(responseData));
         } else {
           throw Exception("Wrong status or data: ${response.statusCode}");
         }
@@ -149,19 +174,6 @@ class _MasetrDetailState extends State<MasterDetail> {
     if (_formKey.currentState!.validate()) {
       setState(() => _dbSaving = true);
       try {
-        final payload = CountryNoPK(
-          (b) => b
-            ..shortcode = _shortcodeController.text.trim().toUpperCase()
-            ..name = _nameController.text.trim()
-            ..flags = int.tryParse(_flagsController.text) ?? 0
-            ..risktype = int.tryParse(_riskTypeController.text) ?? 0
-            ..ibanlenth = _ibanLengthController.text.isNotEmpty
-                ? int.tryParse(_ibanLengthController.text)
-                : null,
-        );
-
-        //----------------------------------------------------------------------
-
         final openapi = Openapi();
 
         openapi.dio.options.connectTimeout = const Duration(seconds: 5);
@@ -169,21 +181,14 @@ class _MasetrDetailState extends State<MasterDetail> {
         // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
         final response = await openapi.getCountryApi().updateCountry(
-          id: widget.listItem!.id, // TODO NULL-Value
-          countryNoPK: payload,
+          id: widget.listItem!.id,
+          countryNoPK: getFormPayload(),
         );
 
         if ((response.statusCode == HttpStatus.ok) && (response.data != null)) {
-          final data = response.data!;
+          final responseData = response.data!;
 
-          final listItem = CountryListItem(
-            (b) => b
-              ..id = data.id
-              ..shortcode = data.shortcode
-              ..name = data.name,
-          );
-
-          widget.itemUpdatedCallback(listItem);
+          widget.itemUpdatedCallback(getListItem(responseData));
         } else {
           throw Exception("Wrong status or data: ${response.statusCode}");
         }
@@ -232,7 +237,6 @@ class _MasetrDetailState extends State<MasterDetail> {
         openapi.dio.options.receiveTimeout = const Duration(seconds: 5);
         // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
-        // TODO NULL-Value
         final response = await openapi.getCountryApi().deleteCountry(
           id: widget.listItem!.id,
         );
@@ -272,7 +276,13 @@ class _MasetrDetailState extends State<MasterDetail> {
     _ibanLengthController = TextEditingController();
     _riskTypeController = TextEditingController();
 
-    _dbReadFuture = _dbRead(widget.listItem);
+    if (widget.createMode) {
+      _dbReadFuture = _dbRead(null);
+
+      setFormDefault();
+    } else {
+      _dbReadFuture = _dbRead(widget.listItem);
+    }
   }
 
   @override
@@ -290,8 +300,15 @@ class _MasetrDetailState extends State<MasterDetail> {
   void didUpdateWidget(covariant MasterDetail oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.listItem != widget.listItem) {
-      _dbReadFuture = _dbRead(widget.listItem);
+    if (!oldWidget.createMode && widget.createMode) {
+      _dbReadFuture = _dbRead(null);
+
+      setFormDefault();
+    } else {
+      if ((oldWidget.createMode && !widget.createMode) ||
+          (oldWidget.listItem != widget.listItem)) {
+        _dbReadFuture = _dbRead(widget.listItem);
+      }
     }
   }
 
@@ -383,7 +400,7 @@ class _MasetrDetailState extends State<MasterDetail> {
             ),
             const SizedBox(height: 12),
             TextFormField(
-              maxLength: 30,
+              maxLength: 80,
               controller: _nameController,
               decoration: const InputDecoration(
                 labelText: 'Name',
@@ -461,13 +478,7 @@ class _MasetrDetailState extends State<MasterDetail> {
 
             if (snapshot.hasData) {
               if (_dbReading) {
-                final data = snapshot.data!;
-
-                _shortcodeController.text = data.shortcode;
-                _nameController.text = data.name;
-                _flagsController.text = data.flags.toString();
-                _ibanLengthController.text = data.ibanlenth?.toString() ?? '';
-                _riskTypeController.text = data.risktype.toString();
+                setFormData(snapshot.data);
 
                 _dbReading = false;
               }

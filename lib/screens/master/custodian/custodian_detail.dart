@@ -48,6 +48,51 @@ class _MasterDetailState extends State<MasterDetail> {
   //----------------------------------------------------------------------------
   //----------------------------------------------------------------------------
 
+  void setFormDefault() {
+    _shortcodeController.text = '';
+    _nameController.text = '';
+    _flagsController.text = '0';
+    _depotNoController.text = '';
+
+    _selectedCountryId = null;
+  }
+
+  void setFormData(Custodian? data) {
+    if (data != null) {
+      _shortcodeController.text = data.shortcode;
+      _nameController.text = data.name;
+      _flagsController.text = data.flags.toString();
+      _depotNoController.text = data.depotno.toString();
+
+      _selectedCountryId = data.idcountry;
+    } else {
+      setFormDefault();
+    }
+  }
+
+  CustodianNoPK getFormPayload() {
+    return CustodianNoPK(
+      (b) => b
+        ..shortcode = _shortcodeController.text.trim().toUpperCase()
+        ..name = _nameController.text.trim()
+        ..flags = int.tryParse(_flagsController.text) ?? 0
+        ..depotno = _depotNoController.text.trim()
+        ..idcountry = _selectedCountryId,
+    );
+  }
+
+  CustodianListItem getListItem(Custodian data) {
+    return CustodianListItem(
+      (b) => b
+        ..id = data.id
+        ..shortcode = data.shortcode
+        ..name = data.name,
+    );
+  }
+
+  //----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+
   bool _dbReading = false;
 
   late Future<Custodian?> _dbReadFuture;
@@ -70,7 +115,7 @@ class _MasterDetailState extends State<MasterDetail> {
         }
       } on DioException catch (e) {
         if ((e.type == DioExceptionType.badResponse) && (e.response != null)) {
-          if (e.response!.statusCode == 404) {
+          if (e.response!.statusCode == HttpStatus.notFound) {
             return null;
           }
         }
@@ -94,17 +139,6 @@ class _MasterDetailState extends State<MasterDetail> {
       setState(() => _dbCreating = true);
 
       try {
-        final payload = CustodianNoPK(
-          (b) => b
-            ..shortcode = _shortcodeController.text.trim().toUpperCase()
-            ..name = _nameController.text.trim()
-            ..flags = int.tryParse(_flagsController.text) ?? 0
-            ..depotno = _depotNoController.text.trim()
-            ..idcountry = _selectedCountryId,
-        );
-
-        //----------------------------------------------------------------------
-
         final openapi = Openapi();
 
         openapi.dio.options.connectTimeout = const Duration(seconds: 5);
@@ -112,21 +146,14 @@ class _MasterDetailState extends State<MasterDetail> {
         // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
         final response = await openapi.getCustodianApi().createCustodian(
-          custodianNoPK: payload,
+          custodianNoPK: getFormPayload(),
         );
 
         if ((response.statusCode == HttpStatus.created) &&
             (response.data != null)) {
-          final data = response.data!;
+          final responseData = response.data!;
 
-          final listItem = CustodianListItem(
-            (b) => b
-              ..id = data.id
-              ..shortcode = data.shortcode
-              ..name = data.name,
-          );
-
-          widget.itemCreatedCallback(listItem);
+          widget.itemCreatedCallback(getListItem(responseData));
         } else {
           throw Exception("Wrong status or data: ${response.statusCode}");
         }
@@ -158,17 +185,6 @@ class _MasterDetailState extends State<MasterDetail> {
 
       setState(() => _dbSaving = true);
       try {
-        final payload = CustodianNoPK(
-          (b) => b
-            ..shortcode = _shortcodeController.text.trim().toUpperCase()
-            ..name = _nameController.text.trim()
-            ..flags = int.tryParse(_flagsController.text) ?? 0
-            ..depotno = _depotNoController.text.trim()
-            ..idcountry = _selectedCountryId,
-        );
-
-        //----------------------------------------------------------------------
-
         final openapi = Openapi();
 
         openapi.dio.options.connectTimeout = const Duration(seconds: 5);
@@ -176,21 +192,14 @@ class _MasterDetailState extends State<MasterDetail> {
         // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
         final response = await openapi.getCustodianApi().updateCustodian(
-          id: widget.listItem!.id, // TODO NULL-Value
-          custodianNoPK: payload,
+          id: widget.listItem!.id,
+          custodianNoPK: getFormPayload(),
         );
 
         if ((response.statusCode == HttpStatus.ok) && (response.data != null)) {
-          final data = response.data!;
+          final resonseData = response.data!;
 
-          final listItem = CustodianListItem(
-            (b) => b
-              ..id = data.id
-              ..shortcode = data.shortcode
-              ..name = data.name,
-          );
-
-          widget.itemUpdatedCallback(listItem);
+          widget.itemUpdatedCallback(getListItem(resonseData));
         } else {
           throw Exception("Wrong status or data: ${response.statusCode}");
         }
@@ -239,7 +248,6 @@ class _MasterDetailState extends State<MasterDetail> {
         openapi.dio.options.receiveTimeout = const Duration(seconds: 5);
         // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
-        // TODO NULL-Value
         final response = await openapi.getCustodianApi().deleteCustodian(
           id: widget.listItem!.id,
         );
@@ -273,12 +281,18 @@ class _MasterDetailState extends State<MasterDetail> {
   void initState() {
     super.initState();
 
-    _dbReadFuture = _dbRead(widget.listItem);
-
     _shortcodeController = TextEditingController();
     _nameController = TextEditingController();
     _flagsController = TextEditingController();
     _depotNoController = TextEditingController();
+
+    if (widget.createMode) {
+      _dbReadFuture = _dbRead(null);
+
+      setFormDefault();
+    } else {
+      _dbReadFuture = _dbRead(widget.listItem);
+    }
   }
 
   @override
@@ -295,8 +309,15 @@ class _MasterDetailState extends State<MasterDetail> {
   void didUpdateWidget(covariant MasterDetail oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.listItem != widget.listItem) {
-      _dbReadFuture = _dbRead(widget.listItem);
+    if (!oldWidget.createMode && widget.createMode) {
+      _dbReadFuture = _dbRead(null);
+
+      setFormDefault();
+    } else {
+      if ((oldWidget.createMode && !widget.createMode) ||
+          (oldWidget.listItem != widget.listItem)) {
+        _dbReadFuture = _dbRead(widget.listItem);
+      }
     }
   }
 
@@ -388,7 +409,7 @@ class _MasterDetailState extends State<MasterDetail> {
             ),
             const SizedBox(height: 12),
             TextFormField(
-              maxLength: 30,
+              maxLength: 80,
               controller: _nameController,
               decoration: const InputDecoration(
                 labelText: 'Name',
@@ -415,23 +436,27 @@ class _MasterDetailState extends State<MasterDetail> {
               },
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              initialValue: _selectedCountryId,
-              decoration: const InputDecoration(
-                labelText: 'Land',
-                floatingLabelBehavior: FloatingLabelBehavior.always,
+            ButtonTheme(
+              alignedDropdown: true,
+              child: DropdownButtonFormField<String>(
+                initialValue: _selectedCountryId,
+                decoration: const InputDecoration(
+                  labelText: 'Land',
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  // contentPadding: EdgeInsets.fromLTRB(16.0, 16.0, 40.0, 40.0),
+                ),
+                items: widget.countries.map((country) {
+                  return DropdownMenuItem<String>(
+                    value: country.id,
+                    child: Text('${country.shortcode} (${country.name})'),
+                  );
+                }).toList(),
+                onChanged: (value) =>
+                    setState(() => _selectedCountryId = value ?? ''),
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Bitte ein Land auswählen'
+                    : null,
               ),
-              items: widget.countries.map((country) {
-                return DropdownMenuItem<String>(
-                  value: country.id,
-                  child: Text('${country.shortcode} (${country.name})'),
-                );
-              }).toList(),
-              onChanged: (value) =>
-                  setState(() => _selectedCountryId = value ?? ''),
-              validator: (value) => value == null || value.isEmpty
-                  ? 'Bitte ein Land auswählen'
-                  : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
@@ -471,14 +496,7 @@ class _MasterDetailState extends State<MasterDetail> {
 
             if (snapshot.hasData) {
               if (_dbReading) {
-                final data = snapshot.data!;
-
-                _shortcodeController.text = data.shortcode;
-                _nameController.text = data.name;
-                _flagsController.text = data.flags.toString();
-                _depotNoController.text = data.depotno.toString();
-
-                _selectedCountryId = data.idcountry;
+                setFormData(snapshot.data);
 
                 _dbReading = false;
               }
