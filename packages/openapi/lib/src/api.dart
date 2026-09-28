@@ -16,7 +16,7 @@ import 'package:openapi/src/api/exchange_api.dart';
 import 'package:openapi/src/api/utilities_api.dart';
 
 class Openapi {
-  static const String basePath = r'https://www.rbsclone.de:8443';
+  static const String basePath = r'http://www.rbsclone.de:8080';
 
   final Dio dio;
   final Serializers serializers;
