@@ -62,7 +62,9 @@ class _MasterDetailState extends State<MasterDetail> {
       _shortcodeController.text = data.shortcode;
       _nameController.text = data.name;
       _flagsController.text = data.flags.toString();
-      _depotNoController.text = data.depotno.toString();
+      _depotNoController.text = data.depotno != null
+          ? data.depotno.toString()
+          : '';
 
       _selectedCountryId = data.idcountry;
     } else {
@@ -71,12 +73,14 @@ class _MasterDetailState extends State<MasterDetail> {
   }
 
   CustodianNoPK getFormPayload() {
+    final depotno = _depotNoController.text.trim();
+
     return CustodianNoPK(
       (b) => b
         ..shortcode = _shortcodeController.text.trim().toUpperCase()
         ..name = _nameController.text.trim()
         ..flags = int.tryParse(_flagsController.text) ?? 0
-        ..depotno = _depotNoController.text.trim()
+        ..depotno = depotno.isNotEmpty ? depotno : null
         ..idcountry = _selectedCountryId,
     );
   }
@@ -463,12 +467,9 @@ class _MasterDetailState extends State<MasterDetail> {
               maxLength: 10,
               controller: _depotNoController,
               decoration: const InputDecoration(
-                labelText: 'Depotnummer',
+                labelText: 'Depotnummer (optional)',
                 floatingLabelBehavior: FloatingLabelBehavior.always,
               ),
-              validator: (value) => (value == null || value.trim().isEmpty)
-                  ? 'Pflichtfeld'
-                  : null,
             ),
             const SizedBox(height: 20),
             createButtonRow(),
