@@ -11,7 +11,8 @@ components:
         ibanlenth:
           description: The exact length of the IBAN required in that country
           format: int16
-          minimum: 0
+          maximum: 34
+          minimum: 8
           type: integer
         id:
           description: This is the unique identifier a this data
@@ -72,7 +73,8 @@ components:
         ibanlenth:
           description: The exact length of the IBAN required in that country
           format: int16
-          minimum: 0
+          maximum: 34
+          minimum: 8
           type: integer
         name:
           description: A longer more descriptive description of this data

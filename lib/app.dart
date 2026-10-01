@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:openapi/openapi.dart';
 import 'package:rbsclone_flutter/screens/app_shell.dart';
-
-import 'dart:io';
+import 'package:rbsclone_flutter/utils/constants_util.dart';
 
 class RbsCloneApp extends StatelessWidget {
   const RbsCloneApp({super.key});
@@ -79,7 +78,7 @@ class ConnectivityService {
         Duration(seconds: timeoutSeconds),
       );
 
-      return response.statusCode == HttpStatus.ok;
+      return response.statusCode == DioApiStatus.ok;
     } catch (e) {
       return false;
     }

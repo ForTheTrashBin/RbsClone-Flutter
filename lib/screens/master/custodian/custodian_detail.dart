@@ -1,10 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:openapi/openapi.dart';
 import 'package:dio/dio.dart';
 import 'package:rbsclone_flutter/widgets/custom_appbar.dart';
+import 'package:rbsclone_flutter/utils/validator_utils.dart';
+import 'package:rbsclone_flutter/utils/constants_util.dart';
 
 //------------------------------------------------------------------------------
 
@@ -122,7 +122,7 @@ class _MasterDetailState extends State<MasterDetail>
         }
       } on DioException catch (e) {
         if ((e.type == DioExceptionType.badResponse) && (e.response != null)) {
-          if (e.response!.statusCode == HttpStatus.notFound) {
+          if (e.response!.statusCode == DioApiStatus.notFound) {
             return null;
           }
         }
@@ -156,7 +156,7 @@ class _MasterDetailState extends State<MasterDetail>
           custodianNoPK: getFormPayload(),
         );
 
-        if ((response.statusCode == HttpStatus.created) &&
+        if ((response.statusCode == DioApiStatus.created) &&
             (response.data != null)) {
           final responseData = response.data!;
 
@@ -203,7 +203,8 @@ class _MasterDetailState extends State<MasterDetail>
           custodianNoPK: getFormPayload(),
         );
 
-        if ((response.statusCode == HttpStatus.ok) && (response.data != null)) {
+        if ((response.statusCode == DioApiStatus.ok) &&
+            (response.data != null)) {
           final resonseData = response.data!;
 
           widget.itemUpdatedCallback(getListItem(resonseData));
@@ -259,7 +260,7 @@ class _MasterDetailState extends State<MasterDetail>
           id: widget.listItem!.id,
         );
 
-        if (response.statusCode == HttpStatus.noContent) {
+        if (response.statusCode == DioApiStatus.noContent) {
           widget.itemDeletedCallback(widget.listItem);
         } else {
           throw Exception("Wrong status: ${response.statusCode}");
@@ -438,12 +439,7 @@ class _MasterDetailState extends State<MasterDetail>
           ),
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           keyboardType: TextInputType.number,
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'Pflichtfeld';
-            }
-            return int.tryParse(value) == null ? 'Zahl erforderlich' : null;
-          },
+          validator: validateFlags,
         ),
         const SizedBox(height: 16),
         ButtonTheme(
