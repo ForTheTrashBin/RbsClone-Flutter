@@ -19,7 +19,7 @@ components:
           type: string
         name:
           description: A longer more descriptive description of this data
-          maxLength: 30
+          maxLength: 80
           minLength: 1
           type: string
         risktype:
@@ -48,7 +48,7 @@ components:
           type: string
         name:
           description: A longer more descriptive description of this data
-          maxLength: 30
+          maxLength: 80
           minLength: 1
           type: string
         shortcode:
@@ -76,7 +76,7 @@ components:
           type: integer
         name:
           description: A longer more descriptive description of this data
-          maxLength: 30
+          maxLength: 80
           minLength: 1
           type: string
         risktype:
@@ -94,6 +94,15 @@ components:
         - name
         - flags
         - risktype
+      type: object
+    CountryResponseCreateHeader:
+      additionalProperties: false
+      properties:
+        Location:
+          description: URL of the newly created entity
+          type: string
+      required:
+        - Location
       type: object
     Custodian:
       additionalProperties: false
@@ -117,7 +126,7 @@ components:
           type: string
         name:
           description: A longer more descriptive description of this data
-          maxLength: 30
+          maxLength: 80
           minLength: 1
           type: string
         shortcode:
@@ -132,39 +141,6 @@ components:
         - flags
         - idcountry
       type: object
-    Custodian2Exchange:
-      additionalProperties: false
-      properties:
-        flags:
-          description: Some binary encoded flags for this data (see external documentation)
-          format: int16
-          minimum: 0
-          type: integer
-        idcustodian:
-          description: This is one of the two parts of the unique identifier of this data
-          format: uuid
-          type: string
-        idexchange:
-          description: This is one of the two parts of the unique identifier of this data
-          format: uuid
-          type: string
-        value01:
-          description: A value01 for this data
-          maxLength: 80
-          minLength: 1
-          type: string
-        value02:
-          description: A value01 for this data
-          format: int16
-          minimum: 0
-          type: integer
-      required:
-        - idexchange
-        - idcustodian
-        - flags
-        - value01
-        - value02
-      type: object
     CustodianListItem:
       additionalProperties: false
       properties:
@@ -174,7 +150,7 @@ components:
           type: string
         name:
           description: A longer more descriptive description of this data
-          maxLength: 30
+          maxLength: 80
           minLength: 1
           type: string
         shortcode:
@@ -205,7 +181,7 @@ components:
           type: string
         name:
           description: A longer more descriptive description of this data
-          maxLength: 30
+          maxLength: 80
           minLength: 1
           type: string
         shortcode:
@@ -218,6 +194,15 @@ components:
         - name
         - flags
         - idcountry
+      type: object
+    CustodianResponseCreateHeader:
+      additionalProperties: false
+      properties:
+        Location:
+          description: URL of the newly created entity
+          type: string
+      required:
+        - Location
       type: object
     ErrorDetail:
       additionalProperties: false
@@ -299,6 +284,38 @@ components:
         - name
         - flags
       type: object
+    Exchange2Custodian:
+      additionalProperties: false
+      properties:
+        idcustodian:
+          description: This is one of the two parts of the unique identifier of this data
+          format: uuid
+          type: string
+        idexchange:
+          description: This is one of the two parts of the unique identifier of this data
+          format: uuid
+          type: string
+        sequenceno:
+          description: Determines the order of the stock exchanges
+          format: int32
+          type: integer
+        value1:
+          description: This is the first special payload for testing
+          format: int16
+          minimum: 0
+          type: integer
+        value2:
+          description: This is the second special payload for testing
+          format: int16
+          minimum: 0
+          type: integer
+      required:
+        - idcustodian
+        - idexchange
+        - sequenceno
+        - value1
+        - value2
+      type: object
     ExchangeListItem:
       additionalProperties: false
       properties:
@@ -344,61 +361,14 @@ components:
         - name
         - flags
       type: object
-    MapCustodian2Exchange:
+    ExchangeResponseCreateHeader:
       additionalProperties: false
       properties:
-        flags:
-          description: Some binary encoded flags for this data (see external documentation)
-          format: int16
-          minimum: 0
-          type: integer
-        idcustodian:
-          description: This is one of the two parts of the unique identifier of this data
-          format: uuid
+        Location:
+          description: URL of the newly created entity
           type: string
-        value01:
-          description: A value01 for this data
-          maxLength: 80
-          minLength: 1
-          type: string
-        value02:
-          description: A value01 for this data
-          format: int16
-          minimum: 0
-          type: integer
       required:
-        - idcustodian
-        - flags
-        - value01
-        - value02
-      type: object
-    MapExchange2Custodian:
-      additionalProperties: false
-      properties:
-        flags:
-          description: Some binary encoded flags for this data (see external documentation)
-          format: int16
-          minimum: 0
-          type: integer
-        idexchange:
-          description: This is one of the two parts of the unique identifier of this data
-          format: uuid
-          type: string
-        value01:
-          description: A value01 for this data
-          maxLength: 80
-          minLength: 1
-          type: string
-        value02:
-          description: A value01 for this data
-          format: int16
-          minimum: 0
-          type: integer
-      required:
-        - idexchange
-        - flags
-        - value01
-        - value02
+        - Location
       type: object
 info:
   contact:
@@ -447,14 +417,16 @@ paths:
               $ref: "#/components/schemas/CountryNoPK"
         required: true
       responses:
-        "204":
-          description: No Content
-          headers:
-            id:
+        "201":
+          content:
+            application/json:
               schema:
-                description: Generated id for newly created data
-                format: uuid
-                type: string
+                $ref: "#/components/schemas/Country"
+          description: Created
+          headers:
+            Header:
+              schema:
+                $ref: "#/components/schemas/CountryResponseCreateHeader"
         default:
           content:
             application/problem+json:
@@ -567,8 +539,12 @@ paths:
               $ref: "#/components/schemas/CountryNoPK"
         required: true
       responses:
-        "204":
-          description: No Content
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Country"
+          description: OK
         default:
           content:
             application/problem+json:
@@ -612,14 +588,16 @@ paths:
               $ref: "#/components/schemas/CustodianNoPK"
         required: true
       responses:
-        "204":
-          description: No Content
-          headers:
-            id:
+        "201":
+          content:
+            application/json:
               schema:
-                description: Generated id for newly created data
-                format: uuid
-                type: string
+                $ref: "#/components/schemas/Custodian"
+          description: Created
+          headers:
+            Header:
+              schema:
+                $ref: "#/components/schemas/CustodianResponseCreateHeader"
         default:
           content:
             application/problem+json:
@@ -732,8 +710,12 @@ paths:
               $ref: "#/components/schemas/CustodianNoPK"
         required: true
       responses:
-        "204":
-          description: No Content
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Custodian"
+          description: OK
         default:
           content:
             application/problem+json:
@@ -743,139 +725,6 @@ paths:
       summary: Update an existing custodian based on the id supplied
       tags:
         - Custodian
-  /custodian2exchange/idcustodian/{idcustodian}:
-    get:
-      description: Get a list of all mappings by idcustodian supplied
-      operationId: getCustodian2ExchangeByIdCustodian
-      parameters:
-        - description: This is one of the two parts of the unique identifier of this data
-          in: path
-          name: idcustodian
-          required: true
-          schema:
-            description: This is one of the two parts of the unique identifier of this data
-            format: uuid
-            type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: "#/components/schemas/Custodian2Exchange"
-                type:
-                  - array
-                  - "null"
-          description: OK
-        default:
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-          description: Error
-      summary: Get a list of all mappings by idcustodian supplied
-      tags:
-        - Custodian2Exchange
-    put:
-      description: Update the mapping of multiple exchanges to a single custodian
-      operationId: mapExchanges2Custodian
-      parameters:
-        - description: This is one of the two parts of the unique identifier of this data
-          in: path
-          name: idcustodian
-          required: true
-          schema:
-            description: This is one of the two parts of the unique identifier of this data
-            format: uuid
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              items:
-                $ref: "#/components/schemas/MapExchange2Custodian"
-              type:
-                - array
-                - "null"
-        required: true
-      responses:
-        "204":
-          description: No Content
-        default:
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-          description: Error
-      summary: Update the mapping of multiple exchanges to a single custodian
-      tags:
-        - Custodian2Exchange
-  /custodian2exchange/idexchange/{idexchange}:
-    get:
-      description: Get a list of all mappings by idexchange supplied
-      operationId: getCustodian2ExchangeByIdExchange
-      parameters:
-        - description: This is one of the two parts of the unique identifier of this data
-          in: path
-          name: idexchange
-          required: true
-          schema:
-            description: This is one of the two parts of the unique identifier of this data
-            format: uuid
-            type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: "#/components/schemas/Custodian2Exchange"
-                type:
-                  - array
-                  - "null"
-          description: OK
-        default:
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-          description: Error
-      summary: Get a list of all mappings by idexchange supplied
-      tags:
-        - Custodian2Exchange
-    put:
-      description: Update the mapping of multiple custodians to a single exchange
-      operationId: mapCustodians2Exchange
-      parameters:
-        - description: This is one of the two parts of the unique identifier of this data
-          in: path
-          name: idexchange
-          required: true
-          schema:
-            description: This is one of the two parts of the unique identifier of this data
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              items:
-                $ref: "#/components/schemas/MapCustodian2Exchange"
-              type:
-                - array
-                - "null"
-        required: true
-      responses:
-        "204":
-          description: No Content
-        default:
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-          description: Error
-      summary: Update the mapping of multiple custodians to a single exchange
-      tags:
-        - Custodian2Exchange
   /exchange:
     get:
       description: Get a list of all exchanges
@@ -910,14 +759,16 @@ paths:
               $ref: "#/components/schemas/ExchangeNoPK"
         required: true
       responses:
-        "204":
-          description: No Content
-          headers:
-            id:
+        "201":
+          content:
+            application/json:
               schema:
-                description: Generated id for newly created data
-                format: uuid
-                type: string
+                $ref: "#/components/schemas/Exchange"
+          description: Created
+          headers:
+            Header:
+              schema:
+                $ref: "#/components/schemas/ExchangeResponseCreateHeader"
         default:
           content:
             application/problem+json:
@@ -1030,8 +881,12 @@ paths:
               $ref: "#/components/schemas/ExchangeNoPK"
         required: true
       responses:
-        "204":
-          description: No Content
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exchange"
+          description: OK
         default:
           content:
             application/problem+json:
@@ -1041,6 +896,39 @@ paths:
       summary: Update an existing exchange based on the id supplied
       tags:
         - Exchange
+  /exchange2custodian/idcustodian/{idcustodian}:
+    get:
+      description: Get a list of all mappings by idcustodian supplied
+      operationId: getExchange2CustodianByIdcustodian
+      parameters:
+        - description: This is one of the two parts of the unique identifier of this data
+          in: path
+          name: idcustodian
+          required: true
+          schema:
+            description: This is one of the two parts of the unique identifier of this data
+            format: uuid
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Exchange2Custodian"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get a list of all mappings by idcustodian supplied
+      tags:
+        - Exchange2Custodian
   /health:
     get:
       description: Check the state of services and components

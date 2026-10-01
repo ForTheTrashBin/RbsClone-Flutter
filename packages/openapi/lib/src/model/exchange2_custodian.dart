@@ -6,81 +6,88 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'map_exchange2_custodian.g.dart';
+part 'exchange2_custodian.g.dart';
 
-/// MapExchange2Custodian
+/// Exchange2Custodian
 ///
 /// Properties:
-/// * [flags] - Some binary encoded flags for this data (see external documentation)
+/// * [idcustodian] - This is one of the two parts of the unique identifier of this data
 /// * [idexchange] - This is one of the two parts of the unique identifier of this data
-/// * [value01] - A value01 for this data
-/// * [value02] - A value01 for this data
+/// * [sequenceno] - Determines the order of the stock exchanges
+/// * [value1] - This is the first special payload for testing
+/// * [value2] - This is the second special payload for testing
 @BuiltValue()
-abstract class MapExchange2Custodian
-    implements Built<MapExchange2Custodian, MapExchange2CustodianBuilder> {
-  /// Some binary encoded flags for this data (see external documentation)
-  @BuiltValueField(wireName: r'flags')
-  int get flags;
+abstract class Exchange2Custodian
+    implements Built<Exchange2Custodian, Exchange2CustodianBuilder> {
+  /// This is one of the two parts of the unique identifier of this data
+  @BuiltValueField(wireName: r'idcustodian')
+  String get idcustodian;
 
   /// This is one of the two parts of the unique identifier of this data
   @BuiltValueField(wireName: r'idexchange')
   String get idexchange;
 
-  /// A value01 for this data
-  @BuiltValueField(wireName: r'value01')
-  String get value01;
+  /// Determines the order of the stock exchanges
+  @BuiltValueField(wireName: r'sequenceno')
+  int get sequenceno;
 
-  /// A value01 for this data
-  @BuiltValueField(wireName: r'value02')
-  int get value02;
+  /// This is the first special payload for testing
+  @BuiltValueField(wireName: r'value1')
+  int get value1;
 
-  MapExchange2Custodian._();
+  /// This is the second special payload for testing
+  @BuiltValueField(wireName: r'value2')
+  int get value2;
 
-  factory MapExchange2Custodian(
-      [void updates(MapExchange2CustodianBuilder b)]) = _$MapExchange2Custodian;
+  Exchange2Custodian._();
+
+  factory Exchange2Custodian([void updates(Exchange2CustodianBuilder b)]) =
+      _$Exchange2Custodian;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(MapExchange2CustodianBuilder b) => b;
+  static void _defaults(Exchange2CustodianBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<MapExchange2Custodian> get serializer =>
-      _$MapExchange2CustodianSerializer();
+  static Serializer<Exchange2Custodian> get serializer =>
+      _$Exchange2CustodianSerializer();
 }
 
-class _$MapExchange2CustodianSerializer
-    implements PrimitiveSerializer<MapExchange2Custodian> {
+class _$Exchange2CustodianSerializer
+    implements PrimitiveSerializer<Exchange2Custodian> {
   @override
-  final Iterable<Type> types = const [
-    MapExchange2Custodian,
-    _$MapExchange2Custodian
-  ];
+  final Iterable<Type> types = const [Exchange2Custodian, _$Exchange2Custodian];
 
   @override
-  final String wireName = r'MapExchange2Custodian';
+  final String wireName = r'Exchange2Custodian';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    MapExchange2Custodian object, {
+    Exchange2Custodian object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'flags';
+    yield r'idcustodian';
     yield serializers.serialize(
-      object.flags,
-      specifiedType: const FullType(int),
+      object.idcustodian,
+      specifiedType: const FullType(String),
     );
     yield r'idexchange';
     yield serializers.serialize(
       object.idexchange,
       specifiedType: const FullType(String),
     );
-    yield r'value01';
+    yield r'sequenceno';
     yield serializers.serialize(
-      object.value01,
-      specifiedType: const FullType(String),
+      object.sequenceno,
+      specifiedType: const FullType(int),
     );
-    yield r'value02';
+    yield r'value1';
     yield serializers.serialize(
-      object.value02,
+      object.value1,
+      specifiedType: const FullType(int),
+    );
+    yield r'value2';
+    yield serializers.serialize(
+      object.value2,
       specifiedType: const FullType(int),
     );
   }
@@ -88,7 +95,7 @@ class _$MapExchange2CustodianSerializer
   @override
   Object serialize(
     Serializers serializers,
-    MapExchange2Custodian object, {
+    Exchange2Custodian object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -101,19 +108,19 @@ class _$MapExchange2CustodianSerializer
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required MapExchange2CustodianBuilder result,
+    required Exchange2CustodianBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'flags':
+        case r'idcustodian':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(int),
-          ) as int;
-          result.flags = valueDes;
+            specifiedType: const FullType(String),
+          ) as String;
+          result.idcustodian = valueDes;
           break;
         case r'idexchange':
           final valueDes = serializers.deserialize(
@@ -122,19 +129,26 @@ class _$MapExchange2CustodianSerializer
           ) as String;
           result.idexchange = valueDes;
           break;
-        case r'value01':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.value01 = valueDes;
-          break;
-        case r'value02':
+        case r'sequenceno':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(int),
           ) as int;
-          result.value02 = valueDes;
+          result.sequenceno = valueDes;
+          break;
+        case r'value1':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.value1 = valueDes;
+          break;
+        case r'value2':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.value2 = valueDes;
           break;
         default:
           unhandled.add(key);
@@ -145,12 +159,12 @@ class _$MapExchange2CustodianSerializer
   }
 
   @override
-  MapExchange2Custodian deserialize(
+  Exchange2Custodian deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = MapExchange2CustodianBuilder();
+    final result = Exchange2CustodianBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

@@ -78,16 +78,13 @@ Class | Method | HTTP request | Description
 [*CustodianApi*](doc/CustodianApi.md) | [**getCustodianByShortcode**](doc/CustodianApi.md#getcustodianbyshortcode) | **GET** /custodian/shortcode/{shortcode} | Get a single custodian based on the shortcode supplied
 [*CustodianApi*](doc/CustodianApi.md) | [**getCustodians**](doc/CustodianApi.md#getcustodians) | **GET** /custodian | Get a list of all custodians
 [*CustodianApi*](doc/CustodianApi.md) | [**updateCustodian**](doc/CustodianApi.md#updatecustodian) | **PUT** /custodian/{id} | Update an existing custodian based on the id supplied
-[*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**getCustodian2ExchangeByIdcustodian**](doc/Custodian2ExchangeApi.md#getcustodian2exchangebyidcustodian) | **GET** /custodian2exchange/idcustodian/{idcustodian} | Get a list of all mappings by idcustodian supplied
-[*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**getCustodian2ExchangeByIdexchange**](doc/Custodian2ExchangeApi.md#getcustodian2exchangebyidexchange) | **GET** /custodian2exchange/idexchange/{idexchange} | Get a list of all mappings by idexchange supplied
-[*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**mapCustodians2Exchange**](doc/Custodian2ExchangeApi.md#mapcustodians2exchange) | **PUT** /custodian2exchange/idexchange/{idexchange} | Update the mapping of multiple custodians to a single exchange
-[*Custodian2ExchangeApi*](doc/Custodian2ExchangeApi.md) | [**mapExchanges2Custodian**](doc/Custodian2ExchangeApi.md#mapexchanges2custodian) | **PUT** /custodian2exchange/idcustodian/{idcustodian} | Update the mapping of multiple exchanges to a single custodian
 [*ExchangeApi*](doc/ExchangeApi.md) | [**createExchange**](doc/ExchangeApi.md#createexchange) | **POST** /exchange | Create a new exchange
 [*ExchangeApi*](doc/ExchangeApi.md) | [**deleteExchange**](doc/ExchangeApi.md#deleteexchange) | **DELETE** /exchange/{id} | Delete a single exchange based on the id supplied
 [*ExchangeApi*](doc/ExchangeApi.md) | [**getExchangeById**](doc/ExchangeApi.md#getexchangebyid) | **GET** /exchange/id/{id} | Get a single exchange based on the id supplied
 [*ExchangeApi*](doc/ExchangeApi.md) | [**getExchangeByShortcode**](doc/ExchangeApi.md#getexchangebyshortcode) | **GET** /exchange/shortcode/{shortcode} | Get a single exchange based on the shortcode supplied
 [*ExchangeApi*](doc/ExchangeApi.md) | [**getExchanges**](doc/ExchangeApi.md#getexchanges) | **GET** /exchange | Get a list of all exchanges
 [*ExchangeApi*](doc/ExchangeApi.md) | [**updateExchange**](doc/ExchangeApi.md#updateexchange) | **PUT** /exchange/{id} | Update an existing exchange based on the id supplied
+[*Exchange2CustodianApi*](doc/Exchange2CustodianApi.md) | [**getExchange2CustodianByIdcustodian**](doc/Exchange2CustodianApi.md#getexchange2custodianbyidcustodian) | **GET** /exchange2custodian/idcustodian/{idcustodian} | Get a list of all mappings by idcustodian supplied
 [*UtilitiesApi*](doc/UtilitiesApi.md) | [**getHealth**](doc/UtilitiesApi.md#gethealth) | **GET** /health | State of services and components (Health)
 [*UtilitiesApi*](doc/UtilitiesApi.md) | [**getPing**](doc/UtilitiesApi.md#getping) | **GET** /ping | Connection-Test
 
@@ -99,18 +96,16 @@ Class | Method | HTTP request | Description
  - [CountryNoPK](doc/CountryNoPK.md)
  - [CountryResponseCreateHeader](doc/CountryResponseCreateHeader.md)
  - [Custodian](doc/Custodian.md)
- - [Custodian2Exchange](doc/Custodian2Exchange.md)
  - [CustodianListItem](doc/CustodianListItem.md)
  - [CustodianNoPK](doc/CustodianNoPK.md)
  - [CustodianResponseCreateHeader](doc/CustodianResponseCreateHeader.md)
  - [ErrorDetail](doc/ErrorDetail.md)
  - [ErrorModel](doc/ErrorModel.md)
  - [Exchange](doc/Exchange.md)
+ - [Exchange2Custodian](doc/Exchange2Custodian.md)
  - [ExchangeListItem](doc/ExchangeListItem.md)
  - [ExchangeNoPK](doc/ExchangeNoPK.md)
  - [ExchangeResponseCreateHeader](doc/ExchangeResponseCreateHeader.md)
- - [MapCustodian2Exchange](doc/MapCustodian2Exchange.md)
- - [MapExchange2Custodian](doc/MapExchange2Custodian.md)
 
 
 ## Documentation For Authorization

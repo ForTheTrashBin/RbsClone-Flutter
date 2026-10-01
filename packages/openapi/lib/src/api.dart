@@ -11,12 +11,12 @@ import 'package:openapi/src/auth/bearer_auth.dart';
 import 'package:openapi/src/auth/oauth.dart';
 import 'package:openapi/src/api/country_api.dart';
 import 'package:openapi/src/api/custodian_api.dart';
-import 'package:openapi/src/api/custodian2_exchange_api.dart';
 import 'package:openapi/src/api/exchange_api.dart';
+import 'package:openapi/src/api/exchange2_custodian_api.dart';
 import 'package:openapi/src/api/utilities_api.dart';
 
 class Openapi {
-  static const String basePath = r'http://www.rbsclone.de:8080';
+  static const String basePath = r'https://www.rbsclone.de:8443';
 
   final Dio dio;
   final Serializers serializers;
@@ -147,16 +147,16 @@ class Openapi {
     return CustodianApi(dio, serializers);
   }
 
-  /// Get Custodian2ExchangeApi instance, base route and serializer can be overridden by a given but be careful,
-  /// by doing that all interceptors will not be executed
-  Custodian2ExchangeApi getCustodian2ExchangeApi() {
-    return Custodian2ExchangeApi(dio, serializers);
-  }
-
   /// Get ExchangeApi instance, base route and serializer can be overridden by a given but be careful,
   /// by doing that all interceptors will not be executed
   ExchangeApi getExchangeApi() {
     return ExchangeApi(dio, serializers);
+  }
+
+  /// Get Exchange2CustodianApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  Exchange2CustodianApi getExchange2CustodianApi() {
+    return Exchange2CustodianApi(dio, serializers);
   }
 
   /// Get UtilitiesApi instance, base route and serializer can be overridden by a given but be careful,

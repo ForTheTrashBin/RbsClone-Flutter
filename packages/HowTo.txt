@@ -6,7 +6,7 @@
 
 4. Format the code using the command 'dart format .'
 
-5. Resolve the dependencies using the 'dart put get' command
+5. Resolve the dependencies using the 'dart pub get' command
 
 6. To create the package, enter the following command 'dart run build_runner build --delete-conflicting-outputs'
 
