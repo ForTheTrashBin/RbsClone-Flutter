@@ -14,6 +14,7 @@ class MasterDetail extends StatefulWidget {
     required this.createMode,
     required this.listItem,
     required this.countries,
+    required this.exchanges,
     required this.itemCreatedCallback,
     required this.itemUpdatedCallback,
     required this.itemDeletedCallback,
@@ -26,6 +27,7 @@ class MasterDetail extends StatefulWidget {
   final CustodianListItem? listItem;
 
   final List<CountryListItem> countries;
+  final List<ExchangeListItem> exchanges;
 
   final ValueChanged<CustodianListItem?> itemCreatedCallback;
   final ValueChanged<CustodianListItem?> itemUpdatedCallback;

@@ -5,6 +5,16 @@ import 'package:rbsclone_flutter/screens/master/custodian/custodian_list.dart';
 
 //------------------------------------------------------------------------------
 
+class _CustodianReferenceData {
+  const _CustodianReferenceData({
+    required this.countries,
+    required this.exchanges,
+  });
+
+  final List<CountryListItem> countries;
+  final List<ExchangeListItem> exchanges;
+}
+
 class CustodianDataModule extends StatefulWidget {
   const CustodianDataModule({
     required this.mobileMode,
@@ -61,24 +71,28 @@ class _DataModuleState extends State<CustodianDataModule> {
 
   //----------------------------------------------------------------------------
 
-  List<CountryListItem> _countries = [];
+  late Future<_CustodianReferenceData> _referenceDataFuture;
 
-  void readCountries() async {
-    final api = Openapi();
+  Future<_CustodianReferenceData> _readReferenceData() async {
+    final openapi = Openapi();
 
-    List<CountryListItem> newList = [];
+    openapi.dio.options.connectTimeout = const Duration(seconds: 10);
+    openapi.dio.options.receiveTimeout = const Duration(seconds: 15);
+    // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
-    try {
-      final response = await api.getCountryApi().getCountries().timeout(
-        const Duration(seconds: 10),
-      );
+    final results = await Future.wait<Object>([
+      openapi.getCountryApi().getCountries().then(
+        (response) => response.data?.toList() ?? const <CountryListItem>[],
+      ),
+      openapi.getExchangeApi().getExchanges().then(
+        (response) => response.data?.toList() ?? const <ExchangeListItem>[],
+      ),
+    ]);
 
-      newList = response.data?.toList() ?? const <CountryListItem>[];
-    } finally {
-      setState(() {
-        _countries = newList;
-      });
-    }
+    return _CustodianReferenceData(
+      countries: results[0] as List<CountryListItem>,
+      exchanges: results[1] as List<ExchangeListItem>,
+    );
   }
 
   //----------------------------------------------------------------------------
@@ -87,7 +101,7 @@ class _DataModuleState extends State<CustodianDataModule> {
   void initState() {
     super.initState();
 
-    readCountries();
+    _referenceDataFuture = _readReferenceData();
   }
 
   @override
@@ -101,12 +115,13 @@ class _DataModuleState extends State<CustodianDataModule> {
 
   //----------------------------------------------------------------------------
 
-  MasterDetail newMasterDetail() {
+  MasterDetail newMasterDetail(_CustodianReferenceData referenceData) {
     return MasterDetail(
       mobileMode: widget.mobileMode,
       createMode: _createMode,
       listItem: _selectedListItem,
-      countries: _countries,
+      countries: referenceData.countries,
+      exchanges: referenceData.exchanges,
       itemCreatedCallback: (item) {
         onCreateMode(false);
 
@@ -129,19 +144,44 @@ class _DataModuleState extends State<CustodianDataModule> {
     );
   }
 
-  void pushMasterDetail() {
+  void pushMasterDetail(_CustodianReferenceData referenceData) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) {
-          return newMasterDetail();
+          return newMasterDetail(referenceData);
         },
       ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  void retryReferenceData() {
+    setState(() {
+      _referenceDataFuture = _readReferenceData();
+    });
+  }
+
+  Widget _buildReferenceDataMessage(String message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(message, textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: retryReferenceData,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Erneut versuchen'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadedModule(_CustodianReferenceData referenceData) {
     if (widget.mobileMode) {
       return Row(
         children: [
@@ -153,12 +193,12 @@ class _DataModuleState extends State<CustodianDataModule> {
               itemSelectedCallback: (item, isManual) {
                 onItemSelected(item);
 
-                if (isManual) pushMasterDetail();
+                if (isManual) pushMasterDetail(referenceData);
               },
               newItemCallback: () {
                 onCreateMode(true);
 
-                pushMasterDetail();
+                pushMasterDetail(referenceData);
               },
               createNotifier: _createNotifier,
               updateNotifier: _updateNotifier,
@@ -188,9 +228,44 @@ class _DataModuleState extends State<CustodianDataModule> {
             ),
           ),
           const VerticalDivider(width: 1),
-          Expanded(flex: 3, child: newMasterDetail()),
+          Expanded(flex: 3, child: newMasterDetail(referenceData)),
         ],
       );
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<_CustodianReferenceData>(
+      future: _referenceDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return _buildReferenceDataMessage(
+            'Länder und Börsen konnten nicht geladen werden.',
+          );
+        }
+
+        final referenceData = snapshot.data;
+        if (referenceData == null) {
+          return _buildReferenceDataMessage(
+            'Länder und Börsen konnten nicht geladen werden.',
+          );
+        }
+
+        if (referenceData.countries.isEmpty ||
+            referenceData.exchanges.isEmpty) {
+          return _buildReferenceDataMessage(
+            'Die Länder- oder Börsenliste ist leer. Das Lagerstellen-Modul kann '
+            'erst verwendet werden, wenn beide Listen Einträge enthalten.',
+          );
+        }
+
+        return _buildLoadedModule(referenceData);
+      },
+    );
   }
 }
