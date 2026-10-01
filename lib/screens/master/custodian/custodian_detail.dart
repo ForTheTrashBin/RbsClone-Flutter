@@ -35,13 +35,16 @@ class MasterDetail extends StatefulWidget {
   State<MasterDetail> createState() => _MasterDetailState();
 }
 
-class _MasterDetailState extends State<MasterDetail> {
+class _MasterDetailState extends State<MasterDetail>
+    with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController _shortcodeController;
   late TextEditingController _nameController;
   late TextEditingController _flagsController;
   late TextEditingController _depotNoController;
+
+  late TabController _tabController;
 
   String? _selectedCountryId;
 
@@ -281,6 +284,8 @@ class _MasterDetailState extends State<MasterDetail> {
   //----------------------------------------------------------------------------
   //----------------------------------------------------------------------------
 
+  int _activeTabIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -289,6 +294,18 @@ class _MasterDetailState extends State<MasterDetail> {
     _nameController = TextEditingController();
     _flagsController = TextEditingController();
     _depotNoController = TextEditingController();
+
+    _tabController = TabController(length: 2, vsync: this);
+
+    // Aktualisiert die Anzeige, wenn der Nutzer auf einen Tab tippt
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging ||
+          _tabController.index != _activeTabIndex) {
+        setState(() {
+          _activeTabIndex = _tabController.index;
+        });
+      }
+    });
 
     if (widget.createMode) {
       _dbReadFuture = _dbRead(null);
@@ -305,6 +322,8 @@ class _MasterDetailState extends State<MasterDetail> {
     _nameController.dispose();
     _flagsController.dispose();
     _depotNoController.dispose();
+
+    _tabController.dispose();
 
     super.dispose();
   }
@@ -325,7 +344,7 @@ class _MasterDetailState extends State<MasterDetail> {
     }
   }
 
-  Widget createButtonRow() {
+  Widget buildButtonRow() {
     return widget.createMode
         ? Row(
             children: [
@@ -381,105 +400,165 @@ class _MasterDetailState extends State<MasterDetail> {
           );
   }
 
-  Container createFormWidgets() {
-    return Container(
-      padding: EdgeInsets.all(16.0),
+  Widget buildTabPageOne() {
+    return Column(
+      children: [
+        TextFormField(
+          maxLength: 5,
+          controller: _shortcodeController,
+          decoration: const InputDecoration(
+            labelText: 'Kürzel',
+            floatingLabelBehavior: FloatingLabelBehavior.always,
+          ),
+          inputFormatters: [
+            TextInputFormatter.withFunction((_, newValue) {
+              return newValue.copyWith(text: newValue.text.toUpperCase());
+            }),
+          ],
+          validator: (value) =>
+              (value == null || value.trim().isEmpty) ? 'Pflichtfeld' : null,
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          maxLength: 80,
+          controller: _nameController,
+          decoration: const InputDecoration(
+            labelText: 'Name',
+            floatingLabelBehavior: FloatingLabelBehavior.always,
+          ),
+          validator: (value) =>
+              (value == null || value.trim().isEmpty) ? 'Pflichtfeld' : null,
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _flagsController,
+          decoration: const InputDecoration(
+            labelText: 'Flags',
+            floatingLabelBehavior: FloatingLabelBehavior.always,
+          ),
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Pflichtfeld';
+            }
+            return int.tryParse(value) == null ? 'Zahl erforderlich' : null;
+          },
+        ),
+        const SizedBox(height: 16),
+        ButtonTheme(
+          alignedDropdown: true,
+          child: DropdownButtonFormField<String>(
+            isExpanded: true,
+            initialValue: _selectedCountryId,
+            decoration: const InputDecoration(
+              labelText: 'Land',
+              floatingLabelBehavior: FloatingLabelBehavior.always,
+              // contentPadding: EdgeInsets.fromLTRB(16.0, 16.0, 40.0, 40.0),
+            ),
+            items: widget.countries.map((country) {
+              return DropdownMenuItem<String>(
+                value: country.id,
+                child: Text(
+                  '${country.shortcode} (${country.name})',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              );
+            }).toList(),
+            onChanged: (value) =>
+                setState(() => _selectedCountryId = value ?? ''),
+            validator: (value) => value == null || value.isEmpty
+                ? 'Bitte ein Land auswählen'
+                : null,
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          maxLength: 10,
+          controller: _depotNoController,
+          decoration: const InputDecoration(
+            labelText: 'Depotnummer (optional)',
+            floatingLabelBehavior: FloatingLabelBehavior.always,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildTabPageTwo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text("Content Tab Two"),
+        const SizedBox(height: 12),
+        Text("Content Tab Two"),
+        const SizedBox(height: 12),
+        Text("Content Tab Two"),
+        const SizedBox(height: 12),
+        Text("Content Tab Two"),
+        const SizedBox(height: 12),
+        Text("Content Tab Two"),
+      ],
+    );
+  }
+
+  Widget buildFormWidgets() {
+    return Align(
+      alignment: Alignment.topLeft,
       child: Form(
         key: _formKey,
-        child: ListView(
-          children: [
-            Text(
-              widget.createMode
-                  ? "Daten neu erstellen"
-                  : 'Daten bearbeiten/löschen',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              maxLength: 5,
-              controller: _shortcodeController,
-              decoration: const InputDecoration(
-                labelText: 'Kürzel',
-                floatingLabelBehavior: FloatingLabelBehavior.always,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                widget.createMode
+                    ? "Daten neu erstellen"
+                    : 'Daten bearbeiten/löschen',
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-              inputFormatters: [
-                TextInputFormatter.withFunction((_, newValue) {
-                  return newValue.copyWith(text: newValue.text.toUpperCase());
-                }),
-              ],
-              validator: (value) => (value == null || value.trim().isEmpty)
-                  ? 'Pflichtfeld'
-                  : null,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              maxLength: 80,
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Name',
-                floatingLabelBehavior: FloatingLabelBehavior.always,
+              // const SizedBox(height: 16),
+              TabBar(
+                controller: _tabController,
+                tabs: [
+                  Tab(text: "Stammdaten"),
+                  Tab(text: "Börsen-Zuordnung"),
+                ],
               ),
-              validator: (value) => (value == null || value.trim().isEmpty)
-                  ? 'Pflichtfeld'
-                  : null,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _flagsController,
-              decoration: const InputDecoration(
-                labelText: 'Flags',
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-              ),
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Pflichtfeld';
-                }
-                return int.tryParse(value) == null ? 'Zahl erforderlich' : null;
-              },
-            ),
-            const SizedBox(height: 16),
-            ButtonTheme(
-              alignedDropdown: true,
-              child: DropdownButtonFormField<String>(
-                initialValue: _selectedCountryId,
-                decoration: const InputDecoration(
-                  labelText: 'Land',
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                  // contentPadding: EdgeInsets.fromLTRB(16.0, 16.0, 40.0, 40.0),
+              const SizedBox(height: 16),
+              IntrinsicHeight(
+                child: IndexedStack(
+                  index: _activeTabIndex,
+                  children: [
+                    // TAB 1
+                    AnimatedOpacity(
+                      duration: const Duration(milliseconds: 250),
+                      opacity: _activeTabIndex == 0 ? 1.0 : 0.0,
+                      child: buildTabPageOne(),
+                    ),
+
+                    // TAB 2 (Wird flüssig eingeblendet, hält im Stack aber die Höhe stabil!)
+                    AnimatedOpacity(
+                      duration: const Duration(milliseconds: 250),
+                      opacity: _activeTabIndex == 1 ? 1.0 : 0.0,
+                      child: buildTabPageTwo(),
+                    ),
+                  ],
                 ),
-                items: widget.countries.map((country) {
-                  return DropdownMenuItem<String>(
-                    value: country.id,
-                    child: Text('${country.shortcode} (${country.name})'),
-                  );
-                }).toList(),
-                onChanged: (value) =>
-                    setState(() => _selectedCountryId = value ?? ''),
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Bitte ein Land auswählen'
-                    : null,
               ),
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              maxLength: 10,
-              controller: _depotNoController,
-              decoration: const InputDecoration(
-                labelText: 'Depotnummer (optional)',
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-              ),
-            ),
-            const SizedBox(height: 20),
-            createButtonRow(),
-          ],
+              const SizedBox(height: 20),
+              buildButtonRow(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget createFutureFormWidgets() {
+  Widget buildFutureFormWidgets() {
     return FutureBuilder<Custodian?>(
       future: _dbReadFuture,
       builder: (context, snapshot) {
@@ -510,7 +589,7 @@ class _MasterDetailState extends State<MasterDetail> {
 
         return Stack(
           children: [
-            createFormWidgets(),
+            buildFormWidgets(),
             if (isLoading)
               Container(
                 color: Colors.white.withAlpha(50),
@@ -537,8 +616,8 @@ class _MasterDetailState extends State<MasterDetail> {
               children: [
                 Expanded(
                   child: widget.createMode
-                      ? createFormWidgets()
-                      : createFutureFormWidgets(),
+                      ? buildFormWidgets()
+                      : buildFutureFormWidgets(),
                 ),
               ],
             ),
@@ -546,9 +625,7 @@ class _MasterDetailState extends State<MasterDetail> {
         ),
       );
     } else {
-      return widget.createMode
-          ? createFormWidgets()
-          : createFutureFormWidgets();
+      return widget.createMode ? buildFormWidgets() : buildFutureFormWidgets();
     }
   }
 }
