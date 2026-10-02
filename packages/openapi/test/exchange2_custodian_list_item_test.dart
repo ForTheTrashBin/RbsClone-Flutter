@@ -1,27 +1,15 @@
 import 'package:test/test.dart';
 import 'package:openapi/openapi.dart';
 
-// tests for Exchange2Custodian
+// tests for Exchange2CustodianListItem
 void main() {
-  final instance = Exchange2CustodianBuilder();
+  final instance = Exchange2CustodianListItemBuilder();
   // TODO add properties to the builder and call build()
 
-  group(Exchange2Custodian, () {
-    // This is one of the two parts of the unique identifier of this data
-    // String idcustodian
-    test('to test the property `idcustodian`', () async {
-      // TODO
-    });
-
-    // This is one of the two parts of the unique identifier of this data
+  group(Exchange2CustodianListItem, () {
+    // This is the unique identifier of this data
     // String idexchange
     test('to test the property `idexchange`', () async {
-      // TODO
-    });
-
-    // Determines the order of the stock exchanges
-    // int sequenceno
-    test('to test the property `sequenceno`', () async {
       // TODO
     });
 

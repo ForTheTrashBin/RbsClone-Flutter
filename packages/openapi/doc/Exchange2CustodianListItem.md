@@ -1,4 +1,4 @@
-# openapi.model.Exchange2Custodian
+# openapi.model.Exchange2CustodianListItem
 
 ## Load the model package
 ```dart
@@ -8,9 +8,7 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**idcustodian** | **String** | This is one of the two parts of the unique identifier of this data | 
-**idexchange** | **String** | This is one of the two parts of the unique identifier of this data | 
-**sequenceno** | **int** | Determines the order of the stock exchanges | 
+**idexchange** | **String** | This is the unique identifier of this data | 
 **value1** | **int** | This is the first special payload for testing | 
 **value2** | **int** | This is the second special payload for testing | 
 

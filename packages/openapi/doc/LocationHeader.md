@@ -1,4 +1,4 @@
-# openapi.model.ExchangeResponseCreateHeader
+# openapi.model.LocationHeader
 
 ## Load the model package
 ```dart

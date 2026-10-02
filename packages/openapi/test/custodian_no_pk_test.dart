@@ -13,6 +13,11 @@ void main() {
       // TODO
     });
 
+    // BuiltList<Exchange2CustodianListItem> exchanges
+    test('to test the property `exchanges`', () async {
+      // TODO
+    });
+
     // Some binary encoded flags for this data (see external documentation)
     // int flags
     test('to test the property `flags`', () async {
@@ -22,6 +27,12 @@ void main() {
     // A reference to a country, where the custodion is in
     // String idcountry
     test('to test the property `idcountry`', () async {
+      // TODO
+    });
+
+    // The id of the default-exchange
+    // String idexchangedefault
+    test('to test the property `idexchangedefault`', () async {
       // TODO
     });
 

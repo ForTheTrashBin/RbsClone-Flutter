@@ -97,15 +97,6 @@ components:
         - flags
         - risktype
       type: object
-    CountryResponseCreateHeader:
-      additionalProperties: false
-      properties:
-        Location:
-          description: URL of the newly created entity
-          type: string
-      required:
-        - Location
-      type: object
     Custodian:
       additionalProperties: false
       properties:
@@ -113,6 +104,12 @@ components:
           description: This dopot numer assocciated with this custodian
           maxLength: 10
           type: string
+        exchanges:
+          items:
+            $ref: "#/components/schemas/Exchange2CustodianListItem"
+          type:
+            - array
+            - "null"
         flags:
           description: Some binary encoded flags for this data (see external documentation)
           format: int16
@@ -124,6 +121,10 @@ components:
           type: string
         idcountry:
           description: A reference to a country, where the custodion is in
+          format: uuid
+          type: string
+        idexchangedefault:
+          description: The id of the default-exchange
           format: uuid
           type: string
         name:
@@ -142,6 +143,7 @@ components:
         - name
         - flags
         - idcountry
+        - exchanges
       type: object
     CustodianListItem:
       additionalProperties: false
@@ -172,6 +174,12 @@ components:
           description: This dopot numer assocciated with this custodian
           maxLength: 10
           type: string
+        exchanges:
+          items:
+            $ref: "#/components/schemas/Exchange2CustodianListItem"
+          type:
+            - array
+            - "null"
         flags:
           description: Some binary encoded flags for this data (see external documentation)
           format: int16
@@ -179,6 +187,10 @@ components:
           type: integer
         idcountry:
           description: A reference to a country, where the custodion is in
+          format: uuid
+          type: string
+        idexchangedefault:
+          description: The id of the default-exchange
           format: uuid
           type: string
         name:
@@ -196,15 +208,7 @@ components:
         - name
         - flags
         - idcountry
-      type: object
-    CustodianResponseCreateHeader:
-      additionalProperties: false
-      properties:
-        Location:
-          description: URL of the newly created entity
-          type: string
-      required:
-        - Location
+        - exchanges
       type: object
     ErrorDetail:
       additionalProperties: false
@@ -286,35 +290,27 @@ components:
         - name
         - flags
       type: object
-    Exchange2Custodian:
+    Exchange2CustodianListItem:
       additionalProperties: false
       properties:
-        idcustodian:
-          description: This is one of the two parts of the unique identifier of this data
-          format: uuid
-          type: string
         idexchange:
-          description: This is one of the two parts of the unique identifier of this data
+          description: This is the unique identifier of this data
           format: uuid
           type: string
-        sequenceno:
-          description: Determines the order of the stock exchanges
-          format: int32
-          type: integer
         value1:
           description: This is the first special payload for testing
           format: int16
+          maximum: 255
           minimum: 0
           type: integer
         value2:
           description: This is the second special payload for testing
           format: int16
+          maximum: 255
           minimum: 0
           type: integer
       required:
-        - idcustodian
         - idexchange
-        - sequenceno
         - value1
         - value2
       type: object
@@ -363,7 +359,7 @@ components:
         - name
         - flags
       type: object
-    ExchangeResponseCreateHeader:
+    LocationHeader:
       additionalProperties: false
       properties:
         Location:
@@ -426,9 +422,10 @@ paths:
                 $ref: "#/components/schemas/Country"
           description: Created
           headers:
-            Header:
+            Location:
+              description: URL of the newly created entity
               schema:
-                $ref: "#/components/schemas/CountryResponseCreateHeader"
+                type: string
         default:
           content:
             application/problem+json:
@@ -472,12 +469,12 @@ paths:
       description: Get a single country based on the shortcode supplied
       operationId: getCountryByShortcode
       parameters:
-        - description: This is the unique identifier a this data
+        - description: A unique short name for this data
           in: path
           name: shortcode
           required: true
           schema:
-            description: This is the unique identifier a this data
+            description: A unique short name for this data
             maxLength: 2
             minLength: 2
             type: string
@@ -597,9 +594,10 @@ paths:
                 $ref: "#/components/schemas/Custodian"
           description: Created
           headers:
-            Header:
+            Location:
+              description: URL of the newly created entity
               schema:
-                $ref: "#/components/schemas/CustodianResponseCreateHeader"
+                type: string
         default:
           content:
             application/problem+json:
@@ -643,12 +641,12 @@ paths:
       description: Get a single custodian based on the shortcode supplied
       operationId: getCustodianByShortcode
       parameters:
-        - description: This is the unique identifier a this data
+        - description: A unique short name for this data
           in: path
           name: shortcode
           required: true
           schema:
-            description: This is the unique identifier a this data
+            description: A unique short name for this data
             maxLength: 5
             minLength: 1
             type: string
@@ -768,9 +766,10 @@ paths:
                 $ref: "#/components/schemas/Exchange"
           description: Created
           headers:
-            Header:
+            Location:
+              description: URL of the newly created entity
               schema:
-                $ref: "#/components/schemas/ExchangeResponseCreateHeader"
+                type: string
         default:
           content:
             application/problem+json:
@@ -814,12 +813,12 @@ paths:
       description: Get a single exchange based on the shortcode supplied
       operationId: getExchangeByShortcode
       parameters:
-        - description: This is the unique identifier a this data
+        - description: A unique short name for this data
           in: path
           name: shortcode
           required: true
           schema:
-            description: This is the unique identifier a this data
+            description: A unique short name for this data
             maxLength: 8
             minLength: 1
             type: string
@@ -898,39 +897,6 @@ paths:
       summary: Update an existing exchange based on the id supplied
       tags:
         - Exchange
-  /exchange2custodian/idcustodian/{idcustodian}:
-    get:
-      description: Get a list of all mappings by idcustodian supplied
-      operationId: getExchange2CustodianByIdcustodian
-      parameters:
-        - description: This is one of the two parts of the unique identifier of this data
-          in: path
-          name: idcustodian
-          required: true
-          schema:
-            description: This is one of the two parts of the unique identifier of this data
-            format: uuid
-            type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: "#/components/schemas/Exchange2Custodian"
-                type:
-                  - array
-                  - "null"
-          description: OK
-        default:
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-          description: Error
-      summary: Get a list of all mappings by idcustodian supplied
-      tags:
-        - Exchange2Custodian
   /health:
     get:
       description: Check the state of services and components

@@ -10,9 +10,13 @@ class _$CustodianNoPK extends CustodianNoPK {
   @override
   final String? depotno;
   @override
+  final BuiltList<Exchange2CustodianListItem>? exchanges;
+  @override
   final int flags;
   @override
   final String idcountry;
+  @override
+  final String? idexchangedefault;
   @override
   final String name;
   @override
@@ -23,8 +27,10 @@ class _$CustodianNoPK extends CustodianNoPK {
 
   _$CustodianNoPK._(
       {this.depotno,
+      this.exchanges,
       required this.flags,
       required this.idcountry,
+      this.idexchangedefault,
       required this.name,
       required this.shortcode})
       : super._();
@@ -40,8 +46,10 @@ class _$CustodianNoPK extends CustodianNoPK {
     if (identical(other, this)) return true;
     return other is CustodianNoPK &&
         depotno == other.depotno &&
+        exchanges == other.exchanges &&
         flags == other.flags &&
         idcountry == other.idcountry &&
+        idexchangedefault == other.idexchangedefault &&
         name == other.name &&
         shortcode == other.shortcode;
   }
@@ -50,8 +58,10 @@ class _$CustodianNoPK extends CustodianNoPK {
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, depotno.hashCode);
+    _$hash = $jc(_$hash, exchanges.hashCode);
     _$hash = $jc(_$hash, flags.hashCode);
     _$hash = $jc(_$hash, idcountry.hashCode);
+    _$hash = $jc(_$hash, idexchangedefault.hashCode);
     _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, shortcode.hashCode);
     _$hash = $jf(_$hash);
@@ -62,8 +72,10 @@ class _$CustodianNoPK extends CustodianNoPK {
   String toString() {
     return (newBuiltValueToStringHelper(r'CustodianNoPK')
           ..add('depotno', depotno)
+          ..add('exchanges', exchanges)
           ..add('flags', flags)
           ..add('idcountry', idcountry)
+          ..add('idexchangedefault', idexchangedefault)
           ..add('name', name)
           ..add('shortcode', shortcode))
         .toString();
@@ -78,6 +90,12 @@ class CustodianNoPKBuilder
   String? get depotno => _$this._depotno;
   set depotno(String? depotno) => _$this._depotno = depotno;
 
+  ListBuilder<Exchange2CustodianListItem>? _exchanges;
+  ListBuilder<Exchange2CustodianListItem> get exchanges =>
+      _$this._exchanges ??= ListBuilder<Exchange2CustodianListItem>();
+  set exchanges(ListBuilder<Exchange2CustodianListItem>? exchanges) =>
+      _$this._exchanges = exchanges;
+
   int? _flags;
   int? get flags => _$this._flags;
   set flags(int? flags) => _$this._flags = flags;
@@ -85,6 +103,11 @@ class CustodianNoPKBuilder
   String? _idcountry;
   String? get idcountry => _$this._idcountry;
   set idcountry(String? idcountry) => _$this._idcountry = idcountry;
+
+  String? _idexchangedefault;
+  String? get idexchangedefault => _$this._idexchangedefault;
+  set idexchangedefault(String? idexchangedefault) =>
+      _$this._idexchangedefault = idexchangedefault;
 
   String? _name;
   String? get name => _$this._name;
@@ -102,8 +125,10 @@ class CustodianNoPKBuilder
     final $v = _$v;
     if ($v != null) {
       _depotno = $v.depotno;
+      _exchanges = $v.exchanges?.toBuilder();
       _flags = $v.flags;
       _idcountry = $v.idcountry;
+      _idexchangedefault = $v.idexchangedefault;
       _name = $v.name;
       _shortcode = $v.shortcode;
       _$v = null;
@@ -125,18 +150,33 @@ class CustodianNoPKBuilder
   CustodianNoPK build() => _build();
 
   _$CustodianNoPK _build() {
-    final _$result = _$v ??
-        _$CustodianNoPK._(
-          depotno: depotno,
-          flags: BuiltValueNullFieldError.checkNotNull(
-              flags, r'CustodianNoPK', 'flags'),
-          idcountry: BuiltValueNullFieldError.checkNotNull(
-              idcountry, r'CustodianNoPK', 'idcountry'),
-          name: BuiltValueNullFieldError.checkNotNull(
-              name, r'CustodianNoPK', 'name'),
-          shortcode: BuiltValueNullFieldError.checkNotNull(
-              shortcode, r'CustodianNoPK', 'shortcode'),
-        );
+    _$CustodianNoPK _$result;
+    try {
+      _$result = _$v ??
+          _$CustodianNoPK._(
+            depotno: depotno,
+            exchanges: _exchanges?.build(),
+            flags: BuiltValueNullFieldError.checkNotNull(
+                flags, r'CustodianNoPK', 'flags'),
+            idcountry: BuiltValueNullFieldError.checkNotNull(
+                idcountry, r'CustodianNoPK', 'idcountry'),
+            idexchangedefault: idexchangedefault,
+            name: BuiltValueNullFieldError.checkNotNull(
+                name, r'CustodianNoPK', 'name'),
+            shortcode: BuiltValueNullFieldError.checkNotNull(
+                shortcode, r'CustodianNoPK', 'shortcode'),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'exchanges';
+        _exchanges?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'CustodianNoPK', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

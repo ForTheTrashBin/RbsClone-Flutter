@@ -196,7 +196,7 @@ Get a single country based on the shortcode supplied
 import 'package:openapi/api.dart';
 
 final api = Openapi().getCountryApi();
-final String shortcode = shortcode_example; // String | This is the unique identifier a this data
+final String shortcode = shortcode_example; // String | A unique short name for this data
 
 try {
     final response = api.getCountryByShortcode(shortcode);
@@ -210,7 +210,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shortcode** | **String**| This is the unique identifier a this data | 
+ **shortcode** | **String**| A unique short name for this data | 
 
 ### Return type
 

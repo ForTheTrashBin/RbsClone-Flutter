@@ -12,7 +12,6 @@ import 'package:openapi/src/auth/oauth.dart';
 import 'package:openapi/src/api/country_api.dart';
 import 'package:openapi/src/api/custodian_api.dart';
 import 'package:openapi/src/api/exchange_api.dart';
-import 'package:openapi/src/api/exchange2_custodian_api.dart';
 import 'package:openapi/src/api/utilities_api.dart';
 
 class Openapi {
@@ -151,12 +150,6 @@ class Openapi {
   /// by doing that all interceptors will not be executed
   ExchangeApi getExchangeApi() {
     return ExchangeApi(dio, serializers);
-  }
-
-  /// Get Exchange2CustodianApi instance, base route and serializer can be overridden by a given but be careful,
-  /// by doing that all interceptors will not be executed
-  Exchange2CustodianApi getExchange2CustodianApi() {
-    return Exchange2CustodianApi(dio, serializers);
   }
 
   /// Get UtilitiesApi instance, base route and serializer can be overridden by a given but be careful,

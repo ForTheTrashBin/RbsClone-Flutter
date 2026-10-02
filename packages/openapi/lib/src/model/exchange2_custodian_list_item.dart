@@ -6,30 +6,21 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'exchange2_custodian.g.dart';
+part 'exchange2_custodian_list_item.g.dart';
 
-/// Exchange2Custodian
+/// Exchange2CustodianListItem
 ///
 /// Properties:
-/// * [idcustodian] - This is one of the two parts of the unique identifier of this data
-/// * [idexchange] - This is one of the two parts of the unique identifier of this data
-/// * [sequenceno] - Determines the order of the stock exchanges
+/// * [idexchange] - This is the unique identifier of this data
 /// * [value1] - This is the first special payload for testing
 /// * [value2] - This is the second special payload for testing
 @BuiltValue()
-abstract class Exchange2Custodian
-    implements Built<Exchange2Custodian, Exchange2CustodianBuilder> {
-  /// This is one of the two parts of the unique identifier of this data
-  @BuiltValueField(wireName: r'idcustodian')
-  String get idcustodian;
-
-  /// This is one of the two parts of the unique identifier of this data
+abstract class Exchange2CustodianListItem
+    implements
+        Built<Exchange2CustodianListItem, Exchange2CustodianListItemBuilder> {
+  /// This is the unique identifier of this data
   @BuiltValueField(wireName: r'idexchange')
   String get idexchange;
-
-  /// Determines the order of the stock exchanges
-  @BuiltValueField(wireName: r'sequenceno')
-  int get sequenceno;
 
   /// This is the first special payload for testing
   @BuiltValueField(wireName: r'value1')
@@ -39,46 +30,40 @@ abstract class Exchange2Custodian
   @BuiltValueField(wireName: r'value2')
   int get value2;
 
-  Exchange2Custodian._();
+  Exchange2CustodianListItem._();
 
-  factory Exchange2Custodian([void updates(Exchange2CustodianBuilder b)]) =
-      _$Exchange2Custodian;
+  factory Exchange2CustodianListItem(
+          [void updates(Exchange2CustodianListItemBuilder b)]) =
+      _$Exchange2CustodianListItem;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(Exchange2CustodianBuilder b) => b;
+  static void _defaults(Exchange2CustodianListItemBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<Exchange2Custodian> get serializer =>
-      _$Exchange2CustodianSerializer();
+  static Serializer<Exchange2CustodianListItem> get serializer =>
+      _$Exchange2CustodianListItemSerializer();
 }
 
-class _$Exchange2CustodianSerializer
-    implements PrimitiveSerializer<Exchange2Custodian> {
+class _$Exchange2CustodianListItemSerializer
+    implements PrimitiveSerializer<Exchange2CustodianListItem> {
   @override
-  final Iterable<Type> types = const [Exchange2Custodian, _$Exchange2Custodian];
+  final Iterable<Type> types = const [
+    Exchange2CustodianListItem,
+    _$Exchange2CustodianListItem
+  ];
 
   @override
-  final String wireName = r'Exchange2Custodian';
+  final String wireName = r'Exchange2CustodianListItem';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    Exchange2Custodian object, {
+    Exchange2CustodianListItem object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'idcustodian';
-    yield serializers.serialize(
-      object.idcustodian,
-      specifiedType: const FullType(String),
-    );
     yield r'idexchange';
     yield serializers.serialize(
       object.idexchange,
       specifiedType: const FullType(String),
-    );
-    yield r'sequenceno';
-    yield serializers.serialize(
-      object.sequenceno,
-      specifiedType: const FullType(int),
     );
     yield r'value1';
     yield serializers.serialize(
@@ -95,7 +80,7 @@ class _$Exchange2CustodianSerializer
   @override
   Object serialize(
     Serializers serializers,
-    Exchange2Custodian object, {
+    Exchange2CustodianListItem object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -108,33 +93,19 @@ class _$Exchange2CustodianSerializer
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required Exchange2CustodianBuilder result,
+    required Exchange2CustodianListItemBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'idcustodian':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.idcustodian = valueDes;
-          break;
         case r'idexchange':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
           result.idexchange = valueDes;
-          break;
-        case r'sequenceno':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(int),
-          ) as int;
-          result.sequenceno = valueDes;
           break;
         case r'value1':
           final valueDes = serializers.deserialize(
@@ -159,12 +130,12 @@ class _$Exchange2CustodianSerializer
   }
 
   @override
-  Exchange2Custodian deserialize(
+  Exchange2CustodianListItem deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = Exchange2CustodianBuilder();
+    final result = Exchange2CustodianListItemBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

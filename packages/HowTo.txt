@@ -1,4 +1,4 @@
-1. Change to the 'openapi' directory
+1. Change to the 'packages' directory
 
 2. Delete the entire contents of the 'openapi' directory
 

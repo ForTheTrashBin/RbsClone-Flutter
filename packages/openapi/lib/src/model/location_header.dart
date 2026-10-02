@@ -6,49 +6,43 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'custodian_response_create_header.g.dart';
+part 'location_header.g.dart';
 
-/// CustodianResponseCreateHeader
+/// LocationHeader
 ///
 /// Properties:
 /// * [location] - URL of the newly created entity
 @BuiltValue()
-abstract class CustodianResponseCreateHeader
-    implements
-        Built<CustodianResponseCreateHeader,
-            CustodianResponseCreateHeaderBuilder> {
+abstract class LocationHeader
+    implements Built<LocationHeader, LocationHeaderBuilder> {
   /// URL of the newly created entity
   @BuiltValueField(wireName: r'Location')
   String get location;
 
-  CustodianResponseCreateHeader._();
+  LocationHeader._();
 
-  factory CustodianResponseCreateHeader(
-          [void updates(CustodianResponseCreateHeaderBuilder b)]) =
-      _$CustodianResponseCreateHeader;
+  factory LocationHeader([void updates(LocationHeaderBuilder b)]) =
+      _$LocationHeader;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(CustodianResponseCreateHeaderBuilder b) => b;
+  static void _defaults(LocationHeaderBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<CustodianResponseCreateHeader> get serializer =>
-      _$CustodianResponseCreateHeaderSerializer();
+  static Serializer<LocationHeader> get serializer =>
+      _$LocationHeaderSerializer();
 }
 
-class _$CustodianResponseCreateHeaderSerializer
-    implements PrimitiveSerializer<CustodianResponseCreateHeader> {
+class _$LocationHeaderSerializer
+    implements PrimitiveSerializer<LocationHeader> {
   @override
-  final Iterable<Type> types = const [
-    CustodianResponseCreateHeader,
-    _$CustodianResponseCreateHeader
-  ];
+  final Iterable<Type> types = const [LocationHeader, _$LocationHeader];
 
   @override
-  final String wireName = r'CustodianResponseCreateHeader';
+  final String wireName = r'LocationHeader';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    CustodianResponseCreateHeader object, {
+    LocationHeader object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
     yield r'Location';
@@ -61,7 +55,7 @@ class _$CustodianResponseCreateHeaderSerializer
   @override
   Object serialize(
     Serializers serializers,
-    CustodianResponseCreateHeader object, {
+    LocationHeader object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -74,7 +68,7 @@ class _$CustodianResponseCreateHeaderSerializer
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required CustodianResponseCreateHeaderBuilder result,
+    required LocationHeaderBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
@@ -97,12 +91,12 @@ class _$CustodianResponseCreateHeaderSerializer
   }
 
   @override
-  CustodianResponseCreateHeader deserialize(
+  LocationHeader deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = CustodianResponseCreateHeaderBuilder();
+    final result = LocationHeaderBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

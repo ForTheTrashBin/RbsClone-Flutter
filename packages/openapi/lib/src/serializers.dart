@@ -17,18 +17,16 @@ import 'package:openapi/src/model/date.dart';
 import 'package:openapi/src/model/country.dart';
 import 'package:openapi/src/model/country_list_item.dart';
 import 'package:openapi/src/model/country_no_pk.dart';
-import 'package:openapi/src/model/country_response_create_header.dart';
 import 'package:openapi/src/model/custodian.dart';
 import 'package:openapi/src/model/custodian_list_item.dart';
 import 'package:openapi/src/model/custodian_no_pk.dart';
-import 'package:openapi/src/model/custodian_response_create_header.dart';
 import 'package:openapi/src/model/error_detail.dart';
 import 'package:openapi/src/model/error_model.dart';
 import 'package:openapi/src/model/exchange.dart';
-import 'package:openapi/src/model/exchange2_custodian.dart';
+import 'package:openapi/src/model/exchange2_custodian_list_item.dart';
 import 'package:openapi/src/model/exchange_list_item.dart';
 import 'package:openapi/src/model/exchange_no_pk.dart';
-import 'package:openapi/src/model/exchange_response_create_header.dart';
+import 'package:openapi/src/model/location_header.dart';
 
 part 'serializers.g.dart';
 
@@ -36,24 +34,18 @@ part 'serializers.g.dart';
   Country,
   CountryListItem,
   CountryNoPK,
-  CountryResponseCreateHeader,
   Custodian,
   CustodianListItem,
   CustodianNoPK,
-  CustodianResponseCreateHeader,
   ErrorDetail,
   ErrorModel,
   Exchange,
-  Exchange2Custodian,
+  Exchange2CustodianListItem,
   ExchangeListItem,
   ExchangeNoPK,
-  ExchangeResponseCreateHeader,
+  LocationHeader,
 ])
 Serializers serializers = (_$serializers.toBuilder()
-      ..addBuilderFactory(
-        const FullType(BuiltList, [FullType(Exchange2Custodian)]),
-        () => ListBuilder<Exchange2Custodian>(),
-      )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(CountryListItem)]),
         () => ListBuilder<CountryListItem>(),
@@ -61,6 +53,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(ErrorDetail)]),
         () => ListBuilder<ErrorDetail>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(Exchange2CustodianListItem)]),
+        () => ListBuilder<Exchange2CustodianListItem>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(CustodianListItem)]),

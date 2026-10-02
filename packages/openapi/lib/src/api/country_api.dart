@@ -13,8 +13,8 @@ import 'package:openapi/src/api_util.dart';
 import 'package:openapi/src/model/country.dart';
 import 'package:openapi/src/model/country_list_item.dart';
 import 'package:openapi/src/model/country_no_pk.dart';
-import 'package:openapi/src/model/country_response_create_header.dart';
 import 'package:openapi/src/model/error_model.dart';
+import 'package:openapi/src/model/location_header.dart';
 
 class CountryApi {
   final Dio _dio;
@@ -326,7 +326,7 @@ class CountryApi {
   /// Get a single country based on the shortcode supplied
   ///
   /// Parameters:
-  /// * [shortcode] - This is the unique identifier a this data
+  /// * [shortcode] - A unique short name for this data
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request

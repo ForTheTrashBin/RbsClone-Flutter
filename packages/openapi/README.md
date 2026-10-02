@@ -84,7 +84,6 @@ Class | Method | HTTP request | Description
 [*ExchangeApi*](doc/ExchangeApi.md) | [**getExchangeByShortcode**](doc/ExchangeApi.md#getexchangebyshortcode) | **GET** /exchange/shortcode/{shortcode} | Get a single exchange based on the shortcode supplied
 [*ExchangeApi*](doc/ExchangeApi.md) | [**getExchanges**](doc/ExchangeApi.md#getexchanges) | **GET** /exchange | Get a list of all exchanges
 [*ExchangeApi*](doc/ExchangeApi.md) | [**updateExchange**](doc/ExchangeApi.md#updateexchange) | **PUT** /exchange/{id} | Update an existing exchange based on the id supplied
-[*Exchange2CustodianApi*](doc/Exchange2CustodianApi.md) | [**getExchange2CustodianByIdcustodian**](doc/Exchange2CustodianApi.md#getexchange2custodianbyidcustodian) | **GET** /exchange2custodian/idcustodian/{idcustodian} | Get a list of all mappings by idcustodian supplied
 [*UtilitiesApi*](doc/UtilitiesApi.md) | [**getHealth**](doc/UtilitiesApi.md#gethealth) | **GET** /health | State of services and components (Health)
 [*UtilitiesApi*](doc/UtilitiesApi.md) | [**getPing**](doc/UtilitiesApi.md#getping) | **GET** /ping | Connection-Test
 
@@ -94,18 +93,16 @@ Class | Method | HTTP request | Description
  - [Country](doc/Country.md)
  - [CountryListItem](doc/CountryListItem.md)
  - [CountryNoPK](doc/CountryNoPK.md)
- - [CountryResponseCreateHeader](doc/CountryResponseCreateHeader.md)
  - [Custodian](doc/Custodian.md)
  - [CustodianListItem](doc/CustodianListItem.md)
  - [CustodianNoPK](doc/CustodianNoPK.md)
- - [CustodianResponseCreateHeader](doc/CustodianResponseCreateHeader.md)
  - [ErrorDetail](doc/ErrorDetail.md)
  - [ErrorModel](doc/ErrorModel.md)
  - [Exchange](doc/Exchange.md)
- - [Exchange2Custodian](doc/Exchange2Custodian.md)
+ - [Exchange2CustodianListItem](doc/Exchange2CustodianListItem.md)
  - [ExchangeListItem](doc/ExchangeListItem.md)
  - [ExchangeNoPK](doc/ExchangeNoPK.md)
- - [ExchangeResponseCreateHeader](doc/ExchangeResponseCreateHeader.md)
+ - [LocationHeader](doc/LocationHeader.md)
 
 
 ## Documentation For Authorization

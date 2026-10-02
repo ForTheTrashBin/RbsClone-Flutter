@@ -13,8 +13,8 @@ import 'package:openapi/src/api_util.dart';
 import 'package:openapi/src/model/custodian.dart';
 import 'package:openapi/src/model/custodian_list_item.dart';
 import 'package:openapi/src/model/custodian_no_pk.dart';
-import 'package:openapi/src/model/custodian_response_create_header.dart';
 import 'package:openapi/src/model/error_model.dart';
+import 'package:openapi/src/model/location_header.dart';
 
 class CustodianApi {
   final Dio _dio;
@@ -251,7 +251,7 @@ class CustodianApi {
   /// Get a single custodian based on the shortcode supplied
   ///
   /// Parameters:
-  /// * [shortcode] - This is the unique identifier a this data
+  /// * [shortcode] - A unique short name for this data
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
