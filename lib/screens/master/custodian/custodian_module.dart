@@ -228,7 +228,7 @@ class _DataModuleState extends State<CustodianDataModule> {
             ),
           ),
           const VerticalDivider(width: 1),
-          Expanded(flex: 3, child: newMasterDetail(referenceData)),
+          Expanded(flex: 4, child: newMasterDetail(referenceData)),
         ],
       );
     }

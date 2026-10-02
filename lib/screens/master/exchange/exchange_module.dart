@@ -158,7 +158,7 @@ class _DataModuleState extends State<ExchangeDataModule> {
             ),
           ),
           const VerticalDivider(width: 1),
-          Expanded(flex: 3, child: newMasterDetail()),
+          Expanded(flex: 4, child: newMasterDetail()),
         ],
       );
     }

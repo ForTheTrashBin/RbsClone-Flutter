@@ -376,6 +376,7 @@ class _MasterListState extends State<MasterList> {
                                           (widget.selectedListItem?.id ==
                                               listItem.id);
                                       return ListTile(
+                                        dense: true,
                                         key: ValueKey(listItem.id),
                                         leading: CircleAvatar(
                                           child: Text(
