@@ -57,7 +57,7 @@ class _MasetrDetailState extends State<MasterDetail> {
       _shortcodeController.text = data.shortcode;
       _nameController.text = data.name;
       _flagsController.text = data.flags.toString();
-      _ibanLengthController.text = data.ibanlenth?.toString() ?? '';
+      _ibanLengthController.text = data.ibanlength?.toString() ?? '';
       _riskTypeController.text = data.risktype.toString();
     } else {
       setFormDefault();
@@ -71,7 +71,7 @@ class _MasetrDetailState extends State<MasterDetail> {
         ..name = _nameController.text.trim()
         ..flags = int.tryParse(_flagsController.text) ?? 0
         ..risktype = int.tryParse(_riskTypeController.text) ?? 0
-        ..ibanlenth = _ibanLengthController.text.isNotEmpty
+        ..ibanlength = _ibanLengthController.text.isNotEmpty
             ? int.tryParse(_ibanLengthController.text)
             : null,
     );
