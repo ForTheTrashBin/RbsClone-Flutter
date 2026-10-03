@@ -22,8 +22,7 @@ class MasterList extends StatefulWidget {
 
   final CustodianListItem? selectedListItem;
 
-  final void Function(CustodianListItem? listItem, bool isManual)
-  itemSelectedCallback;
+  final void Function(CustodianListItem? listItem, bool isManual) itemSelectedCallback;
 
   final VoidCallback newItemCallback;
 
@@ -161,15 +160,11 @@ class _MasterListState extends State<MasterList> {
 
           if (needSort) {
             _entriesAll.sort((a, b) {
-              return a.shortcode.toUpperCase().compareTo(
-                b.shortcode.toUpperCase(),
-              );
+              return a.shortcode.toUpperCase().compareTo(b.shortcode.toUpperCase());
             });
 
             _entriesFiltered.sort((a, b) {
-              return a.shortcode.toUpperCase().compareTo(
-                b.shortcode.toUpperCase(),
-              );
+              return a.shortcode.toUpperCase().compareTo(b.shortcode.toUpperCase());
             });
           }
         });
@@ -288,22 +283,13 @@ class _MasterListState extends State<MasterList> {
                         //------------------------------------------------------
                         Container(
                           color: Theme.of(context).scaffoldBackgroundColor,
-                          padding: const EdgeInsets.only(
-                            left: 16.0,
-                            right: 12.0,
-                            bottom: 12.0,
-                          ),
+                          padding: const EdgeInsets.only(left: 16.0, right: 12.0, bottom: 12.0),
                           child: Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
-                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primaryContainer,
+                                  color: Theme.of(context).colorScheme.primaryContainer,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
@@ -322,8 +308,7 @@ class _MasterListState extends State<MasterList> {
                                   decoration: InputDecoration(
                                     hintText: "Suchen...",
                                     prefixIcon: const Icon(Icons.search),
-                                    suffixIcon:
-                                        _searchController.text.isNotEmpty
+                                    suffixIcon: _searchController.text.isNotEmpty
                                         ? IconButton(
                                             icon: Icon(Icons.clear, size: 20),
                                             onPressed: () {
@@ -332,21 +317,15 @@ class _MasterListState extends State<MasterList> {
                                             },
                                           )
                                         : null,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 8,
-                                    ),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 6),
                               IconButton(
                                 icon: const Icon(Icons.refresh),
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
+                                color: Theme.of(context).colorScheme.onPrimaryContainer,
                                 onPressed: _onRefresh,
                               ),
                             ],
@@ -358,57 +337,31 @@ class _MasterListState extends State<MasterList> {
                         Expanded(
                           child: ClipRect(
                             child: _entriesFiltered.isEmpty
-                                ? const Center(
-                                    child: Text(
-                                      "Keine Lagerstellen vorhanden.",
-                                    ),
-                                  )
+                                ? const Center(child: Text("Keine Lagerstellen vorhanden."))
                                 : ScrollablePositionedList.separated(
                                     itemCount: _entriesFiltered.length,
                                     itemScrollController: _itemScrollController,
-                                    separatorBuilder: (_, _) =>
-                                        const Divider(height: 1),
+                                    separatorBuilder: (_, _) => const Divider(height: 1),
                                     itemBuilder: (context, index) {
                                       final listItem = _entriesFiltered[index];
                                       final isSelected =
-                                          (widget.mobileMode ||
-                                              widget.enabled) &&
-                                          (widget.selectedListItem?.id ==
-                                              listItem.id);
+                                          (widget.mobileMode || widget.enabled) &&
+                                          (widget.selectedListItem?.id == listItem.id);
                                       return ListTile(
                                         dense: true,
                                         key: ValueKey(listItem.id),
                                         leading: CircleAvatar(
-                                          child: Text(
-                                            listItem.shortcode
-                                                .substring(0, 1)
-                                                .toUpperCase(),
-                                          ),
+                                          child: Text(listItem.shortcode.substring(0, 1).toUpperCase()),
                                         ),
                                         title: Text(listItem.shortcode),
-                                        subtitle: Text(
-                                          listItem.name,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        trailing: widget.mobileMode
-                                            ? const Icon(Icons.chevron_right)
-                                            : null,
+                                        subtitle: Text(listItem.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                                        trailing: widget.mobileMode ? const Icon(Icons.chevron_right) : null,
                                         selected: isSelected,
-                                        selectedTileColor: Theme.of(context)
-                                            .colorScheme
-                                            .primaryContainer
+                                        selectedTileColor: Theme.of(context).colorScheme.primaryContainer
                                             .withValues(alpha: 0.55),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                         onTap: () {
-                                          widget.itemSelectedCallback(
-                                            listItem,
-                                            true,
-                                          );
+                                          widget.itemSelectedCallback(listItem, true);
                                         },
                                       );
                                     },

@@ -64,25 +64,13 @@ class _AppScreenState extends State<AppScreen> {
         return const PlaceholderPage(title: 'Willkommen!');
 
       case NavigationId.country:
-        return CountryDataModule(
-          mobileMode: mobileMode,
-          enabled: menuEnabled,
-          menuEnableCallback: onMenuEnable,
-        );
+        return CountryDataModule(mobileMode: mobileMode, enabled: menuEnabled, menuEnableCallback: onMenuEnable);
 
       case NavigationId.custodian:
-        return CustodianDataModule(
-          mobileMode: mobileMode,
-          enabled: menuEnabled,
-          menuEnableCallback: onMenuEnable,
-        );
+        return CustodianDataModule(mobileMode: mobileMode, enabled: menuEnabled, menuEnableCallback: onMenuEnable);
 
       case NavigationId.exchange:
-        return ExchangeDataModule(
-          mobileMode: mobileMode,
-          enabled: menuEnabled,
-          menuEnableCallback: onMenuEnable,
-        );
+        return ExchangeDataModule(mobileMode: mobileMode, enabled: menuEnabled, menuEnableCallback: onMenuEnable);
 
       default:
         return const PlaceholderPage(title: 'In Arbeit');

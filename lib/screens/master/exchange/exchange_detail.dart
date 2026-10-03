@@ -92,9 +92,7 @@ class _MasterDetailState extends State<MasterDetail> {
         openapi.dio.options.receiveTimeout = const Duration(seconds: 15);
         // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
-        final response = await openapi.getExchangeApi().getExchangeById(
-          id: item.id,
-        );
+        final response = await openapi.getExchangeApi().getExchangeById(id: item.id);
 
         if (response.statusCode == 200) {
           return response.data;
@@ -131,12 +129,9 @@ class _MasterDetailState extends State<MasterDetail> {
         openapi.dio.options.receiveTimeout = const Duration(seconds: 5);
         // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
-        final response = await openapi.getExchangeApi().createExchange(
-          exchangeNoPK: getFormPayload(),
-        );
+        final response = await openapi.getExchangeApi().createExchange(exchangeNoPK: getFormPayload());
 
-        if ((response.statusCode == DioApiStatus.created) &&
-            (response.data != null)) {
+        if ((response.statusCode == DioApiStatus.created) && (response.data != null)) {
           final responseData = response.data!;
 
           widget.itemCreatedCallback(getListItem(responseData));
@@ -145,9 +140,7 @@ class _MasterDetailState extends State<MasterDetail> {
         }
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Speichern fehlgeschlagen: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Speichern fehlgeschlagen: $e')));
       } finally {
         if (mounted) setState(() => _dbCreating = false);
       }
@@ -175,8 +168,7 @@ class _MasterDetailState extends State<MasterDetail> {
           exchangeNoPK: getFormPayload(),
         );
 
-        if ((response.statusCode == DioApiStatus.ok) &&
-            (response.data != null)) {
+        if ((response.statusCode == DioApiStatus.ok) && (response.data != null)) {
           final responseData = response.data!;
 
           widget.itemUpdatedCallback(getListItem(responseData));
@@ -185,9 +177,7 @@ class _MasterDetailState extends State<MasterDetail> {
         }
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Speichern fehlgeschlagen: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Speichern fehlgeschlagen: $e')));
       } finally {
         if (mounted) setState(() => _dbSaving = false);
       }
@@ -207,14 +197,8 @@ class _MasterDetailState extends State<MasterDetail> {
         title: const Text('Börse löschen?'),
         content: const Text('Die Daten werden dauerhaft entfernt.'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Abbrechen'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Löschen'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Abbrechen')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Löschen')),
         ],
       ),
     );
@@ -228,9 +212,7 @@ class _MasterDetailState extends State<MasterDetail> {
         openapi.dio.options.receiveTimeout = const Duration(seconds: 5);
         // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
-        final response = await openapi.getExchangeApi().deleteExchange(
-          id: widget.listItem!.id,
-        );
+        final response = await openapi.getExchangeApi().deleteExchange(id: widget.listItem!.id);
 
         if (response.statusCode == DioApiStatus.noContent) {
           widget.itemDeletedCallback(widget.listItem);
@@ -239,9 +221,7 @@ class _MasterDetailState extends State<MasterDetail> {
         }
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Löschen fehlgeschlagen: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Löschen fehlgeschlagen: $e')));
       } finally {
         if (mounted) setState(() => _dbDeleting = false);
       }
@@ -292,8 +272,7 @@ class _MasterDetailState extends State<MasterDetail> {
 
       setFormDefault();
     } else {
-      if ((oldWidget.createMode && !widget.createMode) ||
-          (oldWidget.listItem != widget.listItem)) {
+      if ((oldWidget.createMode && !widget.createMode) || (oldWidget.listItem != widget.listItem)) {
         _dbReadFuture = _dbRead(widget.listItem);
       }
     }
@@ -306,11 +285,7 @@ class _MasterDetailState extends State<MasterDetail> {
               FilledButton.icon(
                 onPressed: _dbActive() ? null : _dbCreate,
                 icon: _dbCreating
-                    ? const SizedBox(
-                        width: 10,
-                        height: 10,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
+                    ? const SizedBox(width: 10, height: 10, child: CircularProgressIndicator(strokeWidth: 2))
                     : const Icon(Icons.save),
                 label: Text(_dbCreating ? 'Speichert...' : 'Speichern'),
               ),
@@ -331,11 +306,7 @@ class _MasterDetailState extends State<MasterDetail> {
               FilledButton.icon(
                 onPressed: _dbActive() ? null : _dbSave,
                 icon: _dbSaving
-                    ? const SizedBox(
-                        width: 10,
-                        height: 10,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
+                    ? const SizedBox(width: 10, height: 10, child: CircularProgressIndicator(strokeWidth: 2))
                     : const Icon(Icons.save),
                 label: Text(_dbSaving ? 'Speichert...' : 'Speichern'),
               ),
@@ -343,11 +314,7 @@ class _MasterDetailState extends State<MasterDetail> {
               OutlinedButton.icon(
                 onPressed: _dbActive() ? null : _dbDelete,
                 icon: _dbDeleting
-                    ? const SizedBox(
-                        width: 10,
-                        height: 10,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
+                    ? const SizedBox(width: 10, height: 10, child: CircularProgressIndicator(strokeWidth: 2))
                     : const Icon(Icons.delete_outline),
                 label: Text(_dbDeleting ? 'Löscht...' : 'Löschen'),
               ),
@@ -363,9 +330,7 @@ class _MasterDetailState extends State<MasterDetail> {
         child: ListView(
           children: [
             Text(
-              widget.createMode
-                  ? "Daten neu erstellen"
-                  : 'Daten bearbeiten/löschen',
+              widget.createMode ? "Daten neu erstellen" : 'Daten bearbeiten/löschen',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
@@ -381,21 +346,14 @@ class _MasterDetailState extends State<MasterDetail> {
                   return newValue.copyWith(text: newValue.text.toUpperCase());
                 }),
               ],
-              validator: (value) => (value == null || value.trim().isEmpty)
-                  ? 'Pflichtfeld'
-                  : null,
+              validator: (value) => (value == null || value.trim().isEmpty) ? 'Pflichtfeld' : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
               maxLength: 80,
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Name',
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-              ),
-              validator: (value) => (value == null || value.trim().isEmpty)
-                  ? 'Pflichtfeld'
-                  : null,
+              decoration: const InputDecoration(labelText: 'Name', floatingLabelBehavior: FloatingLabelBehavior.always),
+              validator: (value) => (value == null || value.trim().isEmpty) ? 'Pflichtfeld' : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
@@ -463,29 +421,18 @@ class _MasterDetailState extends State<MasterDetail> {
   Widget build(BuildContext context) {
     if (widget.mobileMode) {
       return Scaffold(
-        appBar: CustomAppBar(
-          "Stammdaten - Börsen",
-          autoLeading: !widget.createMode,
-        ),
+        appBar: CustomAppBar("Stammdaten - Börsen", autoLeading: !widget.createMode),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Row(
-              children: [
-                Expanded(
-                  child: widget.createMode
-                      ? createFormWidgets()
-                      : createFutureFormWidgets(),
-                ),
-              ],
+              children: [Expanded(child: widget.createMode ? createFormWidgets() : createFutureFormWidgets())],
             ),
           ),
         ),
       );
     } else {
-      return widget.createMode
-          ? createFormWidgets()
-          : createFutureFormWidgets();
+      return widget.createMode ? createFormWidgets() : createFutureFormWidgets();
     }
   }
 }

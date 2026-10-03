@@ -74,9 +74,7 @@ class ConnectivityService {
     timeoutSeconds = timeoutSeconds < 2 ? 2 : timeoutSeconds;
 
     try {
-      final response = await _utilitiesApi.getPing().timeout(
-        Duration(seconds: timeoutSeconds),
-      );
+      final response = await _utilitiesApi.getPing().timeout(Duration(seconds: timeoutSeconds));
 
       return response.statusCode == DioApiStatus.ok;
     } catch (e) {
@@ -147,10 +145,7 @@ class WaitScreen extends StatelessWidget {
                 SizedBox(
                   width: 80,
                   height: 80,
-                  child: Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: CircularProgressIndicator(),
-                  ),
+                  child: Padding(padding: EdgeInsets.all(10.0), child: CircularProgressIndicator()),
                 ),
                 SizedBox(height: 16),
                 Text(
@@ -159,10 +154,7 @@ class WaitScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 8),
-                Text(
-                  "Trying to connect to Server",
-                  textAlign: TextAlign.center,
-                ),
+                Text("Trying to connect to Server", textAlign: TextAlign.center),
               ],
             ),
           ),
@@ -197,10 +189,7 @@ class ErrorScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 8),
-                  Text(
-                    "Unable to connect to server",
-                    textAlign: TextAlign.center,
-                  ),
+                  Text("Unable to connect to server", textAlign: TextAlign.center),
                 ],
               ),
             ),

@@ -6,10 +6,7 @@ import 'package:rbsclone_flutter/screens/master/custodian/custodian_list.dart';
 //------------------------------------------------------------------------------
 
 class _CustodianReferenceData {
-  const _CustodianReferenceData({
-    required this.countries,
-    required this.exchanges,
-  });
+  const _CustodianReferenceData({required this.countries, required this.exchanges});
 
   final List<CountryListItem> countries;
   final List<ExchangeListItem> exchanges;
@@ -81,12 +78,8 @@ class _DataModuleState extends State<CustodianDataModule> {
     // openapi.dio.options.sendTimeout = const Duration(seconds: 5);
 
     final results = await Future.wait<Object>([
-      openapi.getCountryApi().getCountries().then(
-        (response) => response.data?.toList() ?? const <CountryListItem>[],
-      ),
-      openapi.getExchangeApi().getExchanges().then(
-        (response) => response.data?.toList() ?? const <ExchangeListItem>[],
-      ),
+      openapi.getCountryApi().getCountries().then((response) => response.data?.toList() ?? const <CountryListItem>[]),
+      openapi.getExchangeApi().getExchanges().then((response) => response.data?.toList() ?? const <ExchangeListItem>[]),
     ]);
 
     return _CustodianReferenceData(
@@ -244,20 +237,15 @@ class _DataModuleState extends State<CustodianDataModule> {
         }
 
         if (snapshot.hasError) {
-          return _buildReferenceDataMessage(
-            'Länder und Börsen konnten nicht geladen werden.',
-          );
+          return _buildReferenceDataMessage('Länder und Börsen konnten nicht geladen werden.');
         }
 
         final referenceData = snapshot.data;
         if (referenceData == null) {
-          return _buildReferenceDataMessage(
-            'Länder und Börsen konnten nicht geladen werden.',
-          );
+          return _buildReferenceDataMessage('Länder und Börsen konnten nicht geladen werden.');
         }
 
-        if (referenceData.countries.isEmpty ||
-            referenceData.exchanges.isEmpty) {
+        if (referenceData.countries.isEmpty || referenceData.exchanges.isEmpty) {
           return _buildReferenceDataMessage(
             'Die Länder- oder Börsenliste ist leer. Das Lagerstellen-Modul kann '
             'erst verwendet werden, wenn beide Listen Einträge enthalten.',

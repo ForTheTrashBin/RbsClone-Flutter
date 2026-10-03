@@ -23,12 +23,7 @@ class NavigationItem {
 /// Ein einziges hierarchisches Menü mit Hauptkategorien und Sub-Items
 /// Ersetzt die bisherige Aufteilung in Sections + MasterEntries
 class NavigationMenu extends StatefulWidget {
-  const NavigationMenu({
-    required this.onItemSelected,
-    this.selectedNavigationId,
-    this.enabled = true,
-    super.key,
-  });
+  const NavigationMenu({required this.onItemSelected, this.selectedNavigationId, this.enabled = true, super.key});
 
   final ValueChanged<NavigationItem> onItemSelected;
 
@@ -52,25 +47,13 @@ class _NavigationMenuState extends State<NavigationMenu> {
         title: 'Stammdaten',
         icon: Icons.storage,
         children: [
-          NavigationItem(
-            title: 'Depot',
-            subtitle: 'Stammdaten von Depots',
-            icon: Icons.account_balance_wallet,
-          ),
+          NavigationItem(title: 'Depot', subtitle: 'Stammdaten von Depots', icon: Icons.account_balance_wallet),
           NavigationItem(
             title: 'Verfüger',
             icon: Icons.manage_accounts,
             children: [
-              NavigationItem(
-                title: 'Verfüger-Stamm',
-                subtitle: 'Stammdaten von Verfügern',
-                icon: Icons.manage_search,
-              ),
-              NavigationItem(
-                title: 'Verfüger-Konten',
-                subtitle: 'Stammdaten von Konten',
-                icon: Icons.manage_history,
-              ),
+              NavigationItem(title: 'Verfüger-Stamm', subtitle: 'Stammdaten von Verfügern', icon: Icons.manage_search),
+              NavigationItem(title: 'Verfüger-Konten', subtitle: 'Stammdaten von Konten', icon: Icons.manage_history),
               NavigationItem(
                 title: 'Internet-Einstellungen',
                 subtitle: 'Einstellungen von Verfügern',
@@ -102,48 +85,24 @@ class _NavigationMenuState extends State<NavigationMenu> {
         title: 'Aufträge',
         icon: Icons.assignment,
         children: [
-          NavigationItem(
-            title: 'Aufträge-Übersicht',
-            subtitle: 'Alle Aufträge im Überblick',
-            icon: Icons.assignment,
-          ),
-          NavigationItem(
-            title: 'Aufträge-Details',
-            subtitle: 'Details zu einem Auftrag',
-            icon: Icons.assignment,
-          ),
+          NavigationItem(title: 'Aufträge-Übersicht', subtitle: 'Alle Aufträge im Überblick', icon: Icons.assignment),
+          NavigationItem(title: 'Aufträge-Details', subtitle: 'Details zu einem Auftrag', icon: Icons.assignment),
         ],
       ),
       NavigationItem(
         title: 'Berichte',
         icon: Icons.bar_chart,
         children: [
-          NavigationItem(
-            title: 'Berichte-Übersicht',
-            subtitle: 'Alle Berichte im Überblick',
-            icon: Icons.bar_chart,
-          ),
-          NavigationItem(
-            title: 'Berichte-Details',
-            subtitle: 'Details zu einem Bericht',
-            icon: Icons.bar_chart,
-          ),
+          NavigationItem(title: 'Berichte-Übersicht', subtitle: 'Alle Berichte im Überblick', icon: Icons.bar_chart),
+          NavigationItem(title: 'Berichte-Details', subtitle: 'Details zu einem Bericht', icon: Icons.bar_chart),
         ],
       ),
       NavigationItem(
         title: 'Lager',
         icon: Icons.inventory_2,
         children: [
-          NavigationItem(
-            title: 'Lager-Übersicht',
-            subtitle: 'Alle Lager im Überblick',
-            icon: Icons.inventory_2,
-          ),
-          NavigationItem(
-            title: 'Lager-Details',
-            subtitle: 'Details zu einem Lager',
-            icon: Icons.inventory_2,
-          ),
+          NavigationItem(title: 'Lager-Übersicht', subtitle: 'Alle Lager im Überblick', icon: Icons.inventory_2),
+          NavigationItem(title: 'Lager-Details', subtitle: 'Details zu einem Lager', icon: Icons.inventory_2),
         ],
       ),
     ];
@@ -178,9 +137,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 246),
               curve: Curves.fastOutSlowIn,
-              color: widget.enabled
-                  ? Colors.transparent
-                  : Theme.of(context).colorScheme.scrim.withValues(alpha: 0.35),
+              color: widget.enabled ? Colors.transparent : Theme.of(context).colorScheme.scrim.withValues(alpha: 0.35),
             ),
           ),
         ),
@@ -188,15 +145,9 @@ class _NavigationMenuState extends State<NavigationMenu> {
     );
   }
 
-  Widget _buildRecursive(
-    BuildContext context,
-    NavigationItem item,
-    String caption,
-    int level,
-  ) {
+  Widget _buildRecursive(BuildContext context, NavigationItem item, String caption, int level) {
     if (caption.isNotEmpty) {
-      caption =
-          "$caption \u2192 ${item.title}"; // \u203A \u27A4 \u25BB \u2192 \u21D2
+      caption = "$caption \u2192 ${item.title}"; // \u203A \u27A4 \u25BB \u2192 \u21D2
     } else {
       caption = item.title;
     }
@@ -207,18 +158,10 @@ class _NavigationMenuState extends State<NavigationMenu> {
         leading: Icon(item.icon),
         title: Text(
           item.title,
-          style: TextStyle(
-            fontSize: (level == 0) ? 16.0 : 14.0,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: (level == 0) ? 16.0 : 14.0, fontWeight: FontWeight.w600),
         ),
-        subtitle: item.subtitle != null
-            ? Text(item.subtitle!, style: const TextStyle(fontSize: 12))
-            : null,
-        children: [
-          for (var subItem in item.children)
-            _buildRecursive(context, subItem, caption, level + 1),
-        ],
+        subtitle: item.subtitle != null ? Text(item.subtitle!, style: const TextStyle(fontSize: 12)) : null,
+        children: [for (var subItem in item.children) _buildRecursive(context, subItem, caption, level + 1)],
       );
     } else {
       item.caption = caption;
@@ -227,19 +170,11 @@ class _NavigationMenuState extends State<NavigationMenu> {
         leading: Icon(item.icon),
         title: Text(
           item.title,
-          style: TextStyle(
-            fontSize: (level == 0) ? 16.0 : 14.0,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: (level == 0) ? 16.0 : 14.0, fontWeight: FontWeight.w600),
         ),
-        subtitle: item.subtitle != null
-            ? Text(item.subtitle!, style: TextStyle(fontSize: 10))
-            : null,
-        selected:
-            widget.enabled &&
-            (widget.selectedNavigationId == item.navigationId),
-        selectedTileColor: Theme.of(context).colorScheme.primaryContainer
-            .withValues(alpha: 0.3),
+        subtitle: item.subtitle != null ? Text(item.subtitle!, style: TextStyle(fontSize: 10)) : null,
+        selected: widget.enabled && (widget.selectedNavigationId == item.navigationId),
+        selectedTileColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
         onTap: () => widget.onItemSelected(item),
       );
     }
