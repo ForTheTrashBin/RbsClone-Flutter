@@ -14,8 +14,8 @@ void main() {
     });
 
     // The exact length of the IBAN required in that country
-    // int ibanlenth
-    test('to test the property `ibanlenth`', () async {
+    // int ibanlength
+    test('to test the property `ibanlength`', () async {
       // TODO
     });
 

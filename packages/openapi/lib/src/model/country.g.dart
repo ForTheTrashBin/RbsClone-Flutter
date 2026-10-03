@@ -10,7 +10,7 @@ class _$Country extends Country {
   @override
   final int flags;
   @override
-  final int? ibanlenth;
+  final int? ibanlength;
   @override
   final String id;
   @override
@@ -25,7 +25,7 @@ class _$Country extends Country {
 
   _$Country._(
       {required this.flags,
-      this.ibanlenth,
+      this.ibanlength,
       required this.id,
       required this.name,
       required this.risktype,
@@ -43,7 +43,7 @@ class _$Country extends Country {
     if (identical(other, this)) return true;
     return other is Country &&
         flags == other.flags &&
-        ibanlenth == other.ibanlenth &&
+        ibanlength == other.ibanlength &&
         id == other.id &&
         name == other.name &&
         risktype == other.risktype &&
@@ -54,7 +54,7 @@ class _$Country extends Country {
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, flags.hashCode);
-    _$hash = $jc(_$hash, ibanlenth.hashCode);
+    _$hash = $jc(_$hash, ibanlength.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, risktype.hashCode);
@@ -67,7 +67,7 @@ class _$Country extends Country {
   String toString() {
     return (newBuiltValueToStringHelper(r'Country')
           ..add('flags', flags)
-          ..add('ibanlenth', ibanlenth)
+          ..add('ibanlength', ibanlength)
           ..add('id', id)
           ..add('name', name)
           ..add('risktype', risktype)
@@ -83,9 +83,9 @@ class CountryBuilder implements Builder<Country, CountryBuilder> {
   int? get flags => _$this._flags;
   set flags(int? flags) => _$this._flags = flags;
 
-  int? _ibanlenth;
-  int? get ibanlenth => _$this._ibanlenth;
-  set ibanlenth(int? ibanlenth) => _$this._ibanlenth = ibanlenth;
+  int? _ibanlength;
+  int? get ibanlength => _$this._ibanlength;
+  set ibanlength(int? ibanlength) => _$this._ibanlength = ibanlength;
 
   String? _id;
   String? get id => _$this._id;
@@ -111,7 +111,7 @@ class CountryBuilder implements Builder<Country, CountryBuilder> {
     final $v = _$v;
     if ($v != null) {
       _flags = $v.flags;
-      _ibanlenth = $v.ibanlenth;
+      _ibanlength = $v.ibanlength;
       _id = $v.id;
       _name = $v.name;
       _risktype = $v.risktype;
@@ -139,7 +139,7 @@ class CountryBuilder implements Builder<Country, CountryBuilder> {
         _$Country._(
           flags:
               BuiltValueNullFieldError.checkNotNull(flags, r'Country', 'flags'),
-          ibanlenth: ibanlenth,
+          ibanlength: ibanlength,
           id: BuiltValueNullFieldError.checkNotNull(id, r'Country', 'id'),
           name: BuiltValueNullFieldError.checkNotNull(name, r'Country', 'name'),
           risktype: BuiltValueNullFieldError.checkNotNull(

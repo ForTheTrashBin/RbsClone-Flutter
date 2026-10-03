@@ -10,7 +10,7 @@ class _$CountryNoPK extends CountryNoPK {
   @override
   final int flags;
   @override
-  final int? ibanlenth;
+  final int? ibanlength;
   @override
   final String name;
   @override
@@ -23,7 +23,7 @@ class _$CountryNoPK extends CountryNoPK {
 
   _$CountryNoPK._(
       {required this.flags,
-      this.ibanlenth,
+      this.ibanlength,
       required this.name,
       required this.risktype,
       required this.shortcode})
@@ -40,7 +40,7 @@ class _$CountryNoPK extends CountryNoPK {
     if (identical(other, this)) return true;
     return other is CountryNoPK &&
         flags == other.flags &&
-        ibanlenth == other.ibanlenth &&
+        ibanlength == other.ibanlength &&
         name == other.name &&
         risktype == other.risktype &&
         shortcode == other.shortcode;
@@ -50,7 +50,7 @@ class _$CountryNoPK extends CountryNoPK {
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, flags.hashCode);
-    _$hash = $jc(_$hash, ibanlenth.hashCode);
+    _$hash = $jc(_$hash, ibanlength.hashCode);
     _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, risktype.hashCode);
     _$hash = $jc(_$hash, shortcode.hashCode);
@@ -62,7 +62,7 @@ class _$CountryNoPK extends CountryNoPK {
   String toString() {
     return (newBuiltValueToStringHelper(r'CountryNoPK')
           ..add('flags', flags)
-          ..add('ibanlenth', ibanlenth)
+          ..add('ibanlength', ibanlength)
           ..add('name', name)
           ..add('risktype', risktype)
           ..add('shortcode', shortcode))
@@ -77,9 +77,9 @@ class CountryNoPKBuilder implements Builder<CountryNoPK, CountryNoPKBuilder> {
   int? get flags => _$this._flags;
   set flags(int? flags) => _$this._flags = flags;
 
-  int? _ibanlenth;
-  int? get ibanlenth => _$this._ibanlenth;
-  set ibanlenth(int? ibanlenth) => _$this._ibanlenth = ibanlenth;
+  int? _ibanlength;
+  int? get ibanlength => _$this._ibanlength;
+  set ibanlength(int? ibanlength) => _$this._ibanlength = ibanlength;
 
   String? _name;
   String? get name => _$this._name;
@@ -101,7 +101,7 @@ class CountryNoPKBuilder implements Builder<CountryNoPK, CountryNoPKBuilder> {
     final $v = _$v;
     if ($v != null) {
       _flags = $v.flags;
-      _ibanlenth = $v.ibanlenth;
+      _ibanlength = $v.ibanlength;
       _name = $v.name;
       _risktype = $v.risktype;
       _shortcode = $v.shortcode;
@@ -128,7 +128,7 @@ class CountryNoPKBuilder implements Builder<CountryNoPK, CountryNoPKBuilder> {
         _$CountryNoPK._(
           flags: BuiltValueNullFieldError.checkNotNull(
               flags, r'CountryNoPK', 'flags'),
-          ibanlenth: ibanlenth,
+          ibanlength: ibanlength,
           name: BuiltValueNullFieldError.checkNotNull(
               name, r'CountryNoPK', 'name'),
           risktype: BuiltValueNullFieldError.checkNotNull(

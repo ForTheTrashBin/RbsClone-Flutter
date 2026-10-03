@@ -8,7 +8,7 @@ components:
           format: int16
           minimum: 0
           type: integer
-        ibanlenth:
+        ibanlength:
           description: The exact length of the IBAN required in that country
           format: int16
           maximum: 34
@@ -70,7 +70,7 @@ components:
           format: int16
           minimum: 0
           type: integer
-        ibanlenth:
+        ibanlength:
           description: The exact length of the IBAN required in that country
           format: int16
           maximum: 34
@@ -422,10 +422,9 @@ paths:
                 $ref: "#/components/schemas/Country"
           description: Created
           headers:
-            Location:
-              description: URL of the newly created entity
+            Header:
               schema:
-                type: string
+                $ref: "#/components/schemas/LocationHeader"
         default:
           content:
             application/problem+json:
@@ -594,10 +593,9 @@ paths:
                 $ref: "#/components/schemas/Custodian"
           description: Created
           headers:
-            Location:
-              description: URL of the newly created entity
+            Header:
               schema:
-                type: string
+                $ref: "#/components/schemas/LocationHeader"
         default:
           content:
             application/problem+json:
@@ -766,10 +764,9 @@ paths:
                 $ref: "#/components/schemas/Exchange"
           description: Created
           headers:
-            Location:
-              description: URL of the newly created entity
+            Header:
               schema:
-                type: string
+                $ref: "#/components/schemas/LocationHeader"
         default:
           content:
             application/problem+json:

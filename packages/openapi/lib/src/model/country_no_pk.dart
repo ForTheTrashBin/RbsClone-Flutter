@@ -12,7 +12,7 @@ part 'country_no_pk.g.dart';
 ///
 /// Properties:
 /// * [flags] - Some binary encoded flags for this data (see external documentation)
-/// * [ibanlenth] - The exact length of the IBAN required in that country
+/// * [ibanlength] - The exact length of the IBAN required in that country
 /// * [name] - A longer more descriptive description of this data
 /// * [risktype] - This risk profile of this country
 /// * [shortcode] - A unique short name for this data
@@ -23,8 +23,8 @@ abstract class CountryNoPK implements Built<CountryNoPK, CountryNoPKBuilder> {
   int get flags;
 
   /// The exact length of the IBAN required in that country
-  @BuiltValueField(wireName: r'ibanlenth')
-  int? get ibanlenth;
+  @BuiltValueField(wireName: r'ibanlength')
+  int? get ibanlength;
 
   /// A longer more descriptive description of this data
   @BuiltValueField(wireName: r'name')
@@ -66,10 +66,10 @@ class _$CountryNoPKSerializer implements PrimitiveSerializer<CountryNoPK> {
       object.flags,
       specifiedType: const FullType(int),
     );
-    if (object.ibanlenth != null) {
-      yield r'ibanlenth';
+    if (object.ibanlength != null) {
+      yield r'ibanlength';
       yield serializers.serialize(
-        object.ibanlenth,
+        object.ibanlength,
         specifiedType: const FullType(int),
       );
     }
@@ -120,13 +120,13 @@ class _$CountryNoPKSerializer implements PrimitiveSerializer<CountryNoPK> {
           ) as int;
           result.flags = valueDes;
           break;
-        case r'ibanlenth':
+        case r'ibanlength':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType.nullable(int),
           ) as int?;
           if (valueDes == null) continue;
-          result.ibanlenth = valueDes;
+          result.ibanlength = valueDes;
           break;
         case r'name':
           final valueDes = serializers.deserialize(
